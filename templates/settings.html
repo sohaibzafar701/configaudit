@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Settings - NCRT{% endblock %}
+
+{% block breadcrumb_current %}Settings{% endblock %}
+
+{% block content %}
+<section class="bg-white rounded-lg shadow p-6">
+    <h2 class="text-2xl font-bold mb-4">Settings</h2>
+    <div class="space-y-6">
+        <div>
+            <h3 class="text-lg font-semibold mb-2">Database</h3>
+            <div class="space-y-2">
+                <button onclick="backupDatabase()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                    <i class="fas fa-download mr-2"></i>Backup Database
+                </button>
+                <button onclick="optimizeDatabase()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+                    <i class="fas fa-compress mr-2"></i>Optimize Database
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    async function backupDatabase() {
+        window.location.href = '/api/settings/backup';
+    }
+    
+    async function optimizeDatabase() {
+        const result = await fetch('/api/settings/optimize', { method: 'POST' });
+        const data = await result.json();
+        if (result.ok) {
+            showToast('Database optimized successfully', 'success');
+        } else {
+            showToast(data.error || 'Failed to optimize database', 'error');
+        }
+    }
+</script>
+{% endblock %}

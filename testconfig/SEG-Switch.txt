@@ -1,0 +1,340 @@
+=~=~=~=~=~=~=~=~=~=~=~= PuTTY log 2025.12.01 10:56:47 =~=~=~=~=~=~=~=~=~=~=~=
+login as: abcuser
+Keyboard-interactive authentication prompts from server:
+| Password: 
+End of keyboard-interactive prompts from server
+CCCUnauthorized use of this system is prohibited.This switch is property of ABC and is intended to be use by Authorized only
+
+
+
+SEG-Switch#show running-config 
+Building configuration...
+
+Current configuration : 23000 bytes
+!
+! Last configuration change at 14:39:44 UTC Wed Nov 5 2025 by abcuser
+!
+version 17.6
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+service call-home
+platform punt-keepalive disable-kernel-core
+!
+hostname SEG-Switch
+!
+!
+vrf definition Mgmt-vrf
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+ --More--         enable secret 9 $9$9RLVR9xZqlB6Uk$e2jnAjKEvygLv7lroaXtLVTTCLqLiEeKDMivhWZ.E8I
+!
+!
+!
+!
+no aaa new-model
+switch 1 provision c9200l-48t-4g
+switch 2 provision c9200l-48t-4g
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+ip domain name abc.com
+!
+!
+!
+login on-success log
+ --More--         !
+crypto pki trustpoint SLA-TrustPoint
+ enrollment pkcs12
+ revocation-check crl
+!
+crypto pki trustpoint TP-self-signed-1602209878
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-1602209878
+ revocation-check none
+ rsakeypair TP-self-signed-1602209878
+!
+!
+crypto pki certificate chain SLA-TrustPoint
+ certificate ca 01
+  30820321 30820209 A0030201 02020101 300D0609 2A864886 F70D0101 0B050030 
+  32310E30 0C060355 040A1305 43697363 6F312030 1E060355 04031317 43697363 
+  6F204C69 63656E73 696E6720 526F6F74 20434130 1E170D31 33303533 30313934 
+  3834375A 170D3338 30353330 31393438 34375A30 32310E30 0C060355 040A1305 
+  43697363 6F312030 1E060355 04031317 43697363 6F204C69 63656E73 696E6720 
+  526F6F74 20434130 82012230 0D06092A 864886F7 0D010101 05000382 010F0030 
+  82010A02 82010100 A6BCBD96 131E05F7 145EA72C 2CD686E6 17222EA1 F1EFF64D 
+  CBB4C798 212AA147 C655D8D7 9471380D 8711441E 1AAF071A 9CAE6388 8A38E520 
+  1C394D78 462EF239 C659F715 B98C0A59 5BBB5CBD 0CFEBEA3 700A8BF7 D8F256EE 
+ --More--           4AA4E80D DB6FD1C9 60B1FD18 FFC69C96 6FA68957 A2617DE7 104FDC5F EA2956AC 
+  7390A3EB 2B5436AD C847A2C5 DAB553EB 69A9A535 58E9F3E3 C0BD23CF 58BD7188 
+  68E69491 20F320E7 948E71D7 AE3BCC84 F10684C7 4BC8E00F 539BA42B 42C68BB7 
+  C7479096 B4CB2D62 EA2F505D C7B062A4 6811D95B E8250FC4 5D5D5FB8 8F27D191 
+  C55F0D76 61F9A4CD 3D992327 A8BB03BD 4E6D7069 7CBADF8B DF5F4368 95135E44 
+  DFC7C6CF 04DD7FD1 02030100 01A34230 40300E06 03551D0F 0101FF04 04030201 
+  06300F06 03551D13 0101FF04 05300301 01FF301D 0603551D 0E041604 1449DC85 
+  4B3D31E5 1B3E6A17 606AF333 3D3B4C73 E8300D06 092A8648 86F70D01 010B0500 
+  03820101 00507F24 D3932A66 86025D9F E838AE5C 6D4DF6B0 49631C78 240DA905 
+  604EDCDE FF4FED2B 77FC460E CD636FDB DD44681E 3A5673AB 9093D3B1 6C9E3D8B 
+  D98987BF E40CBD9E 1AECA0C2 2189BB5C 8FA85686 CD98B646 5575B146 8DFC66A8 
+  467A3DF4 4D565700 6ADF0F0D CF835015 3C04FF7C 21E878AC 11BA9CD2 55A9232C 
+  7CA7B7E6 C1AF74F6 152E99B7 B1FCF9BB E973DE7F 5BDDEB86 C71E3B49 1765308B 
+  5FB0DA06 B92AFE7F 494E8A9E 07B85737 F3A58BE1 1A48A229 C37C1E69 39F08678 
+  80DDCD16 D6BACECA EEBC7CF9 8428787B 35202CDC 60E4616A B623CDBD 230E3AFB 
+  418616A9 4093E049 4D10AB75 27E86F73 932E35B5 8862FDAE 0275156F 719BB2F0 
+  D697DF7F 28
+  	quit
+crypto pki certificate chain TP-self-signed-1602209878
+ certificate self-signed 01
+  30820330 30820218 A0030201 02020101 300D0609 2A864886 F70D0101 05050030 
+  31312F30 2D060355 04031326 494F532D 53656C66 2D536967 6E65642D 43657274 
+  69666963 6174652D 31363032 32303938 3738301E 170D3234 30333136 31343035 
+ --More--           32325A17 0D333430 33313631 34303532 325A3031 312F302D 06035504 03132649 
+  4F532D53 656C662D 5369676E 65642D43 65727469 66696361 74652D31 36303232 
+  30393837 38308201 22300D06 092A8648 86F70D01 01010500 0382010F 00308201 
+  0A028201 0100C33B FA737838 1024D1E8 AA320BA5 D5D2F5C5 FC2585D9 BADC722B 
+  B64F51FA E0533FB9 FA255635 5D6CEE74 4938B76C E8CB7D4C 426312DF 1EAADB18 
+  F38D9F6D DE7EEF15 91BC6A16 F394879D BF43B46F AC6F3E0F C6CB9CF3 7ED85F9F 
+  7FFA4EE9 F417B373 A123FD56 DC2C0F53 BD8701EA 5A866255 8B2DDD72 E1BFA65B 
+  72646207 B6B340CE A108EBEF F987C130 86014618 9F64C538 C404AFB0 F80E5246 
+  9DE6D45E B44E666A 6905011E 2F569E4E 76C96315 17C10119 3046164C E6A7CA5D 
+  15D385E2 7D0BBB38 155B227A F16CCCBA EDAD2EEC 0EC69F83 25CA3602 A6BDA018 
+  70AFD6C7 D7B1AB47 82F6370B 4099BEE6 8F6366E3 A51BF508 9B330C4F BFD921C0 
+  CE1A74CF BB3F0203 010001A3 53305130 0F060355 1D130101 FF040530 030101FF 
+  301F0603 551D2304 18301680 14D1397F 84CBEA94 6AF87D47 065BD018 D6A1FAAF 
+  C0301D06 03551D0E 04160414 D1397F84 CBEA946A F87D4706 5BD018D6 A1FAAFC0 
+  300D0609 2A864886 F70D0101 05050003 82010100 831171A2 F980ABFC 0D91F9FD 
+  4C4471FA C1446A63 78EDA5F6 F75FB9AB C6978014 ABDD8376 39F33889 36DF0261 
+  F42321CD BB4D59DB 14FEB288 9DA168CF 03BCD8DA D96FD792 BC27ECF4 4F3FD9E2 
+  DB8858EA 3C0EBB9E F8536FA5 542CE3CF ED04FF4A D21EDA2B 461E96E7 DD969089 
+  DFAEA063 9C9753A3 B0079140 D1CCF49B C3D6F344 CE914914 2275A922 7A2FF1A1 
+  62132A72 5D578AD0 C6B53D9C A80FA660 19DE2167 D50C158C EA5F0DFA EFB0EB95 
+  CF7DD9AB CBF6B52A 664ECD60 C581473A 4DAB6CCB AF7B37E6 081316FB C51A5857 
+  E3D024B1 569B1C45 4FBA7CB5 6A519030 A9DC05C4 34C10A5E 4E95CD02 322012C9 
+  EE91EC41 E7E08162 EC9089E7 B3301B1F 30F1581A
+ --More--           	quit
+!
+license boot level network-essentials addon dna-essentials
+!
+!
+diagnostic bootup level minimal
+!
+spanning-tree mode rapid-pvst
+spanning-tree extend system-id
+memory free low-watermark processor 10623
+!
+username abcuser privilege 15 password 7 13031A140922243E3C743A3871
+username root privilege 15 password 7 094A430F1B2B37061C5C16216F7579616700
+!
+redundancy
+ mode sso
+crypto engine compliance shield disable
+!
+!
+transceiver type all
+ --More--          monitoring
+!
+vlan 169
+ name CO-W-Aggregate
+!
+!
+class-map match-any system-cpp-police-ewlc-control
+  description EWLC Control 
+ --More--         class-map match-any system-cpp-police-topology-control
+  description Topology control
+class-map match-any system-cpp-police-sw-forward
+  description Sw forwarding, L2 LVX data packets, LOGGING, Transit Traffic
+class-map match-any system-cpp-default
+  description EWLC data, Inter FED Traffic 
+class-map match-any system-cpp-police-sys-data
+  description Openflow, Exception, EGR Exception, NFL Sampled Data, RPF Failed
+class-map match-any system-cpp-police-punt-webauth
+  description Punt Webauth
+class-map match-any system-cpp-police-l2lvx-control
+  description L2 LVX control packets
+class-map match-any system-cpp-police-forus
+  description Forus Address resolution and Forus traffic
+class-map match-any system-cpp-police-multicast-end-station
+  description MCAST END STATION
+class-map match-any system-cpp-police-high-rate-app
+  description High Rate Applications 
+class-map match-any system-cpp-police-multicast
+  description MCAST Data
+class-map match-any system-cpp-police-l2-control
+  description L2 control
+class-map match-any system-cpp-police-dot1x-auth
+ --More--           description DOT1X Auth
+class-map match-any system-cpp-police-data
+  description ICMP redirect, ICMP_GEN and BROADCAST
+class-map match-any system-cpp-police-stackwise-virt-control
+  description Stackwise Virtual OOB
+class-map match-any non-client-nrt-class
+class-map match-any system-cpp-police-routing-control
+  description Routing control and Low Latency
+class-map match-any system-cpp-police-protocol-snooping
+  description Protocol snooping
+class-map match-any system-cpp-police-dhcp-snooping
+  description DHCP snooping
+class-map match-any system-cpp-police-ios-routing
+  description L2 control, Topology control, Routing control, Low Latency
+class-map match-any system-cpp-police-system-critical
+  description System Critical and Gold Pkt
+class-map match-any system-cpp-police-ios-feature
+  description ICMPGEN,BROADCAST,ICMP,L2LVXCntrl,ProtoSnoop,PuntWebauth,MCASTData,Transit,DOT1XAuth,Swfwd,LOGGING,L2LVXData,ForusTraffic,ForusARP,McastEndStn,Openflow,Exception,EGRExcption,NflSampled,RpfFailed
+!
+policy-map system-cpp-policy
+!
+interface GigabitEthernet0/0
+ vrf forwarding Mgmt-vrf
+ no ip address
+!
+interface GigabitEthernet1/0/6
+ description *********UP-LINK-Extranet-Firewall-A-P-6********
+ switchport trunk allowed vlan 3006-3008,3019,3020
+ switchport mode trunk
+!
+interface GigabitEthernet1/0/46
+ description ************PA-Active-Port-1*********
+ switchport trunk allowed vlan 65,67
+ switchport mode trunk
+!
+interface GigabitEthernet1/0/47
+ description ************MGMT-DIS-P-16***************
+ --More--          switchport access vlan 217
+ switchport mode access
+!
+interface GigabitEthernet2/0/28
+!
+interface GigabitEthernet2/0/29
+ description ******E-Access-Aggregation-UP-Link***********
+ switchport access vlan 2228
+ --More--          switchport mode access
+!
+interface GigabitEthernet2/0/32
+!
+interface GigabitEthernet2/0/33
+ switchport access vlan 3029
+ switchport mode access
+!
+interface GigabitEthernet2/0/34
+!
+interface GigabitEthernet2/0/35
+ description ********SEG-SW-2-Port-38-TO-DC-FW-2--Port-3-UP-Link**********
+ switchport trunk allowed vlan 172
+ switchport mode trunk
+!
+interface GigabitEthernet2/0/36
+ --More--          description *****J-Core-SEG-SW-2-P-36-TO-EXT-FW-2-P-2*********
+ switchport access vlan 111
+ switchport mode access
+!
+interface GigabitEthernet2/0/38
+ description ******1-Link-J-P-3********
+ switchport trunk allowed vlan 825,3604
+ switchport mode trunk
+ spanning-tree bpdufilter enable
+!
+interface GigabitEthernet2/0/39
+ description **********CO-TEEN-INT-P-6-W-SWITCH***********
+ switchport access vlan 3013
+ switchport mode access
+!
+interface GigabitEthernet2/0/40
+ description ********MPLS-PTCL-P-4*********
+ switchport access vlan 3011
+ --More--          switchport mode access
+!
+interface GigabitEthernet2/0/43
+ description **************P-Aggregation**************
+ switchport access vlan 3009
+ switchport mode access
+!
+interface GigabitEthernet2/0/44
+ description ********MPLS-C-N-W-F-BISP********
+ switchport access vlan 3002
+ switchport mode access
+!
+interface GigabitEthernet2/0/45
+ --More--          description **********PA-Passive-Port-1---N-UPlink*************
+ switchport trunk allowed vlan 65,67
+ switchport mode trunk
+!
+interface GigabitEthernet2/0/46
+ description **********N-SIP-ONT-P-2*********
+ switchport access vlan 69
+ switchport mode access
+!
+interface Vlan1
+ no ip address
+ --More--         !
+interface Vlan217
+ ip address 172.16.1.247 255.255.255.224
+!
+ip default-gateway 172.16.1.254
+ip forward-protocol nd
+no ip http server
+ip http authentication local
+no ip http secure-server
+ip route 0.0.0.0 0.0.0.0 172.16.1.254
+ip ssh version 2
+ip ssh server algorithm mac hmac-sha2-256
+ip ssh server algorithm encryption aes256-cbc
+!
+snmp-server engineID remote 192.168.1.152 udp-port 161 80000009030000FCBA4A693B 
+snmp-server group switches v3 auth 
+snmp-server group abcd@Sw!tc# v3 auth 
+snmp-server community Problem1nRTG$ RO
+snmp-server trap-source Vlan217
+snmp-server source-interface informs Vlan217
+ --More--         snmp-server enable traps snmp authentication linkdown linkup coldstart warmstart
+snmp-server enable traps flowmon
+snmp-server enable traps call-home message-send-fail server-fail
+snmp-server enable traps tty
+snmp-server enable traps cpu threshold
+snmp-server enable traps stackwise
+snmp-server enable traps power-ethernet police
+snmp-server host 192.168.1.152 version 3 auth abcd@Sw!tc# 
+!
+control-plane
+ service-policy input system-cpp-policy
+!
+banner motd ^CCCCUnauthorized use of this system is prohibited.This switch is property of ABC and is intended to be use by Authorized only^C
+!
+line con 0
+ stopbits 1
+line aux 0
+line vty 0 4
+ login local
+ transport input ssh
+line vty 5 15
+ login local
+ --More--          transport input ssh
+!
+call-home
+ ! If contact email address in call-home is configured as sch-smart-licensing@cisco.com
+ ! the email address configured in Cisco Smart License Portal will be used as contact email address to send SCH notifications.
+ contact-email-addr sch-smart-licensing@cisco.com
+ profile "CiscoTAC-1"
+  active
+  destination transport-method http
+!
+!
+!
+!
+!
+!
+end
+
+SEG-Switch#    exit

@@ -1,0 +1,702 @@
+{% extends "base.html" %}
+
+{% block title %}Rules - NCRT{% endblock %}
+
+{% block breadcrumb_current %}Rules{% endblock %}
+
+{% block content %}
+<section class="bg-white rounded-lg shadow p-6 mb-6">
+    <div class="mb-6">
+        <h2 class="text-2xl font-bold mb-2">Rules Management</h2>
+        <p class="text-gray-600">Manage security audit rules and compliance frameworks.</p>
+    </div>
+    
+    <div class="mb-6">
+        <div class="flex justify-between items-center mb-4">
+            <div>
+                <h3 class="text-xl font-semibold">Rules Library</h3>
+                <p class="text-sm text-gray-600 mt-1">
+                    Showing <span id="ruleCount" class="font-semibold">0</span> rule(s)
+                </p>
+            </div>
+            <button onclick="showCreateRuleModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                <i class="fas fa-plus mr-2"></i>Add New Rule
+            </button>
+        </div>
+        
+        <!-- Filter Row 1 -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+            <div>
+                <label for="filterVendor" class="block text-sm font-medium text-gray-700 mb-1">Vendor</label>
+                <select id="filterVendor" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="All Vendors">All Vendors</option>
+                </select>
+            </div>
+            <div>
+                <label for="filterCategory" class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                <select id="filterCategory" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="All Categories">All Categories</option>
+                </select>
+            </div>
+            <div>
+                <label for="filterSeverity" class="block text-sm font-medium text-gray-700 mb-1">Severity</label>
+                <select id="filterSeverity" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="All Severities">All Severities</option>
+                </select>
+            </div>
+            <div>
+                <label for="filterType" class="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                <select id="filterType" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="All Types">All Types</option>
+                </select>
+            </div>
+        </div>
+        
+        <!-- Filter Row 2 -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+                <label for="filterStatus" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                <select id="filterStatus" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="All Status">All Status</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    
+    <div id="rulesList" class="space-y-4">
+        <p class="text-gray-500">Loading rules...</p>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Simplified rules management - full rules.js should be inlined here
+    async function apiRequest(url, method = 'GET', data = null) {
+        const options = { method, headers: { 'Content-Type': 'application/json' } };
+        if (data && method !== 'GET') options.body = JSON.stringify(data);
+        try {
+            const response = await fetch(url, options);
+            const result = await response.json();
+            return { ok: response.ok, data: result, status: response.status };
+        } catch (error) {
+            console.error('API request failed:', error);
+            return { ok: false, error: error.message };
+        }
+    }
+    
+    let filterOptions = {
+        vendors: [],
+        categories: [],
+        severities: [],
+        types: [],
+        statuses: []
+    };
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        loadFilterOptions();
+        loadRules();
+        
+        // Add event listeners to filter dropdowns
+        document.getElementById('filterVendor').addEventListener('change', loadRules);
+        document.getElementById('filterCategory').addEventListener('change', loadRules);
+        document.getElementById('filterSeverity').addEventListener('change', loadRules);
+        document.getElementById('filterType').addEventListener('change', loadRules);
+        document.getElementById('filterStatus').addEventListener('change', loadRules);
+    });
+    
+    async function loadFilterOptions() {
+        const result = await apiRequest('/api/rules/filter-options');
+        if (result.ok && result.data) {
+            filterOptions = result.data;
+            
+            // Populate vendor dropdown
+            const vendorSelect = document.getElementById('filterVendor');
+            vendorSelect.innerHTML = filterOptions.vendors.map(v => 
+                `<option value="${v}">${escapeHtml(v)}</option>`
+            ).join('');
+            
+            // Populate category dropdown
+            const categorySelect = document.getElementById('filterCategory');
+            categorySelect.innerHTML = filterOptions.categories.map(c => 
+                `<option value="${c}">${escapeHtml(c)}</option>`
+            ).join('');
+            
+            // Populate severity dropdown
+            const severitySelect = document.getElementById('filterSeverity');
+            severitySelect.innerHTML = filterOptions.severities.map(s => 
+                `<option value="${s}">${escapeHtml(s)}</option>`
+            ).join('');
+            
+            // Populate type dropdown
+            const typeSelect = document.getElementById('filterType');
+            typeSelect.innerHTML = filterOptions.types.map(t => 
+                `<option value="${t}">${escapeHtml(t.charAt(0).toUpperCase() + t.slice(1))}</option>`
+            ).join('');
+            
+            // Populate status dropdown
+            const statusSelect = document.getElementById('filterStatus');
+            statusSelect.innerHTML = filterOptions.statuses.map(s => 
+                `<option value="${s}">${escapeHtml(s)}</option>`
+            ).join('');
+        }
+    }
+    
+    async function loadRules() {
+        const container = document.getElementById('rulesList');
+        
+        // Get current filter values
+        const vendor = document.getElementById('filterVendor').value;
+        const category = document.getElementById('filterCategory').value;
+        const severity = document.getElementById('filterSeverity').value;
+        const type = document.getElementById('filterType').value;
+        const status = document.getElementById('filterStatus').value;
+        
+        // Build query string
+        const params = new URLSearchParams();
+        if (vendor && vendor !== 'All Vendors') params.append('vendor', vendor);
+        if (category && category !== 'All Categories') params.append('category', category);
+        if (severity && severity !== 'All Severities') params.append('severity', severity.toLowerCase());
+        if (type && type !== 'All Types') params.append('type', type.toLowerCase());
+        if (status && status !== 'All Status') params.append('status', status);
+        
+        const url = '/api/rules' + (params.toString() ? '?' + params.toString() : '');
+        const result = await apiRequest(url);
+        
+        if (result.ok && Array.isArray(result.data)) {
+            // Update rule count
+            const ruleCountElement = document.getElementById('ruleCount');
+            if (ruleCountElement) {
+                ruleCountElement.textContent = result.data.length;
+            }
+            
+            if (result.data.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8">
+                        <p class="text-gray-500 mb-4">No rules found matching the current filters.</p>
+                    </div>
+                `;
+                return;
+            }
+            container.innerHTML = result.data.map(rule => `
+                <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                    <div class="flex justify-between items-start">
+                        <div class="flex-1">
+                            <h3 class="font-semibold text-lg">${escapeHtml(rule.name || 'Unnamed')}</h3>
+                            <p class="text-sm text-gray-600 mt-1">${escapeHtml(rule.description || 'No description')}</p>
+                            <div class="mt-3 flex flex-wrap gap-2">
+                                <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs font-medium">${rule.rule_type || 'pattern'}</span>
+                                <span class="px-2 py-1 bg-gray-100 text-gray-800 rounded text-xs">${rule.category || 'Uncategorized'}</span>
+                                <span class="px-2 py-1 ${rule.severity === 'critical' ? 'bg-red-100 text-red-800' : rule.severity === 'high' ? 'bg-orange-100 text-orange-800' : rule.severity === 'medium' ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800'} rounded text-xs font-medium">${rule.severity || 'medium'}</span>
+                                ${rule.enabled ? '<span class="px-2 py-1 bg-green-100 text-green-800 rounded text-xs">Enabled</span>' : '<span class="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs">Disabled</span>'}
+                            </div>
+                        </div>
+                        <div class="flex space-x-2 ml-4">
+                            <button onclick="editRule(${rule.id})" class="text-blue-600 hover:text-blue-800 p-2 hover:bg-blue-50 rounded" title="Edit rule">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="deleteRule(${rule.id})" class="text-red-600 hover:text-red-800 p-2 hover:bg-red-50 rounded" title="Delete rule">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        } else {
+            // Update rule count to 0 on error
+            const ruleCountElement = document.getElementById('ruleCount');
+            if (ruleCountElement) {
+                ruleCountElement.textContent = '0';
+            }
+            container.innerHTML = `
+                <div class="text-center py-8">
+                    <p class="text-red-600 mb-2">Error loading rules</p>
+                    <p class="text-sm text-gray-600">${result.error || 'Unknown error occurred'}</p>
+                </div>
+            `;
+        }
+    }
+    
+    let currentEditingRuleId = null;
+    
+    function showCreateRuleModal() {
+        currentEditingRuleId = null;
+        openRuleModal();
+    }
+    
+    async function editRule(id) {
+        currentEditingRuleId = id;
+        const result = await apiRequest(`/api/rules/${id}`);
+        if (result.ok && result.data) {
+            openRuleModal(result.data);
+        } else {
+            showToast('Failed to load rule for editing', 'error');
+        }
+    }
+    
+    function openRuleModal(ruleData = null) {
+        // Create modal HTML
+        const modalHTML = `
+            <div id="ruleModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+                <div class="bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+                    <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+                        <h3 class="text-xl font-bold">${ruleData ? 'Edit Rule' : 'Add New Rule'}</h3>
+                        <button onclick="closeRuleModal()" class="text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <form id="ruleForm" class="p-6 space-y-4">
+                        <div>
+                            <label for="ruleName" class="block text-sm font-medium text-gray-700 mb-1">
+                                Rule Name <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" id="ruleName" required 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                value="${ruleData ? escapeHtml(ruleData.name || '') : ''}">
+                        </div>
+                        
+                        <div>
+                            <label for="ruleDescription" class="block text-sm font-medium text-gray-700 mb-1">
+                                Description
+                            </label>
+                            <textarea id="ruleDescription" rows="3"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">${ruleData ? escapeHtml(ruleData.description || '') : ''}</textarea>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label for="ruleType" class="block text-sm font-medium text-gray-700 mb-1">
+                                    Rule Type <span class="text-red-500">*</span>
+                                </label>
+                                <select id="ruleType" required
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="pattern" ${ruleData && ruleData.rule_type === 'pattern' ? 'selected' : ''}>Pattern</option>
+                                    <option value="python" ${ruleData && ruleData.rule_type === 'python' ? 'selected' : ''}>Python</option>
+                                    <option value="hybrid" ${ruleData && ruleData.rule_type === 'hybrid' ? 'selected' : ''}>Hybrid</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label for="ruleSeverity" class="block text-sm font-medium text-gray-700 mb-1">
+                                    Severity <span class="text-red-500">*</span>
+                                </label>
+                                <select id="ruleSeverity" required
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="critical" ${ruleData && ruleData.severity === 'critical' ? 'selected' : ''}>Critical</option>
+                                    <option value="high" ${ruleData && ruleData.severity === 'high' ? 'selected' : ''}>High</option>
+                                    <option value="medium" ${ruleData && ruleData.severity === 'medium' ? 'selected' : (!ruleData ? 'selected' : '')}>Medium</option>
+                                    <option value="low" ${ruleData && ruleData.severity === 'low' ? 'selected' : ''}>Low</option>
+                                    <option value="info" ${ruleData && ruleData.severity === 'info' ? 'selected' : ''}>Info</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label for="ruleCategory" class="block text-sm font-medium text-gray-700 mb-1">
+                                Category
+                            </label>
+                            <input type="text" id="ruleCategory"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder="e.g., Authentication"
+                                value="${ruleData ? escapeHtml(ruleData.category || '') : ''}">
+                        </div>
+                        
+                        <div>
+                            <label for="ruleTags" class="block text-sm font-medium text-gray-700 mb-1">
+                                Tags (comma-separated)
+                            </label>
+                            <input type="text" id="ruleTags"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder="e.g., cisco, authentication, pci-dss"
+                                value="${ruleData ? escapeHtml(ruleData.tags || '') : ''}">
+                            <p class="text-xs text-gray-500 mt-1">Tags help organize and filter rules</p>
+                        </div>
+                        
+                        <div>
+                            <label for="ruleYamlContent" class="block text-sm font-medium text-gray-700 mb-1">
+                                YAML Content <span class="text-red-500">*</span>
+                            </label>
+                            <textarea id="ruleYamlContent" required rows="8"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">${ruleData ? escapeHtml(ruleData.yaml_content || '') : 'pattern: |\n  # Add your pattern/regex here\n  # Example: password.*encryption\nremediation: |\n  # Add remediation steps here'}</textarea>
+                            <p class="text-xs text-gray-500 mt-1">YAML format rule definition. See help for examples.</p>
+                        </div>
+                        
+                        <div>
+                            <label for="ruleRemediationTemplate" class="block text-sm font-medium text-gray-700 mb-1">
+                                Remediation Template
+                            </label>
+                            <textarea id="ruleRemediationTemplate" rows="4"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder="Step-by-step remediation instructions...">${ruleData ? escapeHtml(ruleData.remediation_template || '') : ''}</textarea>
+                        </div>
+                        
+                        <div>
+                            <label for="ruleComplianceFrameworks" class="block text-sm font-medium text-gray-700 mb-1">
+                                Compliance Frameworks (comma-separated)
+                            </label>
+                            <div class="flex items-center gap-4">
+                                <input type="text" id="ruleComplianceFrameworks"
+                                    class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="e.g., PCI-DSS, HIPAA, ISO27001"
+                                    value="${ruleData ? escapeHtml(ruleData.compliance_frameworks || '') : ''}">
+                                <label class="flex items-center">
+                                    <input type="checkbox" id="ruleEnabled" 
+                                        class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                        ${ruleData ? (ruleData.enabled ? 'checked' : '') : 'checked'}>
+                                    <span class="ml-2 text-sm text-gray-700">Enabled</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-end gap-3 pt-4 border-t border-gray-200">
+                            <button type="button" onclick="closeRuleModal()"
+                                class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+                                Cancel
+                            </button>
+                            <button type="button" onclick="testRule()"
+                                class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+                                Test Rule
+                            </button>
+                            <button type="submit"
+                                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                                Save Rule
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        `;
+        
+        // Remove existing modal if any
+        const existingModal = document.getElementById('ruleModal');
+        if (existingModal) {
+            existingModal.remove();
+        }
+        
+        // Add modal to body
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+        
+        // Add form submit handler
+        document.getElementById('ruleForm').addEventListener('submit', handleRuleSubmit);
+        
+        // Close modal when clicking outside
+        document.getElementById('ruleModal').addEventListener('click', function(e) {
+            if (e.target.id === 'ruleModal') {
+                closeRuleModal();
+            }
+        });
+        
+        // Close modal on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && document.getElementById('ruleModal')) {
+                closeRuleModal();
+            }
+        });
+    }
+    
+    function closeRuleModal() {
+        const modal = document.getElementById('ruleModal');
+        if (modal) {
+            modal.remove();
+        }
+        currentEditingRuleId = null;
+    }
+    
+    async function handleRuleSubmit(e) {
+        e.preventDefault();
+        
+        const ruleData = {
+            name: document.getElementById('ruleName').value.trim(),
+            description: document.getElementById('ruleDescription').value.trim(),
+            rule_type: document.getElementById('ruleType').value,
+            category: document.getElementById('ruleCategory').value.trim(),
+            severity: document.getElementById('ruleSeverity').value,
+            tags: document.getElementById('ruleTags').value.trim(),
+            yaml_content: document.getElementById('ruleYamlContent').value.trim(),
+            remediation_template: document.getElementById('ruleRemediationTemplate').value.trim(),
+            compliance_frameworks: document.getElementById('ruleComplianceFrameworks').value.trim(),
+            enabled: document.getElementById('ruleEnabled').checked
+        };
+        
+        if (!ruleData.name || !ruleData.yaml_content) {
+            showToast('Rule Name and YAML Content are required', 'error');
+            return;
+        }
+        
+        let result;
+        if (currentEditingRuleId) {
+            // Update existing rule
+            ruleData.id = currentEditingRuleId;
+            ruleData.action = 'update';
+            result = await apiRequest('/api/rules', 'POST', ruleData);
+        } else {
+            // Create new rule
+            ruleData.action = 'create';
+            result = await apiRequest('/api/rules', 'POST', ruleData);
+        }
+        
+        if (result.ok) {
+            showToast(currentEditingRuleId ? 'Rule updated successfully' : 'Rule created successfully', 'success');
+            closeRuleModal();
+            loadRules();
+            loadFilterOptions(); // Reload filter options in case new categories/vendors were added
+        } else {
+            showToast(result.data?.error || 'Failed to save rule', 'error');
+        }
+    }
+    
+    async function testRule() {
+        // Get current form data
+        const ruleData = {
+            name: document.getElementById('ruleName').value.trim(),
+            description: document.getElementById('ruleDescription').value.trim(),
+            rule_type: document.getElementById('ruleType').value,
+            category: document.getElementById('ruleCategory').value.trim(),
+            severity: document.getElementById('ruleSeverity').value,
+            tags: document.getElementById('ruleTags').value.trim(),
+            yaml_content: document.getElementById('ruleYamlContent').value.trim(),
+            remediation_template: document.getElementById('ruleRemediationTemplate').value.trim(),
+            compliance_frameworks: document.getElementById('ruleComplianceFrameworks').value.trim(),
+            enabled: document.getElementById('ruleEnabled').checked
+        };
+        
+        if (!ruleData.yaml_content) {
+            showToast('YAML Content is required to test the rule', 'error');
+            return;
+        }
+        
+        // Show test modal
+        openTestRuleModal(ruleData);
+    }
+    
+    function openTestRuleModal(ruleData) {
+        // Create test modal HTML
+        const testModalHTML = `
+            <div id="testRuleModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+                <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+                    <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+                        <h3 class="text-xl font-bold">Test Rule: ${escapeHtml(ruleData.name || 'Untitled Rule')}</h3>
+                        <button onclick="closeTestRuleModal()" class="text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="p-6 space-y-4">
+                        <div>
+                            <label for="testConfigContent" class="block text-sm font-medium text-gray-700 mb-2">
+                                Sample Configuration Content <span class="text-red-500">*</span>
+                            </label>
+                            <textarea id="testConfigContent" rows="12" required
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder="Paste your sample configuration here to test the rule...">hostname test-router
+interface GigabitEthernet0/0
+ ip address 192.168.1.1 255.255.255.0
+ no shutdown
+line vty 0 4
+ password admin123
+ login</textarea>
+                            <p class="text-xs text-gray-500 mt-1">Enter sample configuration to test if the rule detects issues</p>
+                        </div>
+                        
+                        <div id="testResults" class="hidden">
+                            <h4 class="font-semibold text-lg mb-3">Test Results</h4>
+                            <div id="testResultsContent" class="space-y-3"></div>
+                        </div>
+                        
+                        <div class="flex justify-end gap-3 pt-4 border-t border-gray-200">
+                            <button type="button" onclick="closeTestRuleModal()"
+                                class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+                                Close
+                            </button>
+                            <button type="button" onclick="runRuleTest()"
+                                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                                <i class="fas fa-play mr-2"></i>Run Test
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Remove existing test modal if any
+        const existingModal = document.getElementById('testRuleModal');
+        if (existingModal) {
+            existingModal.remove();
+        }
+        
+        // Store rule data for testing
+        window.currentTestRuleData = ruleData;
+        
+        // Add modal to body
+        document.body.insertAdjacentHTML('beforeend', testModalHTML);
+        
+        // Close modal when clicking outside
+        document.getElementById('testRuleModal').addEventListener('click', function(e) {
+            if (e.target.id === 'testRuleModal') {
+                closeTestRuleModal();
+            }
+        });
+        
+        // Close modal on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && document.getElementById('testRuleModal')) {
+                closeTestRuleModal();
+            }
+        });
+    }
+    
+    function closeTestRuleModal() {
+        const modal = document.getElementById('testRuleModal');
+        if (modal) {
+            modal.remove();
+        }
+        window.currentTestRuleData = null;
+    }
+    
+    async function runRuleTest() {
+        const configContent = document.getElementById('testConfigContent').value.trim();
+        if (!configContent) {
+            showToast('Please enter sample configuration content', 'error');
+            return;
+        }
+        
+        if (!window.currentTestRuleData) {
+            showToast('Rule data not found', 'error');
+            return;
+        }
+        
+        const testButton = event.target.closest('button');
+        const originalText = testButton.innerHTML;
+        testButton.disabled = true;
+        testButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Testing...';
+        
+        try {
+            const testData = {
+                action: 'test',
+                ...window.currentTestRuleData,
+                config_content: configContent
+            };
+            
+            const result = await apiRequest('/api/rules', 'POST', testData);
+            
+            if (result.ok && result.data) {
+                displayTestResults(result.data);
+            } else {
+                showToast(result.data?.error || 'Test failed', 'error');
+            }
+        } catch (error) {
+            showToast('Error running test: ' + error.message, 'error');
+        } finally {
+            testButton.disabled = false;
+            testButton.innerHTML = originalText;
+        }
+    }
+    
+    function displayTestResults(data) {
+        const resultsDiv = document.getElementById('testResults');
+        const resultsContent = document.getElementById('testResultsContent');
+        
+        resultsDiv.classList.remove('hidden');
+        
+        const findingCount = data.finding_count || 0;
+        const findings = data.findings || [];
+        
+        let html = `
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h5 class="font-semibold text-blue-900">Test Summary</h5>
+                        <p class="text-sm text-blue-700 mt-1">
+                            Found <span class="font-bold">${findingCount}</span> finding(s) in the test configuration
+                        </p>
+                    </div>
+                    <span class="px-3 py-1 bg-blue-600 text-white rounded-full text-sm font-medium">
+                        ${findingCount} ${findingCount === 1 ? 'Finding' : 'Findings'}
+                    </span>
+                </div>
+            </div>
+        `;
+        
+        if (findingCount === 0) {
+            html += `
+                <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <div class="flex items-center">
+                        <i class="fas fa-check-circle text-green-600 text-2xl mr-3"></i>
+                        <div>
+                            <h5 class="font-semibold text-green-900">No Issues Found</h5>
+                            <p class="text-sm text-green-700 mt-1">
+                                The rule did not detect any issues in the test configuration.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        } else {
+            html += '<div class="space-y-3">';
+            findings.forEach((finding, index) => {
+                const severityColors = {
+                    'critical': 'bg-red-100 border-red-300 text-red-900',
+                    'high': 'bg-orange-100 border-orange-300 text-orange-900',
+                    'medium': 'bg-yellow-100 border-yellow-300 text-yellow-900',
+                    'low': 'bg-blue-100 border-blue-300 text-blue-900',
+                    'info': 'bg-gray-100 border-gray-300 text-gray-900'
+                };
+                const severityColor = severityColors[finding.severity?.toLowerCase()] || severityColors['medium'];
+                
+                html += `
+                    <div class="border rounded-lg p-4 ${severityColor}">
+                        <div class="flex items-start justify-between mb-2">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="px-2 py-1 bg-white rounded text-xs font-medium">Finding #${index + 1}</span>
+                                    <span class="px-2 py-1 bg-white rounded text-xs font-medium capitalize">${finding.severity || 'medium'}</span>
+                                </div>
+                                <h5 class="font-semibold mt-2">${escapeHtml(finding.message || 'Issue detected')}</h5>
+                            </div>
+                        </div>
+                        ${finding.config_path ? `
+                            <div class="mt-2 text-sm">
+                                <span class="font-medium">Location:</span> ${escapeHtml(finding.config_path)}
+                            </div>
+                        ` : ''}
+                        ${finding.matched_text ? `
+                            <div class="mt-2">
+                                <span class="font-medium text-sm">Matched:</span>
+                                <code class="block mt-1 bg-white px-2 py-1 rounded text-xs">${escapeHtml(finding.matched_text)}</code>
+                            </div>
+                        ` : ''}
+                        ${finding.context ? `
+                            <div class="mt-2">
+                                <span class="font-medium text-sm">Context:</span>
+                                <pre class="mt-1 bg-white px-2 py-1 rounded text-xs overflow-x-auto">${escapeHtml(finding.context)}</pre>
+                            </div>
+                        ` : ''}
+                        ${finding.remediation ? `
+                            <div class="mt-3 pt-3 border-t border-current border-opacity-20">
+                                <span class="font-medium text-sm">Remediation:</span>
+                                <p class="mt-1 text-sm">${escapeHtml(finding.remediation)}</p>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            });
+            html += '</div>';
+        }
+        
+        resultsContent.innerHTML = html;
+        
+        // Scroll to results
+        resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+    
+    async function deleteRule(id) {
+        if (!confirm('Are you sure you want to delete this rule?')) return;
+        const result = await apiRequest('/api/rules', 'POST', { action: 'delete', id: id });
+        if (result.ok) {
+            showToast('Rule deleted successfully', 'success');
+            loadRules();
+        } else {
+            showToast(result.data?.error || 'Failed to delete rule', 'error');
+        }
+    }
+</script>
+{% endblock %}

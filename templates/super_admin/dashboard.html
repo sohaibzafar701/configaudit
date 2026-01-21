@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}Super Admin Dashboard - NCRT{% endblock %}
+
+{% block breadcrumb_current %}Super Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <h1 class="text-3xl font-bold text-gray-900">Super Admin Dashboard</h1>
+    </div>
+    
+    <!-- Statistics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="text-sm text-gray-600 mb-1">Total Organizations</div>
+            <div class="text-3xl font-bold text-blue-600">{{ total_orgs }}</div>
+        </div>
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="text-sm text-gray-600 mb-1">Total Users</div>
+            <div class="text-3xl font-bold text-green-600">{{ total_users }}</div>
+        </div>
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="text-sm text-gray-600 mb-1">Total Audits</div>
+            <div class="text-3xl font-bold text-purple-600">{{ total_audits }}</div>
+        </div>
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="text-sm text-gray-600 mb-1">Total Findings</div>
+            <div class="text-3xl font-bold text-red-600">{{ total_findings }}</div>
+        </div>
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="text-sm text-gray-600 mb-1">Platform Rules</div>
+            <div class="text-3xl font-bold text-orange-600">{{ active_rules }}</div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-xl font-semibold mb-4">Quick Actions</h2>
+        <div class="flex space-x-4">
+            <a href="{% url 'super_admin_organizations' %}" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                <i class="fas fa-building mr-2"></i>Manage Organizations
+            </a>
+        </div>
+    </div>
+    
+    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+        <div class="flex items-start">
+            <i class="fas fa-info-circle text-yellow-600 mt-1 mr-3"></i>
+            <div>
+                <h3 class="font-semibold text-yellow-900 mb-1">Super Admin Access</h3>
+                <p class="text-sm text-yellow-800">
+                    As Super Admin, you can manage organizations and platform rules. 
+                    You cannot access individual organization data (audits, findings, reports).
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

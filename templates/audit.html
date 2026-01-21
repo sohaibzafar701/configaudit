@@ -1,0 +1,334 @@
+{% extends "base.html" %}
+
+{% block title %}Audit - NCRT{% endblock %}
+
+{% block breadcrumb_current %}Audit{% endblock %}
+
+{% block content %}
+<section class="bg-white rounded-lg shadow p-6 mb-6">
+    <h2 class="text-2xl font-bold mb-4">Start New Audit</h2>
+    <form id="uploadForm" class="space-y-6">
+        <div>
+            <label class="block text-sm font-medium mb-2">Configuration File</label>
+            <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-500 transition-colors" id="fileUploadArea">
+                <input type="file" id="configFile" accept=".txt,.cfg,.conf" required class="hidden">
+                <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4"></i>
+                <p class="text-gray-600 mb-2">
+                    <strong>Drag and drop</strong> your configuration file here, or 
+                    <label for="configFile" class="text-blue-600 cursor-pointer hover:underline">click to browse</label>
+                </p>
+                <p class="text-sm text-gray-500">Supported formats: .txt, .cfg, .conf</p>
+        </div>
+            <div id="fileSelected" class="hidden mt-4 p-4 bg-green-50 rounded-lg flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <i class="fas fa-check-circle text-green-500"></i>
+                    <span id="fileSelectedName" class="font-medium"></span>
+                </div>
+                <button type="button" id="fileRemoveBtn" class="text-red-600 hover:text-red-800">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                            </div>
+                        </div>
+                        
+        <div>
+            <label for="deviceIdentifier" class="block text-sm font-medium mb-2">
+                Device Identifier <span class="text-red-500">*</span>
+                                </label>
+            <input type="text" id="deviceIdentifier" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Enter IP address, hostname, or device name" required>
+                            </div>
+                            
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+                <label for="deviceMake" class="block text-sm font-medium mb-2">Device Make</label>
+                <input type="text" id="deviceMake" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="e.g., Cisco">
+                                    </div>
+            <div>
+                <label for="deviceModel" class="block text-sm font-medium mb-2">Device Model</label>
+                <input type="text" id="deviceModel" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="e.g., Catalyst 9300">
+                                </div>
+            <div>
+                <label for="deviceType" class="block text-sm font-medium mb-2">Device Type</label>
+                <input type="text" id="deviceType" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="e.g., Router">
+                                </div>
+                            </div>
+                            
+        <div>
+            <label class="block text-sm font-medium mb-2">Rule Tags <span class="text-red-500">*</span></label>
+            <div id="ruleTagsContainer" class="space-y-2">
+                <p class="text-gray-500 text-sm">Loading tags...</p>
+                            </div>
+                        </div>
+                        
+        <button type="submit" class="w-full bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+            Start Audit
+        </button>
+        
+        <div id="uploadStatus" class="hidden"></div>
+    </form>
+</section>
+
+<!-- Audit Progress Section -->
+<section id="auditProgressSection" class="hidden bg-white rounded-lg shadow p-6 mb-6">
+    <h2 class="text-2xl font-bold mb-4">Audit Progress</h2>
+    <div id="auditProgress" class="space-y-4">
+        <div class="w-full bg-gray-200 rounded-full h-4">
+            <div id="progressBar" class="bg-blue-600 h-4 rounded-full transition-all duration-300" style="width: 0%"></div>
+                        </div>
+        <div id="progressText" class="text-sm text-gray-600"></div>
+                </div>
+            </section>
+
+<!-- Audit History Section -->
+<section class="bg-white rounded-lg shadow p-6">
+    <h2 class="text-2xl font-bold mb-4">Audit History</h2>
+    <div id="auditHistory" class="space-y-4">
+        <p class="text-gray-500">Loading audit history...</p>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Note: Full audit.js functionality should be inlined here
+    // This is a simplified version - the full audit.js file should be read and inlined
+    let currentAuditId = null;
+    
+    async function apiRequest(url, method = 'GET', data = null) {
+        const options = { method, headers: { 'Content-Type': 'application/json' } };
+        if (data && method !== 'GET') options.body = JSON.stringify(data);
+        try {
+            const response = await fetch(url, options);
+            const result = await response.json();
+            return { ok: response.ok, data: result, status: response.status };
+        } catch (error) {
+            console.error('API request failed:', error);
+            return { ok: false, error: error.message };
+        }
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        loadRuleTags();
+        loadAuditHistory();
+        
+        const fileInput = document.getElementById('configFile');
+        const fileUploadArea = document.getElementById('fileUploadArea');
+        const fileSelected = document.getElementById('fileSelected');
+        const fileSelectedName = document.getElementById('fileSelectedName');
+        const fileRemoveBtn = document.getElementById('fileRemoveBtn');
+        
+        fileInput.addEventListener('change', function(e) {
+            if (e.target.files.length > 0) {
+                const file = e.target.files[0];
+                fileSelectedName.textContent = file.name;
+                fileSelected.classList.remove('hidden');
+                fileUploadArea.classList.add('hidden');
+                
+                // Auto-populate fields by uploading file and extracting metadata
+                extractMetadataFromFile(file);
+            }
+        });
+        
+        fileRemoveBtn.addEventListener('click', function() {
+            fileInput.value = '';
+            fileSelected.classList.add('hidden');
+            fileUploadArea.classList.remove('hidden');
+            // Clear auto-populated fields
+            document.getElementById('deviceIdentifier').value = '';
+            document.getElementById('deviceMake').value = '';
+            document.getElementById('deviceModel').value = '';
+            document.getElementById('deviceType').value = '';
+        });
+        
+        document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            await startAudit();
+        });
+    });
+    
+    async function extractMetadataFromFile(file) {
+        // Show loading state
+        const statusDiv = document.getElementById('uploadStatus');
+        statusDiv.classList.remove('hidden');
+        statusDiv.innerHTML = '<p class="text-blue-600 text-sm">Extracting metadata from file...</p>';
+        
+        try {
+            // Create FormData to upload file
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            // Upload file to extract metadata
+            const response = await fetch('/api/upload', {
+                method: 'POST',
+                body: formData
+            });
+            
+            const result = await response.json();
+            
+            if (response.ok && result.device_metadata) {
+                const metadata = result.device_metadata;
+                
+                // Auto-populate form fields
+                const deviceIdentifierField = document.getElementById('deviceIdentifier');
+                const deviceMakeField = document.getElementById('deviceMake');
+                const deviceModelField = document.getElementById('deviceModel');
+                const deviceTypeField = document.getElementById('deviceType');
+                
+                // Populate device identifier with hostname or filename (without extension)
+                if (metadata.hostname) {
+                    deviceIdentifierField.value = metadata.hostname;
+                } else if (!deviceIdentifierField.value) {
+                    // Use filename without extension as fallback
+                    const filenameWithoutExt = file.name.replace(/\.[^/.]+$/, '');
+                    deviceIdentifierField.value = filenameWithoutExt;
+                }
+                
+                // Populate other fields if they exist in metadata and are empty
+                if (metadata.make && !deviceMakeField.value) {
+                    deviceMakeField.value = metadata.make;
+                }
+                if (metadata.model && !deviceModelField.value) {
+                    deviceModelField.value = metadata.model;
+                }
+                if (metadata.type && !deviceTypeField.value) {
+                    deviceTypeField.value = metadata.type;
+                }
+                
+                statusDiv.innerHTML = '<p class="text-green-600 text-sm">Metadata extracted successfully</p>';
+                setTimeout(() => {
+                    statusDiv.classList.add('hidden');
+                }, 2000);
+            } else {
+                statusDiv.innerHTML = '<p class="text-yellow-600 text-sm">Could not extract metadata, please fill fields manually</p>';
+                setTimeout(() => {
+                    statusDiv.classList.add('hidden');
+                }, 3000);
+            }
+        } catch (error) {
+            console.error('Error extracting metadata:', error);
+            statusDiv.innerHTML = '<p class="text-yellow-600 text-sm">Could not extract metadata, please fill fields manually</p>';
+            setTimeout(() => {
+                statusDiv.classList.add('hidden');
+            }, 3000);
+        }
+    }
+    
+    async function loadRuleTags() {
+        const result = await apiRequest('/api/rules/tags');
+        if (result.ok && result.data) {
+            const container = document.getElementById('ruleTagsContainer');
+            if (result.data.tags && result.data.tags.length > 0) {
+                container.innerHTML = result.data.tags.map(tag => `
+                    <label class="flex items-center space-x-2">
+                        <input type="checkbox" name="rule_tags" value="${tag}" class="rounded">
+                        <span>${escapeHtml(tag)}</span>
+                    </label>
+                `).join('');
+            } else {
+                container.innerHTML = '<p class="text-yellow-600 text-sm">No rule tags available. Please create rules first.</p>';
+            }
+        } else {
+            const container = document.getElementById('ruleTagsContainer');
+            container.innerHTML = '<p class="text-red-600 text-sm">Error loading rule tags</p>';
+        }
+    }
+    
+    async function startAudit() {
+        const fileInput = document.getElementById('configFile');
+        if (!fileInput.files.length) {
+            showToast('Please select a configuration file', 'error');
+            return;
+        }
+        
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+        reader.onload = async function(e) {
+            const configContent = e.target.result;
+            const deviceIdentifier = document.getElementById('deviceIdentifier').value;
+            const deviceMake = document.getElementById('deviceMake').value;
+            const deviceModel = document.getElementById('deviceModel').value;
+            const deviceType = document.getElementById('deviceType').value;
+            const selectedTags = Array.from(document.querySelectorAll('input[name="rule_tags"]:checked')).map(cb => cb.value);
+            
+            if (!selectedTags.length) {
+                showToast('Please select at least one rule tag', 'error');
+                return;
+            }
+            
+            const result = await apiRequest('/api/audits', 'POST', {
+                action: 'create',
+                config_content: configContent,
+                config_file: file.name, // Pass the filename
+                device_identifier: deviceIdentifier,
+                device_make: deviceMake,
+                device_model: deviceModel,
+                device_type: deviceType,
+                rule_tags: selectedTags
+            });
+            
+            if (result.ok && result.data) {
+                currentAuditId = result.data.id;
+                showToast('Audit started successfully', 'success');
+                document.getElementById('auditProgressSection').classList.remove('hidden');
+                pollAuditProgress();
+                loadAuditHistory();
+            } else {
+                showToast(result.data?.error || 'Failed to start audit', 'error');
+            }
+        };
+        reader.readAsText(file);
+    }
+    
+    async function pollAuditProgress() {
+        if (!currentAuditId) return;
+        
+        const result = await apiRequest(`/api/audits?audit_id=${currentAuditId}`);
+        if (result.ok && result.data) {
+            const audit = result.data;
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            
+            if (audit.progress) {
+                const percent = audit.progress.progress_percent || 0;
+                progressBar.style.width = percent + '%';
+                progressText.textContent = audit.progress.current_rule || 'Processing...';
+            }
+            
+            if (audit.status === 'Completed' || audit.status === 'Failed') {
+                showToast(`Audit ${audit.status.toLowerCase()}`, audit.status === 'Completed' ? 'success' : 'error');
+                return;
+            }
+            
+            setTimeout(pollAuditProgress, 2000);
+        }
+    }
+    
+    async function loadAuditHistory() {
+        const result = await apiRequest('/api/audits?history=true');
+        if (result.ok && result.data) {
+            const container = document.getElementById('auditHistory');
+            const audits = result.data.audits || [];
+            
+            if (audits.length === 0) {
+                container.innerHTML = '<p class="text-gray-500">No audit history</p>';
+                return;
+            }
+            
+            container.innerHTML = audits.map(audit => `
+                <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <h3 class="font-semibold">${escapeHtml(audit.device_identifier || 'Unknown')}</h3>
+                            <p class="text-sm text-gray-600">${audit.created_at_formatted || audit.created_at || 'Unknown'}</p>
+                        </div>
+                        <span class="px-2 py-1 rounded text-xs font-medium ${audit.status === 'Completed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">${audit.status}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-600">${audit.finding_count || 0} findings</span>
+                        <a href="{% url 'report_page' %}?audit_id=${audit.id}" class="text-blue-600 hover:text-blue-800 text-sm">View Report</a>
+                    </div>
+                </div>
+            `).join('');
+        }
+    }
+    </script>
+{% endblock %}

@@ -1,0 +1,220 @@
+{% extends "base.html" %}
+
+{% block title %}NCRT - Network Configuration Rule Tester{% endblock %}
+
+{% block content %}
+<!-- Welcome Section (Hero) -->
+<section class="bg-gradient-to-r from-blue-600 to-blue-800 text-white rounded-lg p-8 mb-8">
+    <div class="text-center">
+        <h1 class="text-4xl font-bold mb-4">Network Configuration Rule Tester</h1>
+        <p class="text-xl mb-6">Audit your network device configurations for security vulnerabilities and compliance</p>
+        <a href="{% url 'audit_page' %}" class="inline-block bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors">
+            Start New Audit
+        </a>
+    </div>
+</section>
+
+<!-- Statistics Cards -->
+<section class="mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center justify-between mb-4">
+                <i class="fas fa-chart-bar text-3xl text-blue-500"></i>
+            </div>
+            <div class="text-3xl font-bold mb-2" id="statTotalAudits">0</div>
+            <div class="text-gray-600">Total Audits</div>
+        </div>
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center justify-between mb-4">
+                <i class="fas fa-exclamation-triangle text-3xl text-yellow-500"></i>
+            </div>
+            <div class="text-3xl font-bold mb-2" id="statTotalFindings">0</div>
+            <div class="text-gray-600">Total Findings</div>
+        </div>
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center justify-between mb-4">
+                <i class="fas fa-check-circle text-3xl text-green-500"></i>
+            </div>
+            <div class="text-3xl font-bold mb-2" id="statAvgCompliance">0%</div>
+            <div class="text-gray-600">Avg Compliance</div>
+        </div>
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center justify-between mb-4">
+                <i class="fas fa-cog text-3xl text-gray-500"></i>
+            </div>
+            <div class="text-3xl font-bold mb-2" id="statActiveRules">0</div>
+            <div class="text-gray-600">Active Rules</div>
+        </div>
+    </div>
+</section>
+
+<!-- Quick Actions and Recent Activity -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Quick Actions -->
+    <section class="bg-white rounded-lg shadow">
+        <div class="p-6 border-b border-gray-200">
+            <h2 class="text-xl font-semibold">Quick Actions</h2>
+        </div>
+        <div class="p-6">
+            <div class="grid grid-cols-2 gap-4">
+                <a href="{% url 'audit_page' %}" class="flex flex-col items-center justify-center p-6 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                    <i class="fas fa-upload text-3xl text-blue-500 mb-3"></i>
+                    <div class="font-medium">New Audit</div>
+                </a>
+                <a href="{% url 'report_page' %}" class="flex flex-col items-center justify-center p-6 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                    <i class="fas fa-clipboard-list text-3xl text-green-500 mb-3"></i>
+                    <div class="font-medium">View Reports</div>
+                </a>
+                <a href="{% url 'rules_page' %}" class="flex flex-col items-center justify-center p-6 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                    <i class="fas fa-cogs text-3xl text-purple-500 mb-3"></i>
+                    <div class="font-medium">Manage Rules</div>
+                </a>
+                <a href="{% url 'report_page' %}" class="flex flex-col items-center justify-center p-6 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                    <i class="fas fa-history text-3xl text-orange-500 mb-3"></i>
+                    <div class="font-medium">View History</div>
+                </a>
+                <a href="{% url 'assets_page' %}" class="flex flex-col items-center justify-center p-6 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors col-span-2">
+                    <i class="fas fa-server text-3xl text-indigo-500 mb-3"></i>
+                    <div class="font-medium">Assets</div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Recent Activity -->
+    <section class="bg-white rounded-lg shadow">
+        <div class="p-6 border-b border-gray-200 flex justify-between items-center">
+            <h2 class="text-xl font-semibold">Recent Activity</h2>
+            <a href="{% url 'report_page' %}" class="text-blue-600 hover:text-blue-800">View All</a>
+        </div>
+        <div class="p-6">
+            <div id="recentActivityList" class="space-y-4">
+                <p class="text-gray-500">Loading recent activity...</p>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // API helper functions
+    async function apiRequest(url, method = 'GET', data = null) {
+        const options = {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        };
+        
+        if (data && method !== 'GET') {
+            options.body = JSON.stringify(data);
+        }
+        
+        try {
+            const response = await fetch(url, options);
+            const result = await response.json();
+            return { ok: response.ok, data: result, status: response.status };
+        } catch (error) {
+            console.error('API request failed:', error);
+            if (typeof handleApiError === 'function') {
+                handleApiError(error, 'Request failed');
+            }
+            return { ok: false, error: error.message };
+        }
+    }
+    
+    function handleApiError(error, defaultMessage = 'An error occurred') {
+        const message = error.message || error.error || defaultMessage;
+        showToast(message, 'error');
+        return message;
+    }
+    
+    // Home page JavaScript - Statistics and Recent Activity
+    document.addEventListener('DOMContentLoaded', function() {
+        loadStatistics();
+        loadRecentActivity();
+        
+        // Poll for updates
+        setInterval(() => {
+            loadStatistics();
+            loadRecentActivity();
+        }, 5000);
+    });
+    
+    async function loadStatistics() {
+        try {
+            const url = typeof addTimezoneParams === 'function' ? addTimezoneParams('/api/stats') : '/api/stats';
+            const result = await apiRequest(url);
+            if (result.ok && result.data) {
+                const stats = result.data;
+                
+                const statTotalAudits = document.getElementById('statTotalAudits');
+                const statTotalFindings = document.getElementById('statTotalFindings');
+                const statAvgCompliance = document.getElementById('statAvgCompliance');
+                const statActiveRules = document.getElementById('statActiveRules');
+                
+                if (statTotalAudits) statTotalAudits.textContent = stats.total_audits || 0;
+                if (statTotalFindings) statTotalFindings.textContent = stats.total_findings || 0;
+                if (statAvgCompliance) statAvgCompliance.textContent = (stats.average_compliance || 0) + '%';
+                if (statActiveRules) statActiveRules.textContent = stats.active_rules || 0;
+            }
+        } catch (error) {
+            console.error('Error loading statistics:', error);
+        }
+    }
+    
+    async function loadRecentActivity() {
+        const recentActivityList = document.getElementById('recentActivityList');
+        if (!recentActivityList) return;
+        
+        try {
+            const url = typeof addTimezoneParams === 'function' ? addTimezoneParams('/api/stats') : '/api/stats';
+            const result = await apiRequest(url);
+            if (result.ok && result.data && result.data.recent_audits) {
+                const recentAudits = result.data.recent_audits;
+                
+                if (recentAudits.length === 0) {
+                    recentActivityList.innerHTML = '<p class="text-gray-500">No recent audits</p>';
+                    return;
+                }
+                
+                recentActivityList.innerHTML = recentAudits.map(audit => {
+                    const statusColors = {
+                        'completed': 'bg-green-100 text-green-800',
+                        'processing': 'bg-blue-100 text-blue-800',
+                        'pending': 'bg-yellow-100 text-yellow-800',
+                        'failed': 'bg-red-100 text-red-800',
+                        'cancelled': 'bg-gray-100 text-gray-800'
+                    };
+                    const statusClass = statusColors[(audit.status || 'Unknown').toLowerCase()] || 'bg-gray-100 text-gray-800';
+                    const date = audit.created_at_formatted || (audit.created_at ? (typeof formatDateTime === 'function' ? formatDateTime(audit.created_at) : new Date(audit.created_at).toLocaleString()) : 'Unknown');
+                    const deviceIdentifier = audit.device_identifier || audit.config_file || 'Unknown';
+                    const hostname = audit.device_hostname ? ` (${audit.device_hostname})` : '';
+                    
+                    return `
+                        <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                            <div class="flex justify-between items-start mb-2">
+                                <span class="font-semibold">${escapeHtml(deviceIdentifier)}${hostname}</span>
+                                <span class="px-2 py-1 rounded text-xs font-medium ${statusClass}">${audit.status || 'Unknown'}</span>
+                            </div>
+                            <div class="flex justify-between items-center text-sm text-gray-600 mb-2">
+                                <span>${date}</span>
+                                <span>${audit.finding_count || 0} findings</span>
+                            </div>
+                            <div class="mt-2">
+                                <a href="{% url 'report_page' %}?audit_id=${audit.id}" class="text-blue-600 hover:text-blue-800 text-sm">View Report</a>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                recentActivityList.innerHTML = '<p class="text-gray-500">No recent activity</p>';
+            }
+        } catch (error) {
+            console.error('Error loading recent activity:', error);
+            recentActivityList.innerHTML = '<p class="text-red-500">Error loading recent activity</p>';
+        }
+    }
+</script>
+{% endblock %}

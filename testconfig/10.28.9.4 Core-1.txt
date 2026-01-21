@@ -1,0 +1,713 @@
+!Command: show running-config
+!Running configuration last done at: Tue Feb  4 19:29:03 2025
+!Time: Thu Feb 27 14:20:08 2025
+
+version 10.3(4a) Bios:version 07.69
+system memory-thresholds minor 96 severe 97 critical 98
+
+hostname SW9K-I9-Core-1
+vdc SW9K-I9-Core-1 id 1
+  limit-resource vlan minimum 16 maximum 4094
+  limit-resource vrf minimum 2 maximum 4097
+  limit-resource port-channel minimum 0 maximum 511
+  limit-resource m4route-mem minimum 58 maximum 58
+  limit-resource m6route-mem minimum 8 maximum 8
+
+feature bash-shell
+feature scp-server
+feature sftp-server
+feature tacacs+
+cfs eth distribute
+feature bgp
+feature interface-vlan
+feature hsrp
+feature lacp
+feature vpc
+clock timezone PKT 5 0
+
+no password strength-check
+username admin password 5 $5$IOLCGB$UIDxL/stuGmXb.IQq4dqJ/gMKR0NBK2aBiE6FrPCKP5  role network-admin
+username admin role priv-15
+username Waseela-IT password 5 $5$MFAKAH$8Xc0woPeqibOZwvIWYI3TgIu4PDCXNeyOq9rpNdko91  role network-operator
+username Waseela-IT role network-admin
+username Waseela-IT role priv-15
+username Waseela-IT passphrase  lifetime 99999 warntime 14 gracetime 3
+username mmbl password 5 $5$tImlTEk3$m8BpU0s6VLNxOFdwx20nF0vAJHGgeEqNl.q0OYzeye8  role network-operator
+username mmbl passphrase  lifetime 99999 warntime 14 gracetime 3
+
+banner motd !
+##########################################################################################
+#                             Mobilink MicroFinance Bank Limited                         #
+#                                                                                        #
+#                                          WARNING:                                      #
+#                                                                                        #
+#     This system is property of Mobilink Microfinance Bank Limited.                     #
+#     This system is restricted to authorized individuals only. Unauthorized access      #
+#     is a criminal violation of the policy and is subject to prosecution according      #
+#     to the law.                                                                        #
+#                                                                                        #
+#                             All connections and changes are logged.                    #
+#                                                                                        #
+##########################################################################################
+!
+
+userpassphrase sequence keyboard length 2
+
+no ip domain-lookup
+ip tacacs source-interface mgmt0
+tacacs-server host 10.28.11.141 key 7 "ZifQ@1$j"
+aaa group server tacacs+ ise-aaa
+    server 10.28.11.141
+    use-vrf management
+feature password encryption aes
+crypto key generate rsa label Switch-I9-Core-1 modulus 2048
+ip access-list 10
+  10 permit ip 10.28.9.0/24 10.28.9.4/32 log
+  20 permit ip 10.28.11.136/32 any log
+  30 permit ip 10.28.11.202/32 any log
+  40 permit ip 10.28.12.201/32 any log
+  50 permit ip 10.28.12.202/32 any log
+  60 permit ip 10.28.12.203/32 any log
+  70 permit ip 10.28.200.202/32 any log
+  80 permit ip 10.28.11.141/32 any log
+  90 permit ip 10.28.11.238/32 any log
+  100 permit ip 10.28.200.204/32 any log
+  110 permit ip 10.28.12.206/32 any log
+  120 permit ip 10.28.12.163/32 any log
+  130 permit ip 10.28.11.231/32 any log
+  140 permit ip 10.28.12.204/32 any log
+  150 permit ip 10.28.12.204/32 any log
+ip access-list snmp
+  10 permit udp any any eq snmp
+  20 permit udp any any eq snmptrap
+copp profile strict
+snmp-server contact Network.Admin@waseelabank.com
+snmp-server location I-9/3 Data Center
+snmp-server user mmbl network-operator auth md5 0x67263ee7316d2fe8fbb7965a93dd2ed8 priv aes-128 0x67263ee7316d2fe8fbb7965a93dd
+2ed8 localizedkey
+snmp-server user admin network-admin auth md5 482A61CADABEC70102649053AC03BE9514B9 priv aes-128 014336CBF491B631051FA319BF1984
+EB4BAB localizedV2key
+snmp-server user admin priv-15
+snmp-server user Waseela-IT network-operator auth sha-256 174D21BB795A322B45171916C2D5963378450A83CD39FCD62624721AEB224A8E17F4
+ priv aes-128 322C9049F765C31A09E7954210ADD0F9EF3294077130CF11504649CF5A4970E1F36C localizedV2key
+snmp-server user Waseela-IT priv-15
+snmp-server user Waseela-IT network-admin
+snmp-server host 10.28.11.136 traps version 2c mmblsnmp
+rmon event 1 description FATAL(1) owner PMON@FATAL
+rmon event 2 description CRITICAL(2) owner PMON@CRITICAL
+rmon event 3 description ERROR(3) owner PMON@ERROR
+rmon event 4 description WARNING(4) owner PMON@WARNING
+rmon event 5 description INFORMATION(5) owner PMON@INFO
+snmp-server enable traps bgp
+snmp-server enable traps callhome event-notify
+snmp-server enable traps callhome smtp-send-fail
+snmp-server enable traps cfs state-change-notif
+snmp-server enable traps cfs merge-failure
+snmp-server enable traps aaa server-state-change
+snmp-server enable traps hsrp state-change
+snmp-server enable traps feature-control FeatureOpStatusChange
+snmp-server enable traps sysmgr cseFailSwCoreNotifyExtended
+snmp-server enable traps config ccmCLIRunningConfigChanged
+snmp-server enable traps snmp authentication
+snmp-server enable traps link cisco-xcvr-mon-status-chg
+snmp-server enable traps vtp notifs
+snmp-server enable traps vtp vlancreate
+snmp-server enable traps vtp vlandelete
+snmp-server enable traps bridge newroot
+snmp-server enable traps bridge topologychange
+snmp-server enable traps stpx inconsistency
+snmp-server enable traps stpx root-inconsistency
+snmp-server enable traps stpx loop-inconsistency
+snmp-server enable traps system Clock-change-notification
+snmp-server enable traps feature-control ciscoFeatOpStatusChange
+snmp-server enable traps mmode cseNormalModeChangeNotify
+snmp-server enable traps mmode cseMaintModeChangeNotify
+snmp-server enable traps syslog message-generated
+snmp-server community mmblsnmp group network-operator
+ntp server 10.28.9.1 use-vrf management
+ntp source-interface mgmt0
+aaa authentication login default group ise-aaa
+aaa authentication login console local
+aaa authorization config-commands default group ise-aaa
+aaa authorization commands default group ise-aaa local
+
+ip route 10.28.12.202/32 10.28.9.253 vrf management
+no ip source-route
+vlan 1,9-11,14-16,18-21,29,36,55,99,101,116,129-130,135,140,172,722,733,744
+vlan 9
+  name Management
+vlan 10
+  name PCA-ADMIN-VLAN
+vlan 11
+  name Production
+vlan 14
+  name UAT
+vlan 15
+  name Production-2
+vlan 16
+  name T24-Database
+vlan 18
+  name ILO-Mgmt
+vlan 19
+  name Production1
+vlan 20
+  name ZFS-External-Storage
+vlan 21
+  name PCA-Exadata-DB
+vlan 29
+  name HPE-Enclosure
+vlan 55
+  name DMZ
+vlan 99
+  name BGP-VLAN-99-FGT-FTD
+vlan 101
+  name VPC-KeepAlive
+vlan 116
+  name database-subnet2
+vlan 129
+  name DMZ2_10.28.129.0
+vlan 130
+  name CAZ
+vlan 135
+  name DIRTY-VLAN
+vlan 140
+  name DDI-SPAN-VLAN
+vlan 172
+  name ISRM
+vlan 722
+  name PCA-PRIMARY-VLAN
+vlan 733
+  name PCA-BACKUP-VLAN
+vlan 744
+  name CORE-to-FTD-iBGP
+
+spanning-tree vlan 1,11,14-16,18,55 priority 24576
+spanning-tree vlan 2-10,12-13,17,19-54 priority 0
+ip prefix-list LP-PREFIX seq 20 permit 10.17.88.0/24
+vrf context PCA
+vrf context PEER-KEEPALIVE
+vrf context management
+  ip route 0.0.0.0/0 10.28.9.253
+vpc domain 1
+  role priority 1024
+  peer-keepalive destination 192.168.1.2 source 192.168.1.1 vrf PEER-KEEPALIVE
+  peer-gateway
+
+
+interface Vlan1
+  no ip redirects
+  no ipv6 redirects
+
+interface Vlan11
+  no shutdown
+  no ip redirects
+  no ipv6 redirects
+
+interface Vlan101
+  no shutdown
+  no ip redirects
+  ip address 10.28.101.1/30
+  no ipv6 redirects
+
+interface Vlan116
+  no shutdown
+  no ip redirects
+  ip address 10.28.116.10/27
+  no ipv6 redirects
+
+interface Vlan722
+  description PCA-PRIMARY
+  no shutdown
+  no ip redirects
+  ip address 192.168.139.250/30
+  no ipv6 redirects
+
+interface Vlan733
+  no shutdown
+  no ip redirects
+  no ipv6 redirects
+
+interface Vlan744
+  description CORE-to-FTD-iBGP
+  no shutdown
+  no ip redirects
+  ip address 192.168.139.11/29
+  no ipv6 redirects
+  hsrp 10
+    preempt
+    priority 150
+    ip 192.168.139.9
+
+interface port-channel2
+  description ***VPC-PeerLink***
+  switchport
+  switchport mode trunk
+  spanning-tree port type network
+  vpc peer-link
+
+interface port-channel3
+  switchport
+  switchport mode trunk
+  vpc 3
+
+interface port-channel4
+  switchport
+  switchport mode trunk
+  vpc 4
+
+interface port-channel5
+  description ***SWCAT-I9-AML-1***
+  switchport
+  switchport mode trunk
+  vpc 5
+
+interface port-channel6
+  description ***SWCAT-I9-IB-1***
+  switchport
+  switchport mode trunk
+  vpc 6
+
+interface port-channel7
+  description ***SW3K-I9-CORE-3***
+  switchport
+  switchport mode trunk
+  vpc 7
+
+interface port-channel8
+  description ***SW3K-I9-CORE-4***
+  switchport
+  switchport mode trunk
+  vpc 8
+
+interface port-channel9
+  description ***SWCAT-I9-AML-2***
+  switchport
+  switchport mode trunk
+  vpc 9
+
+interface port-channel10
+  description ***SWCAT-I9-IB-2***
+  switchport
+  switchport mode trunk
+  vpc 10
+
+interface port-channel11
+  description ***SWCAT-I9-CORE-5***
+  switchport
+  switchport mode trunk
+  vpc 11
+
+interface port-channel12
+  description ***SWCAT-I9-CORE-6***
+  switchport
+  switchport mode trunk
+  vpc 12
+
+interface port-channel15
+  description ***Connected with WAF1***
+  switchport
+  switchport mode trunk
+  switchport trunk allowed vlan 55,129
+  vpc 15
+
+interface port-channel16
+  description ***Connected with WAF2***
+  switchport
+  switchport mode trunk
+  switchport trunk allowed vlan 55,129
+  vpc 16
+
+interface port-channel17
+  description ***Connected with EXADATA-DB01*********
+  switchport
+  switchport mode trunk
+  switchport trunk allowed vlan 16,21
+  vpc 17
+
+interface port-channel18
+  description ***Connected with EXADATA-DB02*********
+  switchport
+  switchport mode trunk
+  switchport trunk allowed vlan 16,21
+  vpc 18
+
+interface port-channel20
+  description PCA-SW1-P1&2-to-DC-Core1-P25-32
+  switchport
+  switchport access vlan 722
+
+interface port-channel21
+  description ADMIN-PCA-SW1-P5-to-DC-Core1-P33-36
+  switchport
+  switchport access vlan 10
+
+interface port-channel23
+  description ZFS-Ext-Storage-Cont1-to-DC-Core1
+  switchport
+  switchport access vlan 20
+  load-interval counter 1 5
+
+interface port-channel24
+  description FGT-FPR-BGP-VLAN-99
+  switchport
+  switchport mode trunk
+  switchport trunk allowed vlan 99
+  vpc 24
+
+interface port-channel25
+  description FGT-FPR-BGP-VLAN-99
+  switchport
+  switchport mode trunk
+  switchport trunk allowed vlan 99
+  vpc 25
+
+interface Ethernet1/1
+  description ***SWCAT-I9-AML-1***
+  switchport
+  switchport mode trunk
+  channel-group 5 mode active
+  no shutdown
+
+interface Ethernet1/2
+  description ***SWCAT-I9-IB-1***
+  switchport
+  switchport mode trunk
+  channel-group 6 mode active
+  no shutdown
+
+interface Ethernet1/3
+  description ***SWCAT-I9-AML-2***
+  switchport
+  switchport mode trunk
+  channel-group 9 mode active
+  no shutdown
+
+interface Ethernet1/4
+  description ***SWCAT-I9-IB-2***
+  switchport
+  switchport mode trunk
+  channel-group 10 mode active
+  no shutdown
+
+interface Ethernet1/5
+  description ***SWCAT-I9-CORE-5***
+  switchport
+  switchport mode trunk
+  channel-group 11 mode active
+  no shutdown
+
+interface Ethernet1/6
+  description ***SWCAT-I9-CORE-6***
+  switchport
+  switchport mode trunk
+  channel-group 12 mode active
+  no shutdown
+
+interface Ethernet1/7
+  description " *** Connected with WAF1 **"
+  switchport
+  switchport mode trunk
+  switchport trunk allowed vlan 55,129
+  channel-group 15 mode active
+  no shutdown
+
+interface Ethernet1/8
+  description " *** Connected with WAF2 **"
+  switchport
+  switchport mode trunk
+  switchport trunk allowed vlan 55,129
+  channel-group 16 mode active
+  no shutdown
+
+interface Ethernet1/9
+
+interface Ethernet1/10
+
+interface Ethernet1/11
+
+interface Ethernet1/12
+
+interface Ethernet1/13
+
+interface Ethernet1/14
+
+interface Ethernet1/15
+  description FGT1-X1-to-DC-Core1-P15
+  switchport
+  switchport mode trunk
+  switchport trunk allowed vlan 99
+  channel-group 24 mode active
+  no shutdown
+
+interface Ethernet1/16
+  description FGT2-X1-to-DC-Core1-P16
+  switchport
+  switchport mode trunk
+  switchport trunk allowed vlan 99
+  channel-group 25 mode active
+  no shutdown
+
+interface Ethernet1/17
+  description connected to HP DL380 G10 T24 Application Server1
+  switchport
+  switchport access vlan 15
+  no shutdown
+
+interface Ethernet1/18
+  description connected to HP DL380 G10 T24 Application Server2
+  switchport
+  switchport mode trunk
+  no shutdown
+
+interface Ethernet1/19
+  description SPAN-Port-for-TrendMicro
+  switchport
+  switchport monitor
+  no shutdown
+
+interface Ethernet1/20
+
+interface Ethernet1/21
+  description ***Connected with EXADATA-DB01*********
+  switchport
+  switchport mode trunk
+  switchport trunk allowed vlan 16,21
+  channel-group 17 mode active
+  no shutdown
+
+interface Ethernet1/22
+  description ***Connected with EXADATA-DB02*********
+  switchport
+  switchport mode trunk
+  switchport trunk allowed vlan 16,21
+  channel-group 18 mode active
+  no shutdown
+
+interface Ethernet1/23
+
+interface Ethernet1/24
+
+interface Ethernet1/25
+  description PCA-SW1-P1&2-to-DC-Core1-P25-32
+  switchport
+  switchport access vlan 722
+  channel-group 20 mode active
+  no shutdown
+
+interface Ethernet1/26
+  description PCA-SW1-P1&2-to-DC-Core1-P25-32
+  switchport
+  switchport access vlan 722
+  channel-group 20 mode active
+  no shutdown
+
+interface Ethernet1/27
+  description PCA-SW1-P1&2-to-DC-Core1-P25-32
+  switchport
+  switchport access vlan 722
+  channel-group 20 mode active
+  no shutdown
+
+interface Ethernet1/28
+  description PCA-SW1-P1&2-to-DC-Core1-P25-32
+  switchport
+  switchport access vlan 722
+  channel-group 20 mode active
+  no shutdown
+
+interface Ethernet1/29
+  description PCA-SW1-P1&2-to-DC-Core1-P25-32
+  switchport
+  switchport access vlan 722
+  channel-group 20 mode active
+  no shutdown
+
+interface Ethernet1/30
+  description PCA-SW1-P1&2-to-DC-Core1-P25-32
+  switchport
+  switchport access vlan 722
+  channel-group 20 mode active
+  no shutdown
+
+interface Ethernet1/31
+  description PCA-SW1-P1&2-to-DC-Core1-P25-32
+  switchport
+  switchport access vlan 722
+  channel-group 20 mode active
+  no shutdown
+
+interface Ethernet1/32
+  description PCA-SW1-P1&2-to-DC-Core1-P25-32
+  switchport
+  switchport access vlan 722
+  channel-group 20 mode active
+  no shutdown
+
+interface Ethernet1/33
+  description ADMIN-PCA-SW1-P5-to-DC-Core1-P33-36
+  switchport
+  switchport access vlan 10
+  channel-group 21 mode active
+  no shutdown
+
+interface Ethernet1/34
+  description ADMIN-PCA-SW1-P5-to-DC-Core1-P33-36
+  switchport
+  switchport access vlan 10
+  channel-group 21 mode active
+  no shutdown
+
+interface Ethernet1/35
+  description ADMIN-PCA-SW1-P5-to-DC-Core1-P33-36
+  switchport
+  switchport access vlan 10
+  channel-group 21 mode active
+  no shutdown
+
+interface Ethernet1/36
+  description ADMIN-PCA-SW1-P5-to-DC-Core1-P33-36
+  switchport
+  switchport access vlan 10
+  channel-group 21 mode active
+  no shutdown
+
+interface Ethernet1/37
+  description ZFS-Ext-Storage-Cont1-to-DC-Core1
+  switchport
+  switchport access vlan 20
+  load-interval counter 1 5
+  channel-group 23 mode active
+  no shutdown
+
+interface Ethernet1/38
+  description ZFS-Ext-Storage-Cont1-to-DC-Core1
+  switchport
+  switchport access vlan 20
+  load-interval counter 1 5
+  channel-group 23 mode active
+  no shutdown
+
+interface Ethernet1/39
+  description ZFS-Ext-Storage-Cont1-to-DC-Core1
+  switchport
+  switchport access vlan 20
+  load-interval counter 1 5
+  channel-group 23 mode active
+  no shutdown
+
+interface Ethernet1/40
+  description ZFS-Ext-Storage-Cont1-to-DC-Core1
+  switchport
+  switchport access vlan 20
+  load-interval counter 1 5
+  channel-group 23 mode active
+  no shutdown
+
+interface Ethernet1/41
+
+interface Ethernet1/42
+
+interface Ethernet1/43
+
+interface Ethernet1/44
+  switchport
+  switchport access vlan 11
+  spanning-tree port type edge
+  no shutdown
+
+interface Ethernet1/45
+  description ***FPR-Sec-Eth1/2
+  switchport
+  switchport mode trunk
+  channel-group 3 mode active
+  no shutdown
+
+interface Ethernet1/46
+  description ***FPR-Pri-Eth1/2
+  switchport
+  switchport mode trunk
+  channel-group 4 mode active
+  no shutdown
+
+interface Ethernet1/47
+  description *** VPC-KeepAlive ***
+  vrf member PEER-KEEPALIVE
+  ip address 192.168.1.1/30
+  no shutdown
+
+interface Ethernet1/48
+
+interface Ethernet1/49
+  description ***VPC-PeerLink***
+  switchport
+  switchport mode trunk
+  channel-group 2 mode active
+  no shutdown
+
+interface Ethernet1/50
+  description ***VPC-PeerLink***
+  switchport
+  switchport mode trunk
+  channel-group 2 mode active
+  no shutdown
+
+interface Ethernet1/51
+  description ***SW3K-I9-CORE-3***
+  switchport
+  switchport mode trunk
+  channel-group 7 mode active
+  no shutdown
+
+interface Ethernet1/52
+  description ***SW3K-I9-CORE-4***
+  switchport
+  switchport mode trunk
+  channel-group 8 mode active
+  no shutdown
+
+interface Ethernet1/53
+
+interface Ethernet1/54
+
+interface mgmt0
+  vrf member management
+  ip address 10.28.9.4/24
+line console
+line vty
+  session-limit 5
+  exec-timeout 5
+  access-class 10 in
+boot nxos bootflash:/nxos64-cs.10.3.4a.M.bin
+router bgp 64722
+  router-id 192.168.139.250
+  log-neighbor-changes
+  address-family ipv4 unicast
+    maximum-paths 4
+  neighbor 192.168.139.12
+    remote-as 64722
+    description iBGP-with-FTD
+    address-family ipv4 unicast
+      weight 450
+      next-hop-self
+      soft-reconfiguration inbound always
+  neighbor 192.168.139.249
+    remote-as 136025
+    description PCA-NEXUS-SW-01
+    ebgp-multihop 5
+    timers 30 90
+    address-family ipv4 unicast
+      weight 450
+      next-hop-self
+      soft-reconfiguration inbound always
+ip tcp path-mtu-discovery
+monitor session 10
+  source interface port-channel3 both
+  source interface port-channel4 both
+  destination interface Ethernet1/19
+  no shut
+
+logging server 10.28.11.238 6
+logging source-interface mgmt0
+
+
+SW9K-I9-Core-1#

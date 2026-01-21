@@ -1,0 +1,11 @@
+1. rules page se ye remove krna hai:
+No rules found in the database.
+
+Load sample rules by running:
+
+python manage.py load_rules
+
+.\venv\Scripts\python.exe python manage.py load_rules
+
+2. add search bar in reports and assets
+

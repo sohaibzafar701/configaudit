@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}NCRT - Network Configuration Rule Tester{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Custom styles for components that need more than Tailwind utilities */
+        .sidebar-overlay {
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .sidebar-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .toast {
+            animation: slideIn 0.3s ease-out;
+        }
+        .toast-exiting {
+            animation: slideOut 0.3s ease-in;
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-gray-50">
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded">Skip to main content</a>
+    
+    <!-- Sidebar Overlay -->
+    <div class="fixed inset-0 bg-black bg-opacity-50 z-40 sidebar-overlay hidden lg:hidden" id="sidebarOverlay"></div>
+    
+    <!-- Sidebar -->
+    <aside class="fixed top-0 left-0 h-full w-64 bg-gray-900 text-white z-50 transform -translate-x-full transition-transform duration-300 lg:translate-x-0" id="sidebar">
+        <div class="flex items-center justify-between p-4 border-b border-gray-800">
+            <h1 class="text-xl font-bold">NCRT</h1>
+            <button class="lg:hidden text-white hover:text-gray-300" id="sidebarToggle" aria-label="Toggle sidebar">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        {% if user.is_authenticated %}
+        <div class="p-4 border-b border-gray-800">
+            <div class="text-sm text-gray-400">Logged in as</div>
+            <div class="font-medium">{{ user.username }}</div>
+            {% if user.userprofile.organization %}
+            <div class="text-xs text-gray-500 mt-1">{{ user.userprofile.organization.name }}</div>
+            {% elif user.userprofile.is_super_admin %}
+            <div class="text-xs text-blue-400 mt-1">Super Admin</div>
+            {% endif %}
+        </div>
+        {% endif %}
+        <nav class="p-4 space-y-2">
+            <a href="{% url 'index' %}" class="flex items-center space-x-3 px-4 py-2 rounded hover:bg-gray-800 transition-colors">
+                <i class="fas fa-home w-5"></i>
+                <span>Home</span>
+            </a>
+            <a href="{% url 'audit_page' %}" class="flex items-center space-x-3 px-4 py-2 rounded hover:bg-gray-800 transition-colors">
+                <i class="fas fa-search w-5"></i>
+                <span>Audit</span>
+            </a>
+            <a href="{% url 'rules_page' %}" class="flex items-center space-x-3 px-4 py-2 rounded rounded hover:bg-gray-800 transition-colors">
+                <i class="fas fa-list-check w-5"></i>
+                <span>Rules</span>
+            </a>
+            <a href="{% url 'report_page' %}" class="flex items-center space-x-3 px-4 py-2 rounded hover:bg-gray-800 transition-colors">
+                <i class="fas fa-file-alt w-5"></i>
+                <span>Report</span>
+            </a>
+            <a href="{% url 'assets_page' %}" class="flex items-center space-x-3 px-4 py-2 rounded hover:bg-gray-800 transition-colors">
+                <i class="fas fa-server w-5"></i>
+                <span>Assets</span>
+            </a>
+            <a href="{% url 'settings_page' %}" class="flex items-center space-x-3 px-4 py-2 rounded hover:bg-gray-800 transition-colors">
+                <i class="fas fa-cog w-5"></i>
+                <span>Settings</span>
+            </a>
+            <a href="{% url 'help_page' %}" class="flex items-center space-x-3 px-4 py-2 rounded hover:bg-gray-800 transition-colors">
+                <i class="fas fa-question-circle w-5"></i>
+                <span>Help</span>
+            </a>
+            {% if user.is_authenticated %}
+                {% if user.userprofile.is_super_admin %}
+                <div class="pt-4 mt-4 border-t border-gray-800">
+                    <div class="text-xs text-gray-500 uppercase mb-2">Super Admin</div>
+                    <a href="{% url 'super_admin_dashboard' %}" class="flex items-center space-x-3 px-4 py-2 rounded hover:bg-gray-800 transition-colors">
+                        <i class="fas fa-shield-alt w-5"></i>
+                        <span>Super Admin</span>
+                    </a>
+                </div>
+                {% elif user.userprofile.is_org_admin %}
+                <div class="pt-4 mt-4 border-t border-gray-800">
+                    <div class="text-xs text-gray-500 uppercase mb-2">Admin</div>
+                    <a href="{% url 'org_admin_users' %}" class="flex items-center space-x-3 px-4 py-2 rounded hover:bg-gray-800 transition-colors">
+                        <i class="fas fa-users w-5"></i>
+                        <span>User Management</span>
+                    </a>
+                </div>
+                {% endif %}
+                <div class="pt-4 mt-4 border-t border-gray-800">
+                    <button onclick="logout()" class="flex items-center space-x-3 px-4 py-2 rounded hover:bg-gray-800 transition-colors w-full text-left">
+                        <i class="fas fa-sign-out-alt w-5"></i>
+                        <span>Logout</span>
+                    </button>
+                </div>
+            {% endif %}
+        </nav>
+    </aside>
+    
+    <!-- Main Content -->
+    <div class="lg:ml-64 min-h-screen">
+        <nav aria-label="Breadcrumb" class="bg-white border-b border-gray-200 px-4 py-3">
+            {% block breadcrumb %}
+            <div class="flex items-center space-x-2 text-sm text-gray-600">
+                <a href="{% url 'index' %}" class="hover:text-gray-900">Home</a>
+                <span>/</span>
+                <span class="text-gray-900">{% block breadcrumb_current %}Dashboard{% endblock %}</span>
+            </div>
+            {% endblock %}
+        </nav>
+        
+        <main id="main-content" class="p-6">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+    
+    <!-- Toast Container -->
+    <div id="toastContainer" class="fixed top-4 right-4 z-50 space-y-2"></div>
+    
+    <!-- Common JavaScript (inline) -->
+    <script>
+        // Common JavaScript utilities
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function showToast(message, type = 'info', duration = 5000) {
+            let toastContainer = document.getElementById('toastContainer');
+            if (!toastContainer) {
+                toastContainer = document.createElement('div');
+                toastContainer.id = 'toastContainer';
+                toastContainer.className = 'fixed top-4 right-4 z-50 space-y-2';
+                document.body.appendChild(toastContainer);
+            }
+            
+            const toast = document.createElement('div');
+            toast.className = `flex items-center space-x-3 px-4 py-3 rounded-lg shadow-lg max-w-md ${type === 'success' ? 'bg-green-500 text-white' : type === 'error' ? 'bg-red-500 text-white' : type === 'warning' ? 'bg-yellow-500 text-white' : 'bg-blue-500 text-white'} toast`;
+            
+            let iconClass = '';
+            if (type === 'success') iconClass = 'fas fa-check-circle';
+            else if (type === 'error') iconClass = 'fas fa-exclamation-circle';
+            else if (type === 'info') iconClass = 'fas fa-info-circle';
+            else if (type === 'warning') iconClass = 'fas fa-exclamation-triangle';
+            else iconClass = 'fas fa-info-circle';
+            
+            toast.innerHTML = `
+                <i class="${iconClass}"></i>
+                <span class="flex-1">${escapeHtml(message)}</span>
+                <button class="ml-2 hover:opacity-75" onclick="this.closest('.toast').remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            
+            toastContainer.appendChild(toast);
+            const autoRemoveDuration = type === 'error' ? duration * 1.5 : duration;
+            setTimeout(() => {
+                if (toast.parentElement) {
+                    toast.classList.add('toast-exiting');
+                    setTimeout(() => toast.remove(), 300);
+                }
+            }, autoRemoveDuration);
+        }
+        
+        // Timezone utilities
+        function getSettings() {
+            try {
+                const savedSettings = localStorage.getItem('ncrt_settings');
+                if (savedSettings) {
+                    return JSON.parse(savedSettings);
+                }
+            } catch (e) {
+                console.warn('Error loading settings:', e);
+            }
+            return {
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
+                dateTimeFormat: 'YYYY-MM-DD HH:mm:ss'
+            };
+        }
+        
+        function formatDateTime(dateInput, timezone, format) {
+            if (!dateInput) return 'Unknown';
+            const settings = getSettings();
+            const tz = timezone || settings.timezone || 'UTC';
+            const fmt = format || settings.dateTimeFormat || 'YYYY-MM-DD HH:mm:ss';
+            try {
+                let date = dateInput instanceof Date ? dateInput : new Date(dateInput);
+                if (isNaN(date.getTime())) return 'Invalid Date';
+                const options = {
+                    timeZone: tz,
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false
+                };
+                const formatter = new Intl.DateTimeFormat('en-US', options);
+                const parts = formatter.formatToParts(date);
+                const partMap = {};
+                parts.forEach(part => { partMap[part.type] = part.value; });
+                let result = fmt;
+                result = result.replace(/YYYY/g, partMap.year);
+                result = result.replace(/MM/g, partMap.month);
+                result = result.replace(/DD/g, partMap.day);
+                result = result.replace(/HH/g, partMap.hour);
+                result = result.replace(/mm/g, partMap.minute);
+                result = result.replace(/ss/g, partMap.second);
+                return result;
+            } catch (e) {
+                console.warn('Error formatting date:', e);
+                try {
+                    const date = dateInput instanceof Date ? dateInput : new Date(dateInput);
+                    return date.toLocaleString('en-US', { timeZone: tz });
+                } catch (e2) {
+                    return String(dateInput);
+                }
+            }
+        }
+        
+        function formatDateTimeNow(timezone, format) {
+            return formatDateTime(new Date(), timezone, format);
+        }
+        
+        function addTimezoneParams(url) {
+            const settings = getSettings();
+            const timezone = settings.timezone || 'UTC';
+            const dateFormat = settings.dateTimeFormat || 'YYYY-MM-DD HH:mm:ss';
+            const separator = url.includes('?') ? '&' : '?';
+            return `${url}${separator}timezone=${encodeURIComponent(timezone)}&date_format=${encodeURIComponent(dateFormat)}`;
+        }
+        
+        // Sidebar toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+            
+            function toggleSidebar() {
+                sidebar.classList.toggle('-translate-x-full');
+                sidebarOverlay.classList.toggle('hidden');
+            }
+            
+            if (sidebarToggle) {
+                sidebarToggle.addEventListener('click', toggleSidebar);
+            }
+            if (sidebarOverlay) {
+                sidebarOverlay.addEventListener('click', toggleSidebar);
+            }
+            
+            // Set active nav item
+            const currentPath = window.location.pathname;
+            const navLinks = document.querySelectorAll('#sidebar nav a');
+            navLinks.forEach(link => {
+                if (link.getAttribute('href') === currentPath) {
+                    link.classList.add('bg-gray-800');
+                }
+            });
+        });
+        
+        // Logout function
+        async function logout() {
+            try {
+                const response = await fetch('/logout/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    }
+                });
+                
+                if (response.ok) {
+                    window.location.href = '/login/';
+                } else {
+                    showToast('Logout failed', 'error');
+                }
+            } catch (error) {
+                showToast('Logout failed', 'error');
+            }
+        }
+        
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+    
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

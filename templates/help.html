@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Help - NCRT{% endblock %}
+
+{% block breadcrumb_current %}Help{% endblock %}
+
+{% block content %}
+<section class="bg-white rounded-lg shadow p-6">
+    <h2 class="text-2xl font-bold mb-4">Help & Documentation</h2>
+    <div class="prose max-w-none">
+        <h3>Getting Started</h3>
+        <p>NCRT (Network Configuration Rule Tester) helps you audit network device configurations for security vulnerabilities and compliance.</p>
+        
+        <h3>Features</h3>
+        <ul>
+            <li>Upload configuration files for analysis</li>
+            <li>Run security rules against configurations</li>
+            <li>View detailed reports with findings</li>
+            <li>Track assets and audit history</li>
+        </ul>
+        
+        <h3>Support</h3>
+        <p>For more information, please refer to the application documentation.</p>
+    </div>
+</section>
+{% endblock %}

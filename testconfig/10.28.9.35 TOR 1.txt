@@ -1,0 +1,606 @@
+!Command: show running-config
+!Time: Thu Feb 27 13:12:44 2025
+
+version 7.0(3)I2(2b)
+hostname SW3K-I9-CORE-3
+vdc SW3K-I9-CORE-3 id 1
+  limit-resource vlan minimum 16 maximum 4094
+  limit-resource vrf minimum 2 maximum 4096
+  limit-resource port-channel minimum 0 maximum 104
+  limit-resource u4route-mem minimum 128 maximum 128
+  limit-resource u6route-mem minimum 96 maximum 96
+  limit-resource m4route-mem minimum 58 maximum 58
+  limit-resource m6route-mem minimum 8 maximum 8
+
+feature tacacs+
+feature lacp
+feature lldp
+clock protocol ntp vdc 1
+
+username admin password 5 $5$0BSMi1gO$d22FMQR/sxirJqeWZX7oRzcxzugHD3iQUKgk17FWzF5  role network-admin
+username admin role priv-15
+username Waseela-IT password 5 $5$y7iNQHHF$arYwvAXGONLbxLhSKdhLpU1Wcd5Cnveh92GOfJjf0n3  role network-operator
+username mmbl password 5 $5$tImlTEk3$m8BpU0s6VLNxOFdwx20nF0vAJHGgeEqNl.q0OYzeye8  role network-operator
+
+banner motd !
+##########################################################################################
+#                             Mobilink MicroFinance Bank Limited                         #
+#                                                                                        #
+#                                          WARNING:                                      #
+#                                                                                        #
+#     This system is property of Mobilink Microfinance Bank Limited.                     #
+#     This system is restricted to authorized individuals only. Unauthorized access      #
+#     is a criminal violation of the policy and is subject to prosecution according      #
+#     to the law.                                                                        #
+#                                                                                        #
+#                             All connections and changes are logged.                    #
+#                                                                                        #
+##########################################################################################
+!
+
+ip domain-lookup
+ip tacacs source-interface mgmt0
+tacacs-server host 10.28.11.141 key 7 "ZifQ@1$j"
+aaa group server tacacs+ ise-aaa
+    server 10.28.11.141
+    use-vrf management
+crypto key param rsa label switch modulus 1024
+ip access-list copp-system-acl-eigrp
+  10 permit eigrp any 224.0.0.10/32
+ipv6 access-list copp-system-acl-eigrp6
+  10 permit eigrp any ff02::a/128
+ip access-list copp-system-acl-icmp
+  10 permit icmp any any
+ip access-list copp-system-acl-igmp
+  10 permit igmp any any
+ip access-list copp-system-acl-ntp
+  10 permit udp any any eq ntp
+  20 permit udp any eq ntp any
+ip access-list copp-system-acl-pimreg
+  10 permit pim any any
+ip access-list copp-system-acl-ping
+  10 permit icmp any any echo
+  20 permit icmp any any echo-reply
+ip access-list copp-system-acl-routingproto1
+  10 permit tcp any gt 1024 any eq bgp
+  20 permit tcp any eq bgp any gt 1024
+  30 permit udp any 224.0.0.0/24 eq rip
+  40 permit tcp any gt 1024 any eq 639
+  50 permit tcp any eq 639 any gt 1024
+  70 permit ospf any any
+  80 permit ospf any 224.0.0.5/32
+  90 permit ospf any 224.0.0.6/32
+ip access-list copp-system-acl-routingproto2
+  10 permit udp any 224.0.0.0/24 eq 1985
+  20 permit 112 any 224.0.0.0/24
+ip access-list copp-system-acl-snmp
+  10 permit udp any any eq snmp
+  20 permit udp any any eq snmptrap
+ip access-list copp-system-acl-ssh
+  10 permit tcp any any eq 22
+  20 permit tcp any eq 22 any
+ip access-list copp-system-acl-stftp
+  10 permit udp any any eq tftp
+  20 permit udp any any eq 1758
+  30 permit udp any eq tftp any
+  40 permit udp any eq 1758 any
+  50 permit tcp any any eq 115
+  60 permit tcp any eq 115 any
+ip access-list copp-system-acl-tacacsradius
+  10 permit tcp any any eq tacacs
+  20 permit tcp any eq tacacs any
+  30 permit udp any any eq 1812
+  40 permit udp any any eq 1813
+  50 permit udp any any eq 1645
+  60 permit udp any any eq 1646
+  70 permit udp any eq 1812 any
+  80 permit udp any eq 1813 any
+  90 permit udp any eq 1645 any
+  100 permit udp any eq 1646 any
+ip access-list copp-system-acl-telnet
+  10 permit tcp any any eq telnet
+  20 permit tcp any any eq 107
+  30 permit tcp any eq telnet any
+  40 permit tcp any eq 107 any
+ipv6 access-list copp-system-acl-v6routingProto2
+  10 permit udp any ff02::66/128 eq 2029
+  20 permit udp any ff02::fb/128 eq 5353
+  30 permit 112 any ff02::12/128
+ipv6 access-list copp-system-acl-v6routingproto1
+  10 permit 89 any ff02::5/128
+  20 permit 89 any ff02::6/128
+  30 permit udp any ff02::9/128 eq 521
+ip access-list copp-system-dhcp-relay
+  10 permit udp any eq bootps any eq bootps
+ip access-list switch-remote-access
+  10 permit ip 10.28.11.241/32 any
+  20 permit ip 10.28.11.202/32 any
+  30 permit ip 10.28.11.240/32 any
+  40 permit ip 10.28.12.216/32 any
+  50 permit ip 10.28.12.215/32 any
+  60 permit ip 10.28.12.205/32 any
+  70 permit ip 10.28.12.206/32 any
+  80 permit ip 10.28.11.136/32 any
+  90 permit ip 10.28.12.201/32 any
+  100 permit ip 10.28.12.202/32 any
+  110 permit ip 10.28.11.238/32 any
+  210 permit ip 10.28.12.163/32 any
+  220 permit ip 10.28.11.231/32 any
+class-map type control-plane match-any copp-icmp
+  match access-group name copp-system-acl-icmp
+class-map type control-plane match-any copp-ntp
+  match access-group name copp-system-acl-ntp
+class-map type control-plane match-any copp-s-arp
+class-map type control-plane match-any copp-s-bfd
+class-map type control-plane match-any copp-s-bpdu
+class-map type control-plane match-any copp-s-dai
+class-map type control-plane match-any copp-s-default
+class-map type control-plane match-any copp-s-dhcpreq
+class-map type control-plane match-any copp-s-dhcpresp
+  match access-group name copp-system-dhcp-relay
+class-map type control-plane match-any copp-s-dpss
+class-map type control-plane match-any copp-s-eigrp
+  match access-group name copp-system-acl-eigrp
+  match access-group name copp-system-acl-eigrp6
+class-map type control-plane match-any copp-s-glean
+class-map type control-plane match-any copp-s-igmp
+  match access-group name copp-system-acl-igmp
+class-map type control-plane match-any copp-s-ipmcmiss
+class-map type control-plane match-any copp-s-l2switched
+class-map type control-plane match-any copp-s-l3destmiss
+class-map type control-plane match-any copp-s-l3mtufail
+class-map type control-plane match-any copp-s-l3slowpath
+class-map type control-plane match-any copp-s-mpls
+class-map type control-plane match-any copp-s-pimautorp
+class-map type control-plane match-any copp-s-pimreg
+  match access-group name copp-system-acl-pimreg
+class-map type control-plane match-any copp-s-ping
+  match access-group name copp-system-acl-ping
+class-map type control-plane match-any copp-s-ptp
+class-map type control-plane match-any copp-s-routingProto1
+  match access-group name copp-system-acl-routingproto1
+  match access-group name copp-system-acl-v6routingproto1
+class-map type control-plane match-any copp-s-routingProto2
+  match access-group name copp-system-acl-routingproto2
+class-map type control-plane match-any copp-s-selfIp
+class-map type control-plane match-any copp-s-ttl1
+class-map type control-plane match-any copp-s-v6routingProto2
+  match access-group name copp-system-acl-v6routingProto2
+class-map type control-plane match-any copp-s-vxlan
+class-map type control-plane match-any copp-snmp
+  match access-group name copp-system-acl-snmp
+class-map type control-plane match-any copp-ssh
+  match access-group name copp-system-acl-ssh
+class-map type control-plane match-any copp-stftp
+  match access-group name copp-system-acl-stftp
+class-map type control-plane match-any copp-tacacsradius
+  match access-group name copp-system-acl-tacacsradius
+class-map type control-plane match-any copp-telnet
+  match access-group name copp-system-acl-telnet
+policy-map type control-plane copp-system-policy
+  class copp-s-default
+    police pps 400
+  class copp-s-l2switched
+    police pps 200
+  class copp-s-ping
+    police pps 100
+  class copp-s-l3destmiss
+    police pps 100
+  class copp-s-glean
+    police pps 500
+  class copp-s-selfIp
+    police pps 500
+  class copp-s-l3mtufail
+    police pps 100
+  class copp-s-ttl1
+    police pps 100
+  class copp-s-ipmcmiss
+    police pps 400
+  class copp-s-l3slowpath
+    police pps 100
+  class copp-s-dhcpreq
+    police pps 300
+  class copp-s-dhcpresp
+    police pps 300
+  class copp-s-dai
+    police pps 300
+  class copp-s-igmp
+    police pps 400
+  class copp-s-routingProto2
+    police pps 1300
+  class copp-s-v6routingProto2
+    police pps 1300
+  class copp-s-eigrp
+    police pps 200
+  class copp-s-pimreg
+    police pps 200
+  class copp-s-pimautorp
+    police pps 200
+  class copp-s-routingProto1
+    police pps 1000
+  class copp-s-arp
+    police pps 200
+  class copp-s-ptp
+    police pps 1000
+  class copp-s-vxlan
+    police pps 1000
+  class copp-s-bfd
+    police pps 900
+  class copp-s-bpdu
+    police pps 12000
+  class copp-s-dpss
+    police pps 1000
+  class copp-s-mpls
+    police pps 100
+  class copp-icmp
+    police pps 200
+  class copp-telnet
+    police pps 500
+  class copp-ssh
+    police pps 500
+  class copp-snmp
+    police pps 500
+  class copp-ntp
+    police pps 100
+  class copp-tacacsradius
+    police pps 400
+  class copp-stftp
+    police pps 400
+control-plane
+  service-policy input copp-system-policy
+snmp-server contact Network.Admin@waseelabank.com
+snmp-server location I-9/3 Data Center
+snmp-server user mmbl network-operator auth md5 0x67263ee7316d2fe8fbb7965a93dd2ed8 priv aes-128 0x67263ee7316d2fe8fbb7965a93dd
+2ed8 localizedkey
+snmp-server user admin network-admin auth md5 0x612afe0ab1acd0ae6ac152ea596c49f0 priv 0x612afe0ab1acd0ae6ac152ea596c49f0 local
+izedkey
+snmp-server user admin priv-15
+snmp-server user Waseela-IT network-operator auth md5 0xb4d9423c8f3887617bb27cfa7e34cf08 priv 0xb4d9423c8f3887617bb27cfa7e34cf
+08 localizedkey
+rmon event 1 log trap public description FATAL(1) owner PMON@FATAL
+rmon event 2 log trap public description CRITICAL(2) owner PMON@CRITICAL
+rmon event 3 log trap public description ERROR(3) owner PMON@ERROR
+rmon event 4 log trap public description WARNING(4) owner PMON@WARNING
+rmon event 5 log trap public description INFORMATION(5) owner PMON@INFO
+aaa authentication login default group ise-aaa
+aaa authorization config-commands default group ise-aaa
+aaa authorization commands default group ise-aaa local
+
+vlan 1,9
+vlan 10
+  name PCA-ADMIN-VLAN
+vlan 11,14-15
+vlan 16
+  name T24-Database
+vlan 18
+  name ILO-Mgmt
+vlan 19
+  name Production1
+vlan 20
+  name PCA-Storage
+vlan 21
+  name PCA-EXADATA-DB
+vlan 29
+  name C7000-Chassis-Heartbeat
+vlan 55
+vlan 129
+  name DMZ2_10.28.129.0
+vlan 130
+  name CAZ
+vlan 172
+  name ISRM
+vlan 722
+  name ORACLE-PCA
+vrf context management
+  ip route 0.0.0.0/0 10.28.9.253
+no system urpf disable
+hardware profile portmode 48X10G+breakout6x40g
+
+
+
+interface port-channel2
+  description "TRUNK CONNECTION WITH HP ENCLOSURE RACK-5"
+  switchport mode trunk
+  switchport trunk allowed vlan 11,14-16,18-19,29,55,129-130,172
+
+interface port-channel3
+  description "TRUNK CONNECTION WITH HP ENCLOSURE RACK-6"
+  switchport mode trunk
+  switchport trunk allowed vlan 11,14-16,18-19,29,55,129-130,172
+  load-interval counter 1 5
+
+interface port-channel4
+  description "Fiber TRUNK CONNECTION WITH SW9K-I9-CORE-Eth1/51"
+  switchport mode trunk
+  switchport trunk allowed vlan 9,11,14-16,18-19,29,55,129-130,172
+
+interface port-channel55
+
+interface Ethernet1/1
+  description "Connected with WSISBBKPNASPR01 ** 15.234 ** R4-P1-1"
+  switchport access vlan 15
+  spanning-tree bpduguard enable
+
+interface Ethernet1/2
+  description "Connected with WSISBGRDMCOL02 ** 11.129 ** R5-P1-1"
+  switchport access vlan 11
+  spanning-tree bpduguard enable
+
+interface Ethernet1/3
+  description "Connected with WSISBGRDMCOL03 ** 11.157 ** R5-P1-2"
+  switchport access vlan 11
+  spanning-tree bpduguard enable
+
+interface Ethernet1/4
+  description "Connected with WSISGRDMAGGR01 ** 11.161 ** R5-P1-3"
+  switchport access vlan 11
+  spanning-tree bpduguard enable
+
+interface Ethernet1/5
+  description "Connected with WSISBQRSIEM01 ** 11.190 ** R5-P1-4"
+  switchport access vlan 11
+  spanning-tree bpduguard enable
+
+interface Ethernet1/6
+  description "Connected with WSISBI10DC01 ** 11.4 ** R5-P1-5"
+  switchport access vlan 11
+  spanning-tree bpduguard enable
+
+interface Ethernet1/7
+  description "Connected with wsisbrps01 ** 15.214 ** R5-P1-6"
+  switchport access vlan 15
+  spanning-tree bpduguard enable
+
+interface Ethernet1/8
+  description "Connected with WSISBIRISDB01 ** 15.157 ** R5-P1-7"
+  switchport access vlan 15
+  spanning-tree bpduguard enable
+
+interface Ethernet1/9
+  description "Connected with wsisbprismdb01 ** 15.216 ** R5-P1-8"
+  switchport access vlan 15
+  spanning-tree bpduguard enable
+
+interface Ethernet1/10
+  description "Connected with WSISBHVUAT01 ** 14.111 ** R5-P1-9"
+  shutdown
+  switchport access vlan 14
+  spanning-tree bpduguard enable
+
+interface Ethernet1/11
+  description "PO-4 Connected with PR-MMBL-C7000-02 ** 11.135 ** R5-P1-10"
+  switchport mode trunk
+  switchport trunk allowed vlan 11,14-16,18-19,29,55,129-130,172
+  channel-group 2 mode active
+
+interface Ethernet1/12
+  description "PO-3 Connected with PR-MMBL-C7000-02 ** 11.135 ** R5-P1-11 "
+  switchport mode trunk
+  switchport trunk allowed vlan 11,14-16,18-19,29,55,129-130,172
+  channel-group 2 mode active
+
+interface Ethernet1/13
+  description "Connected with wsisbhv02 ** 15.182 ** R6-P1-1"
+  shutdown
+  switchport access vlan 15
+  spanning-tree bpduguard enable
+  speed 1000
+  duplex full
+
+interface Ethernet1/14
+  description "Connected with WSISBI10DC01 ** 11.4 ** R6-P1-2"
+  switchport access vlan 11
+  spanning-tree bpduguard enable
+
+interface Ethernet1/15
+  description "Connected with WSISBHVUAT02 ** 14.112 ** R6-P1-3"
+  switchport access vlan 14
+  spanning-tree bpduguard enable
+
+interface Ethernet1/16
+  description "Connected with WMFB01 ** 15.11 ** R6-P1-4"
+  switchport access vlan 15
+  spanning-tree bpduguard enable
+
+interface Ethernet1/17
+  description "Connected with WSISBBIALAPP01 ** 15.138 ** R6-P1-5"
+  switchport access vlan 15
+  spanning-tree bpduguard enable
+
+interface Ethernet1/18
+  description "Connected with WSISBBIALDB01 ** 15.139 ** R6-P1-6"
+  switchport access vlan 15
+  spanning-tree bpduguard enable
+
+interface Ethernet1/19
+  description "Connected with WSISBIRISDB02 ** 15.158 ** R6-P1-7"
+  switchport access vlan 15
+  spanning-tree bpduguard enable
+
+interface Ethernet1/20
+  description "Connected with wsisbprismdb02 ** 15.217 ** R6-P1-8"
+  switchport access vlan 15
+  spanning-tree bpduguard enable
+
+interface Ethernet1/21
+  description "Connected with T24R17DB02 ** 15.212 ** R6-P1-9"
+  switchport access vlan 15
+  spanning-tree bpduguard enable
+
+interface Ethernet1/22
+  description "PO-3 Connected with PR-MMBL-C7000-01 ** 11.107 ** R6-P1-10"
+  switchport mode trunk
+  switchport trunk allowed vlan 11,14-16,18-19,29,55,129-130,172
+  load-interval counter 1 5
+  channel-group 3 mode active
+
+interface Ethernet1/23
+  description "PO-3 Connected with PR-MMBL-C7000-01 ** 11.107 ** R6-P1-11"
+  switchport mode trunk
+  switchport trunk allowed vlan 11,14-16,18-19,29,55,129-130,172
+  load-interval counter 1 5
+  channel-group 3 mode active
+
+interface Ethernet1/24
+  description "Connected with SMAP6000 ** 11.104 ** R7-P1-1"
+  switchport access vlan 11
+  spanning-tree bpduguard enable
+
+interface Ethernet1/25
+  description "Connected with HPE-3PAR-SP ** 15.103 ** R7-P1-3"
+  switchport access vlan 15
+  spanning-tree bpduguard enable
+  speed 100
+
+interface Ethernet1/26
+  description "Connected with HPE-StoreOnce-4500 ** 15.112 ** R7-P1-5"
+  switchport access vlan 15
+  spanning-tree bpduguard enable
+
+interface Ethernet1/27
+  description "Connected with T24NiterApp ** XXX ** R5-P1-13"
+  spanning-tree bpduguard enable
+
+interface Ethernet1/28
+  description "Connected with WSISBRPS02 ** XXX ** R6-P1-12"
+  spanning-tree bpduguard enable
+
+interface Ethernet1/29
+  description "Connected with Sophos1 ** Port 1 ** LAN** ** R9-P1-1"
+  switchport access vlan 11
+  spanning-tree bpduguard enable
+
+interface Ethernet1/30
+  description "Connected with Sophos1 ** Port 2 ** DMZ** ** R9-P1-1"
+  switchport access vlan 55
+  spanning-tree bpduguard enable
+
+interface Ethernet1/31
+  description OLD-Sophos1 ** Port 1 ** LAN** ** R9-P1-1"
+  shutdown
+  switchport access vlan 11
+  spanning-tree bpduguard enable
+
+interface Ethernet1/32
+  description "Connected with wsisbhv02 ** 15.182 ** R6-P1-4"
+  switchport access vlan 15
+  spanning-tree bpduguard enable
+  speed 1000
+  duplex full
+
+interface Ethernet1/33
+  description "Connected with WAF ** Port  ** DMZ** ** R9-P1-"
+  switchport access vlan 55
+  spanning-tree bpduguard enable
+
+interface Ethernet1/34
+  description "Connected to 18.253-ILO ** R5-P13-1"
+  switchport access vlan 18
+  spanning-tree bpduguard enable
+
+interface Ethernet1/35
+  description "Connected to 18.254-ILO ** R6-P13-1"
+  switchport access vlan 18
+  spanning-tree bpduguard enable
+
+interface Ethernet1/36
+  description "BackUP-EXADATA ** 11.247 **"
+  switchport access vlan 11
+  spanning-tree bpduguard enable
+
+interface Ethernet1/37
+  description "BackUP-EXADATA ** 11.247 **"
+  switchport access vlan 11
+  spanning-tree bpduguard enable
+
+interface Ethernet1/38
+  description "BackUP-EXADATA ** 11.246 **"
+  switchport access vlan 11
+  spanning-tree bpduguard enable
+
+interface Ethernet1/39
+  description "BackUP-EXADATA ** 11.246 **"
+  switchport access vlan 11
+  spanning-tree bpduguard enable
+
+interface Ethernet1/40
+  description *** PR-MMBL-NETBACKUP 11.14 (MGMT-iLO) / R7-Port 1 ***
+  switchport access vlan 11
+
+interface Ethernet1/41
+  description *** PR-MMBL-NETBACKUP 11.15 (Appliance IP) / R7-Port 2 ***
+  switchport access vlan 11
+
+interface Ethernet1/42
+  description *** PR-MMBL-NETBACKUP 11.18 (DATA) / R7-Port 3 ***
+  switchport access vlan 11
+
+interface Ethernet1/43
+  description *** 10.28.128.205 Fortinet-(DMZ)WAN1 Port ***
+  shutdown
+  switchport access vlan 55
+  spanning-tree bpduguard enable
+
+interface Ethernet1/44
+  description *** 10.28.11.205 / Fortinet-(PROD)WAN2 Port ***
+  shutdown
+  switchport access vlan 11
+  spanning-tree bpduguard enable
+
+interface Ethernet1/45
+  description "Connected with MSA-2060-Node-1 Controller A**15.102"
+  switchport access vlan 15
+  spanning-tree bpduguard enable
+
+interface Ethernet1/46
+  description "Connected with MSA-2060Node-1 Controller B**15.103"
+  switchport access vlan 15
+  spanning-tree bpduguard enable
+
+interface Ethernet1/47
+  description OLD-Sophos1 ** Port 2 ** WAN** ** R9-P1-1"
+  shutdown
+  switchport access vlan 55
+  spanning-tree bpduguard enable
+
+interface Ethernet1/48
+  switchport access vlan 9
+
+interface Ethernet1/49
+  no shutdown
+
+interface Ethernet1/50
+  no shutdown
+
+interface Ethernet1/51
+  no shutdown
+
+interface Ethernet1/52
+  no shutdown
+
+interface Ethernet1/53
+  description Fiber TRUNK CONNECTION WITH SW9K-I9-CORE-1-Eth1/51
+  switchport mode trunk
+  switchport trunk allowed vlan 9,11,14-16,18-19,29,55,129-130,172
+  channel-group 4 mode active
+  no shutdown
+
+interface Ethernet1/54
+  description Fiber TRUNK CONNECTION WITH SW9K-I9-CORE-2-Eth1/51
+  switchport mode trunk
+  switchport trunk allowed vlan 9,11,14-16,18-19,29,55,129-130,172
+  channel-group 4 mode active
+  no shutdown
+
+interface mgmt0
+  vrf member management
+  ip address 10.28.9.35/24
+clock timezone PST 5 0
+line console
+line vty
+boot nxos bootflash:/nxos.7.0.3.I2.2b.bin
+logging server 10.28.11.238 5 use-vrf management facility syslog
+logging source-interface mgmt0
+
+
+SW3K-I9-CORE-3#

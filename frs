@@ -1,0 +1,544 @@
+# NCRT Application Development Plan
+
+## Project Overview
+
+Build NCRT (Network Configuration Rule Tester), a local desktop application for network device configuration security auditing similar to Nipper. The application runs locally on the end user's device and analyzes router, switch, and firewall configurations from multiple vendors (initially Cisco, Juniper, Arista, with extensible architecture for additional vendors) to identify security vulnerabilities and compliance issues. The system processes one assessment at a time and uses a database-based ruleset for rule management with import/export capabilities.
+
+## Architecture Overview
+
+```mermaid
+graph TB
+    subgraph Frontend[Frontend Layer]
+        HTML[HTML Pages]
+        CSS[CSS Styling]
+        JS[JavaScript]
+    end
+    
+    subgraph Backend[Backend Layer]
+        Server[Python HTTP Server]
+        API[Python API Endpoints]
+    end
+    
+    subgraph Services[Service Layer]
+        Parser[Multi-Vendor Parser]
+        RuleEngine[Rule Execution Engine]
+        ReportGen[Report Generator]
+        AuditService[Audit Service]
+    end
+    
+    subgraph Data[Data Layer]
+        DB[(SQLite Database)]
+        Files[File Storage]
+    end
+    
+    HTML --> Server
+    JS --> API
+    Server --> API
+    API --> Services
+    Services --> DB
+    Services --> Files
+```
+
+## Phase 1: Feature Specification Document
+
+Create comprehensive specification document (`FEATURE_SPECIFICATION.md`) covering:
+
+- Executive Summary
+- Architecture & Technology Stack
+- Database Schema (all models - Audit, Finding, Rule)
+- Core Features
+- API Specification
+- UI Requirements
+- Rule System
+- Security Features
+- Integration Capabilities
+- Deployment & Operations
+- Testing Requirements
+- Implementation Details
+
+## Phase 2: Project Setup & Foundation
+
+### 2.1 Project Structure
+
+- Simple Python application structure
+- Frontend: HTML, CSS, JavaScript files
+- Backend: Python modules for API and services
+- Set up database configuration: SQLite only (local file-based database)
+
+### 2.2 Core Dependencies
+
+- Python 3.8+ (standard library http.server or Flask for simple API)
+- sqlite3 (standard library)
+- PyYAML (for rule YAML parsing - import/export and database storage)
+- Configuration parsing libraries (ciscoconfparse for Cisco, etc.)
+- Additional vendor-specific libraries as needed (extensible)
+
+## Phase 3: Database Models
+
+Implement all database models (using sqlite3):
+
+### 3.1 Audit & Findings Models
+
+- `Audit` (configuration audit sessions, status: Pending, Processing, Completed, Failed, Cancelled, Partial)
+  - Only one audit at a time (old audits are deleted when new audit is created, or user can manually delete)
+  - Progress tracking: in-memory during synchronous execution (no database persistence needed)
+  - Parser output storage: JSONField storing raw AST, normalized security sections, and original config text
+    - Storage size considerations: Large configs + frequent audits + long retention = significant database growth
+    - JSONField is NOT indexed (prevents index bloat, heavy data excluded from indexes)
+    - Heavy data (parsed config JSONField) excluded from list views (only metadata fields queried for list views)
+    - Retention policies STRONGLY ENCOURAGED to manage database size and backup costs
+    - Database bloat expected: Large configs can result in multi-MB JSONField per audit
+    - Backup costs: Full audit data included in backups (retention policies reduce backup size over time)
+- `Finding` (security findings/vulnerabilities)
+  - Foreign key to Audit (required)
+  - Foreign key to Rule (the rule that generated this finding)
+  - Reference to configuration element/section that triggered it (config path stored for grouping)
+  - Stored as flat list (no grouping at execution time, complete data preserved)
+
+### 3.2 Rule Management Models
+
+- `Rule` (single model storing all rule types: pattern, python, hybrid)
+  - YAML content stored in TextField (keeps YAML format in database)
+  - Rule type field (pattern, python, hybrid)
+  - Rule metadata: name, description, severity, category, compliance tags
+  - Rules organized by category/tags (no rule sets needed)
+  - No versioning: rules are edited in place, always use latest version
+
+## Phase 4: (Removed - No Authentication Required)
+
+Single-user, single-tenant system requires no authentication or authorization. All data is globally accessible.
+
+## Phase 5: Multi-Vendor Configuration Parser
+
+- Plugin-based parser architecture with abstract base class
+- Parser registration system for easy vendor addition
+- Parser factory pattern with auto-discovery
+- Device family detection: Vendor + OS + model granularity (e.g., "Cisco IOS-XE Catalyst 9300")
+- Device family detection: automatic from config content with manual override option
+- Vendor identification: automatic detection with user override option
+- Configuration parsing: parse everything into raw AST (Abstract Syntax Tree) structure
+- Normalization strategy: normalize only security-relevant domains (authentication, encryption, access control, firewalls, VPN, etc.)
+- Non-security sections: leave as structured raw blocks (preserved but not normalized)
+- Realistic scope: focus parser efforts on security-relevant sections that matter for auditing
+- Normalized format: JSON schema definition with vendor-agnostic security sections
+- Raw AST structure: preserves all configuration content in structured format for future expansion
+- Parser error recovery: parse what can be parsed, mark sections as "unparsed", store original config alongside parsed output
+- Parser output storage: stored in database (Audit model with JSONField)
+- Commercial-grade target: parser depth optimized for security auditing use case, not full feature parity
+
+### 5.1 Initial Vendor Support
+
+- Cisco IOS/IOS-XE parser implementation
+- Juniper JunOS parser implementation
+- Arista EOS parser implementation
+- Additional vendors (Palo Alto, Fortinet, Check Point, etc.) can be added via plugin system
+
+### 5.2 Extensibility Design
+
+- Parser plugin interface with clear extension points
+- Vendor parser registration mechanism
+- Standardized parser output format (raw AST + normalized security sections)
+- Parser validation and testing utilities
+- Documentation for adding new vendor parsers
+- Focus on security-relevant parsing (not full configuration feature parity)
+
+### 5.3 Parser Output Structure
+
+- Raw AST: All configuration content parsed into structured Abstract Syntax Tree
+- Normalized security sections: Authentication, encryption, access control, firewalls, VPN, logging, monitoring
+- Structured raw blocks: Non-security sections preserved as structured blocks (not normalized but accessible)
+- JSON schema definition for normalized security sections
+- Original configuration text preserved alongside parsed output
+- Progressive enhancement: Additional sections can be normalized in future releases
+- Storage in Audit model: All parser output stored in JSONField (raw AST + normalized sections + original config)
+  - Storage size impact: Large configs can result in multi-MB JSONField per audit
+  - JSONField is NOT indexed (prevents index bloat, heavy data excluded from database indexes)
+  - List views exclude heavy data: Only metadata fields (status, created_at, device_family, etc.) queried for list views
+  - Detail views load full JSONField only when explicitly requested (lazy loading)
+  - Retention policies STRONGLY ENCOURAGED: Database size grows with large configs, frequent audits, and long retention periods
+  - Backup considerations: Full audit data included in backups (retention policies reduce backup size and costs over time)
+
+## Phase 6: Rule System (Database-Based Ruleset)
+
+### 6.1 Rule Storage in Database
+
+- Rules stored in database (not filesystem)
+- Single `Rule` model stores all rule types (pattern, python, hybrid)
+- Rule content: YAML text stored in TextField (keeps YAML format, just in database)
+- Rule type field distinguishes between pattern, python, and hybrid rules
+- Rule metadata stored in database fields: name, description, severity, category, compliance tags
+- Rules organized by category/tags (no rule sets needed)
+- Query database directly for rules (no caching, no periodic reload)
+- User selects rules individually or by category/tag when creating audit
+
+### 6.2 Rule Format & Storage
+
+- YAML-based rule schema with clear structure
+- Rule content stored as YAML text in database TextField
+- Rule validation against schema (before saving to database)
+- Three rule types:
+  - Pattern-based rules (regex/string matching)
+  - Python-based rules (custom logic) - full parsed configuration available in execution context
+  - Hybrid rules (combination)
+- Rule metadata stored in database fields (name, description, severity, category, compliance tags, version)
+- Compliance mapping via tags stored in database (e.g., `compliance: [pci-dss, hipaa]`)
+- Database is the source of truth for rules
+- Finding severity: rule defines default severity, but can be overridden by risk calculation
+
+### 6.3 Rule Engine
+
+- Rule query system: queries rules from database (no filesystem scanning)
+- Rule execution engine with device family filtering
+- Rule execution: Query Rule model directly (use current/latest rules)
+- Rule execution order: rules execute in selected order
+- Rule dependencies: all rules are independent (no rule dependencies)
+- Python rule execution: executes in separate OS process (subprocess) - REQUIRED for security
+  - Execution model: Sequential execution (one Python rule at a time)
+    - Each rule execution runs in separate subprocess (maintains security isolation)
+    - Rules execute one after another (no parallelism needed for single assessment)
+  - Process isolation: Each rule execution runs in separate process (maintains security isolation)
+  - Read-only input via JSON (no shared memory, serialized config passed to subprocess)
+  - Output via pipe/stdout (subprocess returns findings via stdout/pipe)
+  - Hard timeout kill (process termination if rule exceeds timeout)
+  - Isolated process prevents introspection attacks, side-channels, and escaping
+- Rule set organization: rules can belong to multiple rule sets (many-to-many)
+- Category and framework-based organization
+- Rule results aggregation: all findings stored as flat list (no deduplication at execution time)
+- Finding storage: findings stored individually without grouping (complete data preserved)
+- Query database directly for rules (no caching, no periodic reload)
+  - Rules are always current (no versioning, edits are in place)
+- Python-based rules: full parsed configuration available in execution context
+- Python rule execution security: Python rules execute in separate OS process (REQUIRED - in-process execution is not safe)
+  - Execution model: Sequential execution (one Python rule at a time in separate subprocess)
+    - Each rule execution runs in separate subprocess (maintains security isolation)
+    - Rules execute one after another (no parallelism needed for single assessment)
+  - Implementation pattern: subprocess execution with process isolation
+  - Read-only input via JSON (no shared memory, serialized config passed to subprocess)
+  - Output via pipe/stdout (subprocess returns findings via stdout/pipe)
+  - Hard timeout kill (process termination if rule exceeds timeout)
+  - CPU limits, memory limits, timeouts enforced at OS level
+  - No network access allowed
+  - No shared interpreter state (separate process prevents introspection, __subclasses__ traversal, GC abuse, timing side-channels)
+  - Prevents escaping via allowed built-ins (isolated process)
+
+### 6.4 Rule Management
+
+- Web-based interface to manage rules in database
+- Create/edit/delete rules through UI forms
+- Rule editing: rules are edited in place (no version history)
+- Rule import: upload YAML files and parse into database (import rules from files)
+- Rule export: export rules to YAML files for backup/sharing
+- Rule validation and syntax checking (YAML schema validation)
+- Comprehensive rule testing interface:
+  - Test rules against sample/uploaded configuration snippets
+  - Create synthetic test cases for rule validation
+  - Dry-run mode: test rules without creating audit/findings
+- Initial rules: loaded via Python script on first run (pre-installed rules inserted into database)
+  - Rules created by security experts, default compliance frameworks, security best practices
+
+### 6.5 Rule Selection
+
+- Per-audit rule selection: user selects rules individually or by category/tag when creating audit
+- Rules are always current (no versioning, use latest rules)
+
+## Phase 7: Audit Processing Service
+
+### 7.0 Audit Creation Workflow
+
+- Audit creation workflow:
+  1. User selects rules (by category/tag or individually)
+  2. Optionally delete previous audit (if exists)
+  3. Create Audit record
+  4. Execute rules using current/latest rule definitions
+
+- Configuration file upload (drag-and-drop UI)
+- File validation and storage
+- File size limits: configurable global limit
+- File format restrictions: plain text files (.txt, .cfg), configurable extension restrictions
+- Parser auto-detection: automatic vendor/device type detection from file content with user override option
+- Device family detection: automatic with manual override option (Vendor + OS + model granularity)
+- Configuration file storage: configurable retention policies
+  - Retention enforcement: cleanup managed manually (no automated background tasks)
+  - Retention policies STRONGLY ENCOURAGED: Large configs stored in Audit JSONField (raw AST + normalized JSON + original config) result in significant database growth
+    - Database bloat: Large configs can result in multi-MB JSONField per audit
+    - Backup costs: Full audit data included in backups (retention policies reduce backup size and costs)
+    - Query performance: JSONField is NOT indexed, heavy data excluded from list views (only metadata queried)
+    - Storage management: Configure appropriate retention policies based on storage capacity and compliance requirements
+- Audit creation: Creates new audit (optionally deletes previous audit)
+- Rules are executed using current/latest rule definitions (no version locking)
+- Synchronous processing: All audit processing runs synchronously (single assessment at a time, no async needed)
+- Progress tracking: in-memory progress tracking during execution
+  - Progress tracked in memory during synchronous execution
+  - UI updated directly via JavaScript (polling or direct updates)
+  - No database persistence needed (synchronous execution means no restarts)
+  - Progress percentage calculated: (rules_executed / total_rules) * 100
+- Finding generation and storage
+  - Finding severity: rule-defined default with risk calculation override capability
+  - Multiple findings: all matching rules report findings (no deduplication)
+  - Finding insertion: Efficient database writes (single assessment at a time, no concurrency concerns)
+- Python rule execution model:
+  - Sequential execution (one Python rule at a time in separate subprocess)
+  - Each rule execution uses separate subprocess (maintains security isolation)
+  - Pattern rules execute in-process (no subprocess needed)
+  - Hybrid rules: pattern portion in-process, Python portion uses subprocess
+- Error handling: detailed error reporting, continue processing where possible
+  - Parsing errors reported as warnings, audit continues with partial results
+  - Flag problematic sections but attempt to process rest of configuration
+- Audit completion notifications: in-app notifications only (no email, no webhook events)
+
+## Phase 8: Reporting System
+
+- Report generation service (on-demand generation, no caching)
+- Report generation triggers: both on-demand (user clicks "Generate Report") and automatic (after audit completion)
+- Export formats:
+  - HTML reports (primary format)
+  - PDF generation (optional, template-based HTML to PDF, includes charts/graphs)
+- Report templates (HTML templates)
+- Report content includes:
+  - Executive summary
+  - All findings with grouping options (grouped by rule, config path, root cause hash, or flat list)
+  - Rule metadata from current Rule model (rules are always current)
+  - Compliance scores per framework
+  - Remediation recommendations
+- Finding grouping for usability (report-time only, not execution-time):
+  - Findings stored as flat list (complete data preserved)
+  - Report-time grouping by: same rule, same config path, same root cause hash
+  - Helps analysts manage findings when one misconfig triggers many findings
+  - Grouping is optional - users can view flat list or grouped views
+- Compliance framework mapping (flexible framework mapping system with configurable scoring)
+- Compliance scoring: configurable scoring method
+  - Options: pass/fail count, weighted by severity, framework-specific algorithms
+
+## Phase 9: Python API
+
+### 9.1 API Endpoints
+
+- Simple Python HTTP server (http.server or Flask)
+- API endpoints for:
+  - Audit CRUD operations
+  - Finding retrieval
+  - Rule management
+  - Report generation
+  - File upload handling
+- JSON request/response format
+- Error handling and validation
+
+## Phase 10: User Interface
+
+### 10.1 Core Pages (HTML)
+
+- Configuration upload interface (HTML form with file input)
+- Current audit view (only one audit at a time, or simple list with delete option)
+  - Shows current audit status and findings
+  - Option to delete current audit and create new one
+- Audit detail view (findings)
+  - Finding display with grouping options (grouped by rule, config path, root cause hash, or flat list)
+  - Helps analysts manage findings when one misconfig triggers many findings
+- Report viewer (HTML page)
+- Rules management interface (HTML forms for view and manage rules)
+
+### 10.2 UI Components
+
+- HTML structure with semantic markup
+- CSS for styling (simple, clean design)
+- JavaScript for interactivity:
+  - Real-time progress tracking: Direct UI updates during synchronous execution
+    - Progress tracked in memory during execution
+    - Updates displayed as audit progresses (percentage bar, rule count)
+    - JavaScript polling via fetch API
+  - File upload handling (HTML5 file input)
+  - Data tables with filtering (vanilla JavaScript)
+  - Modal dialogs (CSS + JavaScript)
+  - Toast notifications (simple JavaScript)
+- Responsive design (CSS media queries)
+- Vanilla JavaScript (ES6+) with fetch API for backend communication
+- Finding display: findings stored as flat list, with report-time grouping options for analyst usability
+  - Grouping dimensions: same rule, same config path, same root cause hash
+  - Grouping is report-time only (not execution-time, preserves complete data)
+  - Helps analysts manage findings when one misconfig triggers many findings
+
+## Phase 11: (Removed - No Audit Comparison Required)
+
+Audit comparison not needed for local single-assessment application.
+
+## Phase 12: (Removed - No Remediation Tracking Required)
+
+Remediation tracking not needed. User can track remediation externally if needed.
+
+## Phase 13: (Removed - No Webhooks Required)
+
+Webhooks not needed for local application. All processing happens synchronously on the user's device.
+
+## Phase 14: Security Features
+
+- Input validation and sanitization
+- XSS prevention
+- SQL injection prevention
+- Secure file upload handling:
+  - Configurable file extension restrictions
+  - No virus/malware scanning
+  - No content validation (files don't need to look like network config)
+- Python rule execution security:
+  - Python rules execute in separate OS process (REQUIRED - in-process execution is not safe)
+  - Execution model: Sequential execution (one Python rule at a time in separate subprocess)
+    - Each rule execution uses separate subprocess (maintains security isolation)
+    - Rules execute one after another (no parallelism needed for single assessment)
+  - Implementation pattern: subprocess execution with process isolation
+  - Read-only input via JSON (no shared memory, serialized config passed to subprocess)
+  - Output via pipe/stdout (subprocess returns findings via stdout/pipe)
+  - Hard timeout kill (process termination if rule exceeds timeout)
+  - CPU limits, memory limits, timeouts enforced at OS level
+  - No network access allowed
+  - No shared interpreter state (separate process prevents introspection, __subclasses__ traversal, GC abuse, timing side-channels)
+  - Prevents escaping via allowed built-ins (isolated process)
+- Audit logging: actions logged, stored in files, manual retention policy
+
+## Phase 15: Testing
+
+### 15.1 Test Coverage
+
+- Unit tests for models, services, parsers
+- End-to-end tests for critical workflows
+- Parser tests: both sample configuration files in repository and synthetic config generators
+- Rule engine tests: both sample parsed configurations and synthetic test data generators
+
+### 15.2 Test Strategy
+
+- Test-driven development approach
+- Coverage target: 80%+
+- Continuous integration setup
+- Performance testing
+- Security testing (OWASP guidelines)
+
+## Phase 16: Local Installation
+
+- Local installation: Simple installation process for end users
+- Environment variable management (minimal, for local configuration)
+- Logging configuration (file-based logging only)
+- Database configuration: SQLite only (local file-based database)
+  - Database file stored in user's local application directory
+  - No database server required
+  - Automatic database initialization on first run
+- Backup strategies: User-managed (copy database file)
+  - What's backed up: database file (includes all rules, audits with full parsed config JSONField), and media files
+  - Storage size impact: Audit JSONField (raw AST + normalized JSON + original config) significantly increases database file size
+  - Retention policies STRONGLY ENCOURAGED to manage storage (older audits can be archived/deleted)
+  - Separate export/import functionality for rules only (YAML export/import)
+  - SQLite: file-based backup (copy .db file)
+  - Backup frequency, storage location: User's choice
+  - Database size considerations: Large configs + frequent audits + long retention = large database files (retention policies reduce database size over time)
+- Application launcher: Simple Python script to start HTTP server
+- Static file serving: Python HTTP server (serves HTML, CSS, JS files)
+- Media file serving: Python HTTP server (serves uploaded files)
+- Documentation for installation (installation guide for end users)
+
+## Implementation Order
+
+1. **Foundation** (Phases 1-2): Specification document and project setup
+2. **Core Data** (Phase 3): Database models
+3. **Parsing** (Phase 5): Multi-vendor configuration parsing
+4. **Rules** (Phase 6): Rule system and execution engine
+5. **Auditing** (Phase 7): Audit processing (synchronous, single assessment)
+6. **Reporting** (Phase 8): Report generation (HTML, optional PDF)
+7. **API** (Phase 9): Python HTTP server and API endpoints
+8. **UI** (Phase 10): HTML/CSS/JavaScript interface
+9. **Security & Testing** (Phases 14-15): Security hardening and testing
+10. **Local Installation** (Phase 16): Local installation setup for end users
+
+## Key Files & Structure
+
+```
+ncrt/
+├── server.py          # Python HTTP server (main entry point)
+├── requirements.txt
+├── README.md
+├── api/               # Python API endpoints
+│   ├── __init__.py
+│   ├── audits.py      # Audit API endpoints
+│   ├── rules.py       # Rule API endpoints
+│   ├── reports.py     # Report API endpoints
+│   └── upload.py      # File upload handling
+├── models/            # Database models
+│   ├── __init__.py
+│   ├── audit.py       # Audit and Finding models
+│   └── rule.py        # Rule model
+├── services/          # Business logic
+│   ├── __init__.py
+│   ├── audit_service.py
+│   ├── rule_engine.py # Rule execution engine
+│   ├── python_executor.py  # Python rule executor (sequential subprocess execution)
+│   ├── report_generator.py
+│   └── database.py    # Database connection and queries
+├── parsers/           # Multi-vendor parsers
+│   ├── __init__.py
+│   ├── base.py        # Abstract parser interface
+│   ├── factory.py     # Parser factory
+│   ├── registry.py    # Parser registration
+│   ├── cisco/
+│   ├── juniper/
+│   ├── arista/
+│   └── [vendor]/      # Additional vendor parsers
+├── static/            # Static files
+│   ├── css/           # CSS files
+│   ├── js/            # JavaScript files
+│   └── images/        # Image files
+├── templates/         # HTML templates
+│   ├── index.html
+│   ├── audit.html
+│   ├── rules.html
+│   └── report.html
+├── media/             # User-uploaded files
+└── data/              # Database and data files
+    └── ncrt.db        # SQLite database
+```
+
+## Technology Stack Summary
+
+- **Backend**: Python 3.8+ (http.server or Flask for simple API)
+- **Database**: SQLite (local file-based database, sqlite3 standard library)
+- **Frontend**: HTML, CSS, JavaScript (vanilla, no frameworks)
+- **File Storage**: Local filesystem
+- **PDF Generation**: ReportLab or WeasyPrint (optional)
+- **Rule Format**: YAML (stored in database TextField)
+- **Rule Storage**: Database-based (not file-based)
+- **Processing**: Synchronous (single assessment at a time)
+
+## Key Design Decisions
+
+1. **Database-Based Ruleset**: Rules stored in database as YAML text in TextField for centralized management (database is source of truth, with import/export capabilities)
+2. **Plugin Architecture**: Extensible multi-vendor parser system with clear extension points
+3. **Simple Stack**: HTML, CSS, JavaScript frontend with Python backend (no frameworks, just standard library + minimal dependencies)
+4. **Database Configuration**: SQLite only (local file-based database, sqlite3 standard library)
+5. **Local Application**: Runs locally on end user's device, no server deployment needed
+6. **No Authentication**: Single-user, single-tenant system with no authentication required
+7. **Realistic Parser Approach**: Parse into raw AST, normalize only security-relevant domains (authentication, encryption, access control, etc.), preserve rest as structured raw blocks
+8. **Flexible Compliance Mapping**: Support for any compliance framework through tagging with configurable scoring
+9. **Synchronous Processing**: All processing runs synchronously (single assessment at a time, no async needed)
+10. **Error Handling**: Detailed error reporting, continue processing where possible (partial results)
+11. **Finding Reporting**: All matching rules report findings (no deduplication at execution, stored as flat list), with report-time grouping options (by rule, config path, root cause hash) for analyst usability
+12. **No Versioning**: Rules have no version history - always use latest rules, edited in place
+13. **No Audit History**: Only one audit at a time (old audits deleted when new audit created, or user can manually delete)
+14. **Initial Rules**: System ships with pre-installed rules (default compliance frameworks, security best practices)
+14. **Parser Auto-Detection**: Automatic vendor/device detection with manual override option
+15. **Configuration Retention**: Configurable retention policies for uploaded configuration files. STRONGLY ENCOURAGED due to storage size impact: Audit JSONField (raw AST + normalized JSON + original config) can be multi-MB per audit, database bloat expected with large configs/frequent audits/long retention, backup costs increase with full audit data, JSONField NOT indexed and excluded from list views for query performance
+16. **Report Generation**: On-demand generation (no caching)
+17. **Progress Tracking**: In-memory progress tracking during synchronous execution, UI updated directly (no database persistence needed)
+18. **Rule Testing**: Comprehensive testing interface (samples, synthetic, dry-run mode)
+19. **Rule Management**: Create/edit rules in database (editing is in place, no version history), no rule sets needed
+20. **Rule Execution**: Independent rules, execute sequentially, query Rule model directly (use current/latest rules)
+21. **Python Rules Security**: Python rules execute in separate OS process (REQUIRED), sequential execution (one subprocess at a time, maintains isolation), read-only JSON input, output via pipe/stdout, hard timeout kill, no shared memory, CPU/memory limits at OS level, no network access
+22. **File Upload**: Configurable global limits and extension restrictions
+23. **Rule Import/Export**: YAML import/export functionality for backup/sharing
+24. **Initial Rules**: Loaded via Python script on first run
+25. **Rule Querying**: Query database directly (no caching, no periodic reload, rules always current)
+26. **Rule Selection**: User selects rules individually or by category/tag when creating audit
+27. **Error Notifications**: In-app only (no email, no webhook events)
+28. **Finding Display**: Findings stored as flat list (complete data preserved), with report-time grouping options (by rule, config path, root cause hash) for analyst usability
+29. **Device Family**: Vendor + OS + model granularity
+30. **Parser Output**: Raw AST structure, normalized security-relevant domains, stored in Audit JSONField, original config stored alongside. JSONField NOT indexed, heavy data excluded from list views
+31. **Parser Scope**: Commercial-grade Nipper alternative - focus on security-relevant sections (authentication, encryption, access control, firewalls, VPN), not full configuration feature parity
+32. **Rule Organization**: Rules organized by category/tags (no rule sets needed)
+33. **Report Formats**: HTML (primary), PDF (optional)
+34. **No Dashboard**: Simple current audit view, no aggregated statistics needed
+35. **No Audit History**: Only one audit at a time (old audits deleted automatically or manually)
+
