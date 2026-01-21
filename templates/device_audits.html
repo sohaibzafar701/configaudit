@@ -79,7 +79,7 @@
                         <div class="flex items-start justify-between">
                             <div class="flex-1">
                                 <div class="flex items-center gap-3 mb-3">
-                                    <h3 class="text-lg font-semibold">Audit #${audit.id}</h3>
+                                    <h3 class="text-lg font-semibold">Audit #${audit.audit_number || audit.id}</h3>
                                     <span class="px-3 py-1 rounded-full text-xs font-medium ${statusColor}">${audit.status || 'Unknown'}</span>
                                 </div>
                                 

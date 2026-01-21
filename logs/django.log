@@ -1173,3 +1173,314 @@ INFO 2026-01-21 20:25:10,865 apps.core.utils utils log_audit_action 35 CREATE: C
 INFO 2026-01-21 20:31:15,787 apps.core.utils utils log_audit_action 35 CREATE: Created audit for SW9K-I9-Core-1 | User: tournamentshelp | Org: MMBL | IP: 223.123.73.179
 WARNING 2026-01-21 20:32:08,880 django.request log log_message 249 Not Found: /.git/config
 WARNING 2026-01-21 20:50:29,791 django.request log log_message 249 Not Found: /favicon.ico
+INFO 2026-01-21 20:57:23,419 apps.core.utils utils log_audit_action 35 LOGOUT: User tournamentshelp logged out | User: tournamentshelp | Org: MMBL | IP: 223.123.73.179
+INFO 2026-01-21 20:57:33,962 apps.email_delivery.services.dns_service dns_service get_mx_records 71 Resolving MX records for domain: gmail.com
+INFO 2026-01-21 20:57:34,001 apps.email_delivery.services.dns_service dns_service get_mx_records 87 Found 5 MX record(s) for gmail.com: [(5, 'gmail-smtp-in.l.google.com'), (10, 'alt1.gmail-smtp-in.l.google.com'), (20, 'alt2.gmail-smtp-in.l.google.com'), (30, 'alt3.gmail-smtp-in.l.google.com'), (40, 'alt4.gmail-smtp-in.l.google.com')]
+INFO 2026-01-21 20:57:34,001 apps.email_delivery.services.email_service email_service send_to_mx_server 108 Attempting to send email to MX server: gmail-smtp-in.l.google.com (priority: 5)
+INFO 2026-01-21 20:57:38,253 apps.email_delivery.services.email_service email_service send_to_mx_server 143 Successfully sent email via MX server: gmail-smtp-in.l.google.com
+INFO 2026-01-21 20:57:38,674 apps.email_delivery.services.email_service email_service send_email_direct 224 Successfully sent email to domain gmail.com via MX server
+INFO 2026-01-21 20:57:38,675 apps.email_delivery.utils utils send_2fa_code_email 248 2FA code email sent to chmsohaib701@gmail.com
+WARNING 2026-01-21 21:01:20,530 django.request log log_message 249 Bad Request: /verify-2fa/
+WARNING 2026-01-21 21:01:23,350 django.request log log_message 249 Bad Request: /verify-2fa/
+INFO 2026-01-21 21:01:25,770 apps.email_delivery.services.email_service email_service send_to_mx_server 108 Attempting to send email to MX server: gmail-smtp-in.l.google.com (priority: 5)
+INFO 2026-01-21 21:01:29,145 apps.email_delivery.services.email_service email_service send_to_mx_server 143 Successfully sent email via MX server: gmail-smtp-in.l.google.com
+INFO 2026-01-21 21:01:29,572 apps.email_delivery.services.email_service email_service send_email_direct 224 Successfully sent email to domain gmail.com via MX server
+INFO 2026-01-21 21:01:29,572 apps.email_delivery.utils utils send_2fa_code_email 248 2FA code email sent to chmsohaib701@gmail.com
+INFO 2026-01-21 21:01:52,274 apps.core.utils utils log_audit_action 35 LOGIN: User admin logged in with 2FA | User: admin | Org: N/A | IP: 223.123.73.179
+INFO 2026-01-21 21:02:33,119 apps.core.utils utils log_audit_action 35 CREATE: Created organization: HBL | User: admin | Org: N/A | IP: 223.123.73.179
+INFO 2026-01-21 21:02:33,473 apps.email_delivery.services.dns_service dns_service get_mx_records 71 Resolving MX records for domain: gmail.com
+INFO 2026-01-21 21:02:33,476 apps.email_delivery.services.dns_service dns_service get_mx_records 87 Found 5 MX record(s) for gmail.com: [(5, 'gmail-smtp-in.l.google.com'), (10, 'alt1.gmail-smtp-in.l.google.com'), (20, 'alt2.gmail-smtp-in.l.google.com'), (30, 'alt3.gmail-smtp-in.l.google.com'), (40, 'alt4.gmail-smtp-in.l.google.com')]
+INFO 2026-01-21 21:02:33,476 apps.email_delivery.services.email_service email_service send_to_mx_server 108 Attempting to send email to MX server: gmail-smtp-in.l.google.com (priority: 5)
+INFO 2026-01-21 21:02:36,910 apps.email_delivery.services.email_service email_service send_to_mx_server 143 Successfully sent email via MX server: gmail-smtp-in.l.google.com
+INFO 2026-01-21 21:02:37,332 apps.email_delivery.services.email_service email_service send_email_direct 224 Successfully sent email to domain gmail.com via MX server
+INFO 2026-01-21 21:02:37,332 apps.email_delivery.utils utils send_organization_created_email 125 Organization creation email sent to sohaibzafar700@gmail.com
+INFO 2026-01-21 21:03:49,223 apps.core.utils utils log_audit_action 35 CREATE: POC sohaibzafar700 created account for organization HBL | User: sohaibzafar700 | Org: HBL | IP: 223.123.73.179
+INFO 2026-01-21 21:04:00,546 apps.core.utils utils log_audit_action 35 LOGOUT: User admin logged out | User: admin | Org: N/A | IP: 223.123.73.179
+INFO 2026-01-21 21:04:07,394 apps.email_delivery.services.dns_service dns_service get_mx_records 71 Resolving MX records for domain: gmail.com
+INFO 2026-01-21 21:04:07,397 apps.email_delivery.services.dns_service dns_service get_mx_records 87 Found 5 MX record(s) for gmail.com: [(5, 'gmail-smtp-in.l.google.com'), (10, 'alt1.gmail-smtp-in.l.google.com'), (20, 'alt2.gmail-smtp-in.l.google.com'), (30, 'alt3.gmail-smtp-in.l.google.com'), (40, 'alt4.gmail-smtp-in.l.google.com')]
+INFO 2026-01-21 21:04:07,397 apps.email_delivery.services.email_service email_service send_to_mx_server 108 Attempting to send email to MX server: gmail-smtp-in.l.google.com (priority: 5)
+INFO 2026-01-21 21:04:10,948 apps.email_delivery.services.email_service email_service send_to_mx_server 143 Successfully sent email via MX server: gmail-smtp-in.l.google.com
+INFO 2026-01-21 21:04:11,373 apps.email_delivery.services.email_service email_service send_email_direct 224 Successfully sent email to domain gmail.com via MX server
+INFO 2026-01-21 21:04:11,373 apps.email_delivery.utils utils send_2fa_code_email 248 2FA code email sent to sohaibzafar700@gmail.com
+INFO 2026-01-21 21:04:45,520 apps.core.utils utils log_audit_action 35 LOGIN: User sohaibzafar700 logged in with 2FA | User: sohaibzafar700 | Org: HBL | IP: 223.123.73.179
+INFO 2026-01-21 21:05:28,939 apps.core.utils utils log_audit_action 35 CREATE: Created audit for SW9K-I9-Core-1 | User: sohaibzafar700 | Org: HBL | IP: 223.123.73.179
+INFO 2026-01-21 21:13:44,101 apps.core.utils utils log_audit_action 35 DELETE: Deleted audit 10 | User: sohaibzafar700 | Org: HBL | IP: 223.123.73.179
+INFO 2026-01-21 21:13:59,966 apps.core.utils utils log_audit_action 35 CREATE: Created audit for SW9K-I9-Core-1 | User: sohaibzafar700 | Org: HBL | IP: 223.123.73.179
+INFO 2026-01-21 21:19:04,167 apps.core.utils utils log_audit_action 35 CREATE: Created audit for SWCAT-I9-IB-2 | User: sohaibzafar700 | Org: HBL | IP: 223.123.73.179
+WARNING 2026-01-21 21:24:36,194 django.request log log_message 249 Not Found: /favicon.ico
+WARNING 2026-01-21 21:26:12,815 django.request log log_message 249 Not Found: /favicon.ico
+ERROR 2026-01-21 21:32:30,475 django.security.DisallowedHost log log_message 249 Invalid HTTP_HOST header: '169.254.169.254'. You may need to add '169.254.169.254' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/utils/deprecation.py", line 308, in __call__
+    response = self.process_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/http/request.py", line 205, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '169.254.169.254'. You may need to add '169.254.169.254' to ALLOWED_HOSTS.
+ERROR 2026-01-21 21:32:30,499 django.security.DisallowedHost log log_message 249 Invalid HTTP_HOST header: 'aws.zaproxy.org'. You may need to add 'aws.zaproxy.org' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/utils/deprecation.py", line 308, in __call__
+    response = self.process_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/http/request.py", line 205, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'aws.zaproxy.org'. You may need to add 'aws.zaproxy.org' to ALLOWED_HOSTS.
+ERROR 2026-01-21 21:32:30,527 django.security.DisallowedHost log log_message 249 Invalid HTTP_HOST header: '169.254.169.254'. You may need to add '169.254.169.254' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/utils/deprecation.py", line 308, in __call__
+    response = self.process_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/http/request.py", line 205, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '169.254.169.254'. You may need to add '169.254.169.254' to ALLOWED_HOSTS.
+ERROR 2026-01-21 21:32:30,547 django.security.DisallowedHost log log_message 249 Invalid HTTP_HOST header: 'metadata.google.internal'. You may need to add 'metadata.google.internal' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/utils/deprecation.py", line 308, in __call__
+    response = self.process_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/http/request.py", line 205, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'metadata.google.internal'. You may need to add 'metadata.google.internal' to ALLOWED_HOSTS.
+ERROR 2026-01-21 21:32:30,567 django.security.DisallowedHost log log_message 249 Invalid HTTP_HOST header: '169.254.169.254'. You may need to add '169.254.169.254' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/utils/deprecation.py", line 308, in __call__
+    response = self.process_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/http/request.py", line 205, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '169.254.169.254'. You may need to add '169.254.169.254' to ALLOWED_HOSTS.
+ERROR 2026-01-21 21:32:30,662 django.security.DisallowedHost log log_message 249 Invalid HTTP_HOST header: 'metadata.oraclecloud.com'. You may need to add 'metadata.oraclecloud.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/utils/deprecation.py", line 308, in __call__
+    response = self.process_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/http/request.py", line 205, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'metadata.oraclecloud.com'. You may need to add 'metadata.oraclecloud.com' to ALLOWED_HOSTS.
+ERROR 2026-01-21 21:32:30,696 django.security.DisallowedHost log log_message 249 Invalid HTTP_HOST header: '100.100.100.200'. You may need to add '100.100.100.200' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/utils/deprecation.py", line 308, in __call__
+    response = self.process_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/http/request.py", line 205, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '100.100.100.200'. You may need to add '100.100.100.200' to ALLOWED_HOSTS.
+ERROR 2026-01-21 21:32:30,718 django.security.DisallowedHost log log_message 249 Invalid HTTP_HOST header: 'alibaba.zaproxy.org'. You may need to add 'alibaba.zaproxy.org' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/utils/deprecation.py", line 308, in __call__
+    response = self.process_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/http/request.py", line 205, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'alibaba.zaproxy.org'. You may need to add 'alibaba.zaproxy.org' to ALLOWED_HOSTS.
+ERROR 2026-01-21 21:32:30,747 django.security.DisallowedHost log log_message 249 Invalid HTTP_HOST header: '169.254.169.254'. You may need to add '169.254.169.254' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/utils/deprecation.py", line 308, in __call__
+    response = self.process_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/http/request.py", line 205, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '169.254.169.254'. You may need to add '169.254.169.254' to ALLOWED_HOSTS.
+ERROR 2026-01-21 21:32:33,735 django.security.DisallowedHost log log_message 249 Invalid HTTP_HOST header: '169.254.169.254'. You may need to add '169.254.169.254' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/utils/deprecation.py", line 308, in __call__
+    response = self.process_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/http/request.py", line 205, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '169.254.169.254'. You may need to add '169.254.169.254' to ALLOWED_HOSTS.
+ERROR 2026-01-21 21:32:33,756 django.security.DisallowedHost log log_message 249 Invalid HTTP_HOST header: 'aws.zaproxy.org'. You may need to add 'aws.zaproxy.org' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/utils/deprecation.py", line 308, in __call__
+    response = self.process_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/http/request.py", line 205, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'aws.zaproxy.org'. You may need to add 'aws.zaproxy.org' to ALLOWED_HOSTS.
+ERROR 2026-01-21 21:32:33,784 django.security.DisallowedHost log log_message 249 Invalid HTTP_HOST header: '169.254.169.254'. You may need to add '169.254.169.254' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/utils/deprecation.py", line 308, in __call__
+    response = self.process_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/http/request.py", line 205, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '169.254.169.254'. You may need to add '169.254.169.254' to ALLOWED_HOSTS.
+ERROR 2026-01-21 21:32:33,807 django.security.DisallowedHost log log_message 249 Invalid HTTP_HOST header: 'metadata.google.internal'. You may need to add 'metadata.google.internal' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/utils/deprecation.py", line 308, in __call__
+    response = self.process_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/http/request.py", line 205, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'metadata.google.internal'. You may need to add 'metadata.google.internal' to ALLOWED_HOSTS.
+ERROR 2026-01-21 21:32:33,913 django.security.DisallowedHost log log_message 249 Invalid HTTP_HOST header: '169.254.169.254'. You may need to add '169.254.169.254' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/utils/deprecation.py", line 308, in __call__
+    response = self.process_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/http/request.py", line 205, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '169.254.169.254'. You may need to add '169.254.169.254' to ALLOWED_HOSTS.
+ERROR 2026-01-21 21:32:33,946 django.security.DisallowedHost log log_message 249 Invalid HTTP_HOST header: 'metadata.oraclecloud.com'. You may need to add 'metadata.oraclecloud.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/utils/deprecation.py", line 308, in __call__
+    response = self.process_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/http/request.py", line 205, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'metadata.oraclecloud.com'. You may need to add 'metadata.oraclecloud.com' to ALLOWED_HOSTS.
+ERROR 2026-01-21 21:32:33,983 django.security.DisallowedHost log log_message 249 Invalid HTTP_HOST header: '100.100.100.200'. You may need to add '100.100.100.200' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/utils/deprecation.py", line 308, in __call__
+    response = self.process_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/http/request.py", line 205, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '100.100.100.200'. You may need to add '100.100.100.200' to ALLOWED_HOSTS.
+ERROR 2026-01-21 21:32:34,004 django.security.DisallowedHost log log_message 249 Invalid HTTP_HOST header: 'alibaba.zaproxy.org'. You may need to add 'alibaba.zaproxy.org' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/utils/deprecation.py", line 308, in __call__
+    response = self.process_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/http/request.py", line 205, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'alibaba.zaproxy.org'. You may need to add 'alibaba.zaproxy.org' to ALLOWED_HOSTS.
+ERROR 2026-01-21 21:32:34,034 django.security.DisallowedHost log log_message 249 Invalid HTTP_HOST header: '169.254.169.254'. You may need to add '169.254.169.254' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/utils/deprecation.py", line 308, in __call__
+    response = self.process_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/http/request.py", line 205, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '169.254.169.254'. You may need to add '169.254.169.254' to ALLOWED_HOSTS.
+WARNING 2026-01-21 21:48:19,189 django.security.SuspiciousSession base decode 140 Session data corrupted
+INFO 2026-01-21 21:48:24,360 apps.email_delivery.services.dns_service dns_service get_mx_records 71 Resolving MX records for domain: gmail.com
+INFO 2026-01-21 21:48:24,400 apps.email_delivery.services.dns_service dns_service get_mx_records 87 Found 5 MX record(s) for gmail.com: [(5, 'gmail-smtp-in.l.google.com'), (10, 'alt1.gmail-smtp-in.l.google.com'), (20, 'alt2.gmail-smtp-in.l.google.com'), (30, 'alt3.gmail-smtp-in.l.google.com'), (40, 'alt4.gmail-smtp-in.l.google.com')]
+INFO 2026-01-21 21:48:24,400 apps.email_delivery.services.email_service email_service send_to_mx_server 108 Attempting to send email to MX server: gmail-smtp-in.l.google.com (priority: 5)
+INFO 2026-01-21 21:48:28,693 apps.email_delivery.services.email_service email_service send_to_mx_server 143 Successfully sent email via MX server: gmail-smtp-in.l.google.com
+INFO 2026-01-21 21:48:29,116 apps.email_delivery.services.email_service email_service send_email_direct 224 Successfully sent email to domain gmail.com via MX server
+INFO 2026-01-21 21:48:29,117 apps.email_delivery.utils utils send_2fa_code_email 248 2FA code email sent to sohaibzafar700@gmail.com
+INFO 2026-01-21 21:48:42,143 apps.core.utils utils log_audit_action 35 LOGIN: User sohaibzafar700 logged in with 2FA | User: sohaibzafar700 | Org: HBL | IP: 223.123.73.179
+WARNING 2026-01-21 21:51:11,273 django.request log log_message 249 Not Found: /+CSCOL+/Java.jar
+WARNING 2026-01-21 21:51:12,554 django.request log log_message 249 Not Found: /+CSCOE+/logon_forms.js
+WARNING 2026-01-21 21:51:13,828 django.request log log_message 249 Not Found: /+CSCOL+/a1.jar
+WARNING 2026-01-21 21:51:15,367 django.request log log_message 249 Not Found: /+CSCOE+/transfer.js
+WARNING 2026-01-21 21:53:37,691 django.request log log_message 249 Not Found: /favicon.ico
+INFO 2026-01-21 21:53:45,924 apps.email_delivery.services.dns_service dns_service get_mx_records 71 Resolving MX records for domain: gmail.com
+INFO 2026-01-21 21:53:45,927 apps.email_delivery.services.dns_service dns_service get_mx_records 87 Found 5 MX record(s) for gmail.com: [(5, 'gmail-smtp-in.l.google.com'), (10, 'alt1.gmail-smtp-in.l.google.com'), (20, 'alt2.gmail-smtp-in.l.google.com'), (30, 'alt3.gmail-smtp-in.l.google.com'), (40, 'alt4.gmail-smtp-in.l.google.com')]
+INFO 2026-01-21 21:53:45,928 apps.email_delivery.services.email_service email_service send_to_mx_server 108 Attempting to send email to MX server: gmail-smtp-in.l.google.com (priority: 5)
+INFO 2026-01-21 21:53:49,771 apps.email_delivery.services.email_service email_service send_to_mx_server 143 Successfully sent email via MX server: gmail-smtp-in.l.google.com
+INFO 2026-01-21 21:53:50,192 apps.email_delivery.services.email_service email_service send_email_direct 224 Successfully sent email to domain gmail.com via MX server
+INFO 2026-01-21 21:53:50,193 apps.email_delivery.utils utils send_2fa_code_email 248 2FA code email sent to tournamentshelp@gmail.com
+INFO 2026-01-21 21:54:16,864 apps.core.utils utils log_audit_action 35 LOGIN: User tournamentshelp logged in with 2FA | User: tournamentshelp | Org: MMBL | IP: 223.123.73.179
+INFO 2026-01-21 21:54:33,684 apps.core.utils utils log_audit_action 35 CREATE: Created audit for SWCAT-I9-IB-2 | User: tournamentshelp | Org: MMBL | IP: 223.123.73.179
+INFO 2026-01-21 21:55:03,109 apps.core.utils utils log_audit_action 35 CREATE: Created audit for SW9K-I9-Core-1 | User: tournamentshelp | Org: MMBL | IP: 223.123.73.179
+INFO 2026-01-21 21:55:58,824 apps.core.utils utils log_audit_action 35 CREATE: Created audit for SW9K-I9-Core-1 | User: tournamentshelp | Org: MMBL | IP: 223.123.73.179

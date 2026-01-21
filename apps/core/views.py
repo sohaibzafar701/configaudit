@@ -32,6 +32,29 @@ from services.metadata_extractor import extract_metadata
 from services.config_diff import compare_configs
 
 
+# Helper function to get organization-relative audit number
+def get_organization_audit_number(audit, organization):
+    """Calculate the audit number relative to the organization (1-indexed)"""
+    if not audit or not organization:
+        return None
+    try:
+        # Get all audits for this organization, ordered by created_at (oldest first)
+        all_org_audits = Audit.objects.filter(
+            organization=organization
+        ).order_by('created_at', 'id').values_list('id', flat=True)
+        
+        # Convert to list and find the index of this audit
+        audit_ids = list(all_org_audits)
+        try:
+            index = audit_ids.index(audit.id)
+            return index + 1  # 1-indexed
+        except ValueError:
+            # Audit not found in organization's audits (shouldn't happen, but handle gracefully)
+            return None
+    except Exception:
+        return None
+
+
 # Helper function to convert Django model to dict
 def model_to_dict(model_instance):
     """Convert Django model instance to dictionary"""
@@ -786,6 +809,9 @@ def audits_api(request):
                     else:
                         return JsonResponse({'error': 'No organization found'}, status=403)
                     audit_dict = model_to_dict(audit)
+                    # Add organization-relative audit number
+                    if hasattr(request, 'organization') and request.organization:
+                        audit_dict['audit_number'] = get_organization_audit_number(audit, request.organization)
                     findings = Finding.objects.filter(audit=audit).select_related('rule')
                     findings_list = []
                     for finding in findings:
@@ -823,6 +849,9 @@ def audits_api(request):
         
         if audit:
             audit_dict = model_to_dict(audit)
+            # Add organization-relative audit number
+            if hasattr(request, 'organization') and request.organization:
+                audit_dict['audit_number'] = get_organization_audit_number(audit, request.organization)
             findings = Finding.objects.filter(audit=audit).select_related('rule')
             findings_list = []
             for finding in findings:
@@ -1012,7 +1041,15 @@ def audits_api(request):
             audit_id = data.get('audit_id')
             if audit_id:
                 try:
-                    audit = Audit.objects.get(id=audit_id)
+                    # Filter by organization (unless super admin)
+                    if hasattr(request, 'user_role') and request.user_role == 'super_admin':
+                        return JsonResponse({'error': 'Super Admin cannot access individual audits'}, status=403)
+                    
+                    if hasattr(request, 'organization') and request.organization:
+                        audit = Audit.objects.get(id=audit_id, organization=request.organization)
+                    else:
+                        return JsonResponse({'error': 'No organization found'}, status=403)
+                    
                     progress = audit.get_progress()
                     progress['audit_id'] = audit_id
                     return JsonResponse(progress, status=200)
@@ -1024,7 +1061,15 @@ def audits_api(request):
             audit_id = data.get('audit_id')
             if audit_id:
                 try:
-                    audit = Audit.objects.get(id=audit_id)
+                    # Filter by organization (unless super admin)
+                    if hasattr(request, 'user_role') and request.user_role == 'super_admin':
+                        return JsonResponse({'error': 'Super Admin cannot access individual audits'}, status=403)
+                    
+                    if hasattr(request, 'organization') and request.organization:
+                        audit = Audit.objects.get(id=audit_id, organization=request.organization)
+                    else:
+                        return JsonResponse({'error': 'No organization found'}, status=403)
+                    
                     audit.update_status(Audit.STATUS_CANCELLED)
                     return JsonResponse({'status': 'cancelled'}, status=200)
                 except Audit.DoesNotExist:
@@ -1061,12 +1106,21 @@ def audits_api(request):
                 return JsonResponse({'error': 'audit_id required'}, status=400)
             
             try:
-                parent_audit = Audit.objects.get(id=audit_id)
+                # Filter by organization (unless super admin)
+                if hasattr(request, 'user_role') and request.user_role == 'super_admin':
+                    return JsonResponse({'error': 'Super Admin cannot access individual audits'}, status=403)
+                
+                if hasattr(request, 'organization') and request.organization:
+                    parent_audit = Audit.objects.get(id=audit_id, organization=request.organization)
+                else:
+                    return JsonResponse({'error': 'No organization found'}, status=403)
+                
                 if parent_audit.status != Audit.STATUS_COMPLETED:
                     return JsonResponse({'error': 'Can only create snapshots of completed audits'}, status=400)
                 
-                # Create snapshot
+                # Create snapshot - ensure it belongs to the same organization
                 snapshot = Audit.objects.create(
+                    organization=request.organization,
                     device_identifier=parent_audit.device_identifier or parent_audit.config_file or 'Unknown',
                     device_family=parent_audit.device_family,
                     config_file=parent_audit.config_file,
@@ -1659,6 +1713,9 @@ def reports_api(request):
     elif format_type == 'json':
         findings = get_filtered_findings(audit.id, filters, sort_by, sort_order, group_by)
         audit_dict = model_to_dict(audit)
+        # Add organization-relative audit number
+        if hasattr(request, 'organization') and request.organization:
+            audit_dict['audit_number'] = get_organization_audit_number(audit, request.organization)
         result = {
             'audit': audit_dict,
             'findings': findings,
@@ -1681,6 +1738,9 @@ def reports_api(request):
     else:  # HTML format (default)
         findings = get_filtered_findings(audit.id, filters, sort_by, sort_order, group_by)
         audit_dict = model_to_dict(audit)
+        # Add organization-relative audit number
+        if hasattr(request, 'organization') and request.organization:
+            audit_dict['audit_number'] = get_organization_audit_number(audit, request.organization)
         audit_dict['findings'] = findings
         
         if include_statistics or 'statistics' in sections:
@@ -1832,7 +1892,8 @@ def stats_api(request):
             # Super Admin: Aggregated stats only (counts, not individual data)
             all_audits = Audit.objects.all()  # For counting only
             total_audits = all_audits.count()
-            total_findings = Finding.objects.count()
+            # Count only parent findings (not children)
+            total_findings = Finding.objects.filter(parent_finding__isnull=True).count()
             active_rules_count = Rule.objects.filter(enabled=True).count()
             completed_audits = all_audits.filter(status=Audit.STATUS_COMPLETED)
         else:
@@ -1840,8 +1901,8 @@ def stats_api(request):
             if hasattr(request, 'organization') and request.organization:
                 all_audits = Audit.objects.filter(organization=request.organization)
                 total_audits = all_audits.count()
-                # Count findings for organization's audits only
-                total_findings = Finding.objects.filter(audit__organization=request.organization).count()
+                # Count only parent findings (not children) for organization's audits only
+                total_findings = Finding.objects.filter(audit__organization=request.organization, parent_finding__isnull=True).count()
                 # Count organization's rules only
                 active_rules_count = Rule.objects.filter(enabled=True, organization=request.organization).count()
                 completed_audits = all_audits.filter(status=Audit.STATUS_COMPLETED)
@@ -1908,11 +1969,15 @@ def stats_api(request):
         
         for audit in recent_audits_query:
             try:
-                findings_count = Finding.objects.filter(audit=audit).count()
+                # Count only parent findings (not children)
+                findings_count = Finding.objects.filter(audit=audit, parent_finding__isnull=True).count()
                 created_at_iso = audit.created_at.isoformat() if audit.created_at else None
                 created_at_formatted = format_datetime_from_iso(created_at_iso, timezone_str, date_format_py) if created_at_iso else None
+                # Calculate organization-relative audit number
+                audit_number = get_organization_audit_number(audit, request.organization) if hasattr(request, 'organization') and request.organization else None
                 recent_audits.append({
                     'id': audit.id,
+                    'audit_number': audit_number,
                     'config_file': audit.config_file or 'Unknown',
                     'status': audit.status,
                     'created_at': created_at_iso,
@@ -1980,7 +2045,8 @@ def assets_api(request, device_identifier=None):
                     organization=request.organization
                 ).order_by('-created_at').first()
                 if latest_audit:
-                    findings_count = Finding.objects.filter(audit=latest_audit).count()
+                    # Count only parent findings (not children)
+                    findings_count = Finding.objects.filter(audit=latest_audit, parent_finding__isnull=True).count()
                     audit_dict = model_to_dict(latest_audit)
                     audit_dict['findings'] = []
                     audit_dict['finding_count'] = findings_count
@@ -1997,8 +2063,11 @@ def assets_api(request, device_identifier=None):
         audits_list = []
         for audit in audits:
             audit_dict = model_to_dict(audit)
-            findings_count = Finding.objects.filter(audit=audit).count()
+            # Count only parent findings (not children)
+            findings_count = Finding.objects.filter(audit=audit, parent_finding__isnull=True).count()
             audit_dict['finding_count'] = findings_count
+            # Add organization-relative audit number
+            audit_dict['audit_number'] = get_organization_audit_number(audit, request.organization)
             # Format dates
             if audit_dict.get('created_at'):
                 audit_dict['created_at_formatted'] = format_datetime_from_iso(
@@ -2063,8 +2132,8 @@ def assets_api(request, device_identifier=None):
             if not latest_audit.created_at or latest_audit.created_at < cutoff_date:
                 continue
         
-        # Get finding count for latest audit
-        findings_count = Finding.objects.filter(audit=latest_audit).count()
+        # Get finding count for latest audit (only parent findings, not children)
+        findings_count = Finding.objects.filter(audit=latest_audit, parent_finding__isnull=True).count()
         
         # Calculate total audit count
         total_audits = audits.count()
