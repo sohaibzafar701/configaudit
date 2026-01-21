@@ -93,8 +93,17 @@ echo -e "${YELLOW}Step 5: Pushing to GitHub...${NC}"
 read -p "Push branch '${branch_name}' to origin? (y/n): " confirm_push
 
 if [ "$confirm_push" = "y" ] || [ "$confirm_push" = "Y" ]; then
-    # Try to push, if it fails, try with -u flag to set upstream
-    if git push -u origin "$branch_name"; then
+    # Check remote URL to determine authentication method
+    remote_url=$(git remote get-url origin 2>/dev/null)
+    
+    # Try to push and capture output
+    push_output=$(git push -u origin "$branch_name" 2>&1)
+    push_exit_code=$?
+    
+    # Show the output
+    echo "$push_output"
+    
+    if [ $push_exit_code -eq 0 ]; then
         echo -e "${GREEN}✓ Successfully pushed branch '${branch_name}' to origin${NC}"
         echo ""
         echo -e "${BLUE}========================================${NC}"
@@ -102,8 +111,66 @@ if [ "$confirm_push" = "y" ] || [ "$confirm_push" = "Y" ]; then
         echo -e "${BLUE}You can now create a Pull Request on GitHub.${NC}"
         echo -e "${BLUE}========================================${NC}"
     else
-        echo -e "${RED}Error: Failed to push to GitHub${NC}"
-        exit 1
+        # Check for authentication errors
+        if echo "$push_output" | grep -qi "authentication failed\|invalid username or token\|password authentication is not supported"; then
+            echo ""
+            echo -e "${RED}Authentication Error: GitHub no longer supports password authentication.${NC}"
+            echo ""
+            echo -e "${YELLOW}You have two options:${NC}"
+            echo ""
+            echo -e "${BLUE}Option 1: Use Personal Access Token (PAT)${NC}"
+            echo -e "  1. Go to: https://github.com/settings/tokens"
+            echo -e "  2. Click 'Generate new token' -> 'Generate new token (classic)'"
+            echo -e "  3. Give it a name and select 'repo' scope"
+            echo -e "  4. Copy the token and use it as your password when prompted"
+            echo -e "  5. Or configure it: git config credential.helper store"
+            echo ""
+            echo -e "${BLUE}Option 2: Switch to SSH (Recommended)${NC}"
+            read -p "Do you want to switch to SSH authentication? (y/n): " switch_ssh
+            if [ "$switch_ssh" = "y" ] || [ "$switch_ssh" = "Y" ]; then
+                # Extract repo path from HTTPS URL
+                if echo "$remote_url" | grep -q "^https://"; then
+                    repo_path=$(echo "$remote_url" | sed 's|https://github.com/||' | sed 's|\.git$||')
+                    ssh_url="git@github.com:${repo_path}.git"
+                    echo -e "${YELLOW}Switching remote URL to SSH...${NC}"
+                    if git remote set-url origin "$ssh_url"; then
+                        echo -e "${GREEN}✓ Remote URL updated to: ${ssh_url}${NC}"
+                        echo ""
+                        echo -e "${YELLOW}Make sure you have SSH keys set up:${NC}"
+                        echo -e "  - Check: ssh -T git@github.com"
+                        echo -e "  - If not set up, see: https://docs.github.com/en/authentication/connecting-to-github-with-ssh"
+                        echo ""
+                        read -p "Try pushing again now? (y/n): " retry_push
+                        if [ "$retry_push" = "y" ] || [ "$retry_push" = "Y" ]; then
+                            if git push -u origin "$branch_name"; then
+                                echo -e "${GREEN}✓ Successfully pushed branch '${branch_name}' to origin${NC}"
+                                echo ""
+                                echo -e "${BLUE}========================================${NC}"
+                                echo -e "${GREEN}All done! Your branch has been pushed to GitHub.${NC}"
+                                echo -e "${BLUE}You can now create a Pull Request on GitHub.${NC}"
+                                echo -e "${BLUE}========================================${NC}"
+                            else
+                                echo -e "${RED}Still failed. Please check your SSH setup.${NC}"
+                                exit 1
+                            fi
+                        fi
+                    else
+                        echo -e "${RED}Failed to update remote URL${NC}"
+                        exit 1
+                    fi
+                fi
+            else
+                echo -e "${YELLOW}To push manually later, use one of these methods:${NC}"
+                echo -e "  - With PAT: git push -u origin ${branch_name}"
+                echo -e "  - Or switch to SSH first: git remote set-url origin git@github.com:sohaibzafar701/configaudit.git"
+                exit 1
+            fi
+        else
+            echo -e "${RED}Error: Failed to push to GitHub${NC}"
+            echo -e "${YELLOW}Error details:${NC}"
+            echo "$push_output"
+            exit 1
+        fi
     fi
 else
     echo -e "${YELLOW}Push cancelled. Branch '${branch_name}' is ready but not pushed.${NC}"
