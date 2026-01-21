@@ -1,0 +1,31 @@
+Organization Created - {{ organization.name }}
+
+Hello,
+
+A new organization has been created on the ConfigAudit platform with you as the Point of Contact (POC).
+
+Organization Details:
+- Organization Name: {{ organization.name }}
+{% if organization.domain %}- Domain: {{ organization.domain }}
+{% endif %}- Status: {{ organization.status }}
+- Created: {{ created_at|date:"F d, Y g:i A" }}
+
+NEXT STEPS:
+1. Click the link below to create your organization admin account
+2. Set your password and complete your account setup
+3. Once your account is created, you can start managing your organization
+4. You can invite team members and configure your organization settings
+
+Create Your Account:
+{{ signup_url }}
+
+As the Point of Contact for this organization, you will be responsible for:
+- Managing organization settings and users
+- Overseeing security audits and compliance
+- Receiving important notifications and updates
+
+If you have any questions or need assistance, please contact the platform administrator.
+
+---
+This is an automated message from ConfigAudit. Please do not reply to this email.
+© {{ "now"|date:"Y" }} ConfigAudit. All rights reserved.

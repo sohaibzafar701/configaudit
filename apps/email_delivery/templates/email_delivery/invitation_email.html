@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invitation to Join {{ organization.name }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 30px;
+            margin: 20px 0;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: #2c3e50;
+            margin: 0;
+        }
+        .content {
+            background-color: #ffffff;
+            padding: 25px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: #3498db;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        .button:hover {
+            background-color: #2980b9;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #7f8c8d;
+            font-size: 12px;
+        }
+        .info-box {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .info-box p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>You're Invited!</h1>
+        </div>
+        
+        <div class="content">
+            <p>Hello,</p>
+            
+            <p>You have been invited by <strong>{{ invited_by.get_full_name|default:invited_by.username }}</strong> to join <strong>{{ organization.name }}</strong> on the ConfigAudit platform.</p>
+            
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="{{ invite_url }}" class="button">Accept Invitation</a>
+            </div>
+            
+            <p>Or copy and paste this link into your browser:</p>
+            <p style="word-break: break-all; color: #3498db;">{{ invite_url }}</p>
+            
+            <div class="info-box">
+                <p><strong>Organization:</strong> {{ organization.name }}</p>
+                <p><strong>Role:</strong> {{ invitation.get_role_display|default:invitation.role }}</p>
+                <p><strong>Expires:</strong> {{ expires_at|date:"F d, Y g:i A" }}</p>
+            </div>
+            
+            <p><strong>Important:</strong> This invitation will expire on {{ expires_at|date:"F d, Y" }}. Please accept it before then.</p>
+            
+            <p>If you did not expect this invitation, you can safely ignore this email.</p>
+        </div>
+        
+        <div class="footer">
+            <p>This is an automated message from ConfigAudit. Please do not reply to this email.</p>
+            <p>&copy; {{ "now"|date:"Y" }} ConfigAudit. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

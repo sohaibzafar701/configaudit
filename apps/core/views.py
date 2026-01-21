@@ -14,7 +14,7 @@ from django.core.files.base import ContentFile
 from django.conf import settings
 from django.db import connection
 
-from .models import Organization, UserProfile, Rule, Audit, Finding, UserInvitation, AuditLog
+from .models import Organization, UserProfile, Rule, Audit, Finding, UserInvitation, AuditLog, PasswordResetToken, TwoFactorAuthCode
 from .decorators import require_authenticated, require_super_admin, require_org_admin, require_org_user, require_org_viewer
 from .utils import log_audit_action, get_client_ip
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
@@ -72,16 +72,57 @@ def login_view(request):
             password = data.get('password', '')
             
             if not username or not password:
-                return JsonResponse({'error': 'Username and password are required'}, status=400)
+                return JsonResponse({'error': 'Username/Email and password are required'}, status=400)
             
+            # Try to authenticate with username first
             user = authenticate(request, username=username, password=password)
+            
+            # If that fails, try to authenticate with email
+            if user is None:
+                from django.contrib.auth.models import User
+                try:
+                    user_by_email = User.objects.get(email__iexact=username)
+                    user = authenticate(request, username=user_by_email.username, password=password)
+                except User.DoesNotExist:
+                    pass
+            
             if user is not None:
-                auth_login(request, user)
-                ip_address = get_client_ip(request)
-                log_audit_action(user, 'login', 'user', user.id, f'User {username} logged in', ip_address)
-                return JsonResponse({'status': 'success', 'redirect': '/'}, status=200)
+                # Generate 2FA code and send email
+                from apps.email_delivery.utils import send_2fa_code_email
+                
+                # Rate limiting: Check if user has requested too many 2FA codes recently
+                recent_codes = TwoFactorAuthCode.objects.filter(
+                    user=user,
+                    created_at__gte=timezone.now() - timedelta(minutes=5)
+                ).count()
+                
+                if recent_codes >= 3:
+                    return JsonResponse({'error': 'Too many 2FA code requests. Please wait before trying again.'}, status=429)
+                
+                # Invalidate any existing unused 2FA codes for this user
+                TwoFactorAuthCode.objects.filter(user=user, used_at__isnull=True).update(used_at=timezone.now())
+                
+                # Create new 2FA code
+                two_factor_code = TwoFactorAuthCode.objects.create(
+                    user=user,
+                    session_key=request.session.session_key or request.session.create(),
+                    expires_at=timezone.now() + timedelta(minutes=10)
+                )
+                
+                # Send 2FA code email
+                email_sent = send_2fa_code_email(user, two_factor_code, request)
+                
+                if not email_sent:
+                    return JsonResponse({'error': 'Failed to send 2FA code. Please try again.'}, status=500)
+                
+                # Store user ID in session for 2FA verification
+                request.session['2fa_user_id'] = user.id
+                request.session['2fa_code_id'] = two_factor_code.id
+                request.session.save()
+                
+                return JsonResponse({'status': '2fa_required', 'message': '2FA code sent to your email'}, status=200)
             else:
-                return JsonResponse({'error': 'Invalid username or password'}, status=401)
+                return JsonResponse({'error': 'Invalid username/email or password'}, status=401)
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Invalid JSON'}, status=400)
     
@@ -100,6 +141,372 @@ def logout_view(request):
     log_audit_action(user, 'logout', 'user', user.id, f'User {user.username} logged out', ip_address)
     auth_logout(request)
     return JsonResponse({'status': 'success', 'redirect': '/login/'}, status=200)
+
+
+@csrf_exempt
+@require_http_methods(["GET", "POST"])
+def forgot_password_view(request):
+    """Forgot password view"""
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            email = data.get('email', '').strip().lower()
+            
+            if not email:
+                return JsonResponse({'error': 'Email is required'}, status=400)
+            
+            # Rate limiting: Check if user has requested too many resets recently
+            from django.contrib.auth.models import User
+            try:
+                user = User.objects.get(email__iexact=email)
+            except User.DoesNotExist:
+                # Don't reveal if user exists - return success anyway for security
+                return JsonResponse({
+                    'status': 'success',
+                    'message': 'If an account with that email exists, a password reset link has been sent.'
+                }, status=200)
+            
+            # Check rate limiting (max 3 requests per hour)
+            recent_requests = PasswordResetToken.objects.filter(
+                user=user,
+                created_at__gte=timezone.now() - timedelta(hours=1)
+            ).count()
+            
+            if recent_requests >= 3:
+                return JsonResponse({'error': 'Too many password reset requests. Please wait before trying again.'}, status=429)
+            
+            # Send password reset email
+            from apps.email_delivery.utils import send_password_reset_email
+            email_sent = send_password_reset_email(user, request)
+            
+            if email_sent:
+                return JsonResponse({
+                    'status': 'success',
+                    'message': 'If an account with that email exists, a password reset link has been sent.'
+                }, status=200)
+            else:
+                return JsonResponse({'error': 'Failed to send password reset email. Please try again.'}, status=500)
+                
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    
+    # GET request - show forgot password page
+    if request.user.is_authenticated:
+        return redirect('index')
+    return render(request, 'registration/forgot_password.html')
+
+
+@csrf_exempt
+@require_http_methods(["GET", "POST"])
+def reset_password_view(request):
+    """Reset password view"""
+    token = request.GET.get('token', '') or (json.loads(request.body).get('token', '') if request.method == 'POST' else '')
+    
+    if not token:
+        return render(request, 'registration/reset_password.html', {
+            'error': 'Reset token is required',
+            'token': ''
+        })
+    
+    try:
+        reset_token = PasswordResetToken.objects.get(token=token)
+    except PasswordResetToken.DoesNotExist:
+        return render(request, 'registration/reset_password.html', {
+            'error': 'Invalid reset token',
+            'token': token
+        })
+    
+    if reset_token.is_expired():
+        return render(request, 'registration/reset_password.html', {
+            'error': 'Reset token has expired. Please request a new password reset.',
+            'token': token
+        })
+    
+    if reset_token.is_used():
+        return render(request, 'registration/reset_password.html', {
+            'error': 'Reset token has already been used. Please request a new password reset.',
+            'token': token
+        })
+    
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            password = data.get('password', '')
+            password_confirm = data.get('password_confirm', '')
+            
+            if not password or not password_confirm:
+                return JsonResponse({'error': 'Password and confirmation are required'}, status=400)
+            
+            if password != password_confirm:
+                return JsonResponse({'error': 'Passwords do not match'}, status=400)
+            
+            if len(password) < 8:
+                return JsonResponse({'error': 'Password must be at least 8 characters long'}, status=400)
+            
+            # Reset password
+            user = reset_token.user
+            user.set_password(password)
+            user.save()
+            
+            # Mark token as used
+            reset_token.used_at = timezone.now()
+            reset_token.save()
+            
+            # Log action
+            ip_address = get_client_ip(request)
+            log_audit_action(user, 'update', 'user', user.id, f'User {user.username} reset password', ip_address)
+            
+            return JsonResponse({
+                'status': 'success',
+                'message': 'Password reset successfully. Please login with your new password.',
+                'redirect': '/login/'
+            }, status=200)
+            
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    
+    # GET request - show reset password form
+    if request.user.is_authenticated:
+        return redirect('index')
+    return render(request, 'registration/reset_password.html', {'token': token})
+
+
+@csrf_exempt
+@require_http_methods(["GET", "POST"])
+def verify_2fa_view(request):
+    """Verify 2FA code view"""
+    # Check if user is in 2FA flow
+    user_id = request.session.get('2fa_user_id')
+    code_id = request.session.get('2fa_code_id')
+    
+    if not user_id or not code_id:
+        # Not in 2FA flow - redirect to login
+        return redirect('login')
+    
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            
+            # Handle resend request
+            if data.get('resend', False):
+                from django.contrib.auth.models import User
+                from apps.email_delivery.utils import send_2fa_code_email
+                
+                try:
+                    user = User.objects.get(id=user_id)
+                except User.DoesNotExist:
+                    request.session.flush()
+                    return JsonResponse({'error': 'User not found'}, status=404)
+                
+                # Invalidate old code
+                TwoFactorAuthCode.objects.filter(id=code_id).update(used_at=timezone.now())
+                
+                # Create new code
+                new_code = TwoFactorAuthCode.objects.create(
+                    user=user,
+                    session_key=request.session.session_key,
+                    expires_at=timezone.now() + timedelta(minutes=10)
+                )
+                
+                # Update session
+                request.session['2fa_code_id'] = new_code.id
+                request.session.save()
+                
+                # Send email
+                email_sent = send_2fa_code_email(user, new_code, request)
+                
+                if email_sent:
+                    return JsonResponse({
+                        'status': 'success',
+                        'message': 'New 2FA code has been sent to your email.'
+                    }, status=200)
+                else:
+                    return JsonResponse({'error': 'Failed to send 2FA code. Please try again.'}, status=500)
+            
+            # Handle code verification
+            code = data.get('code', '').strip()
+            
+            if not code or len(code) != 6:
+                return JsonResponse({'error': 'Please enter a valid 6-digit code'}, status=400)
+            
+            try:
+                two_factor_code = TwoFactorAuthCode.objects.get(id=code_id, user_id=user_id)
+            except TwoFactorAuthCode.DoesNotExist:
+                request.session.flush()
+                return JsonResponse({'error': 'Invalid session. Please login again.'}, status=400)
+            
+            if two_factor_code.is_expired():
+                request.session.flush()
+                return JsonResponse({'error': '2FA code has expired. Please login again.'}, status=400)
+            
+            if two_factor_code.is_used():
+                request.session.flush()
+                return JsonResponse({'error': '2FA code has already been used. Please login again.'}, status=400)
+            
+            if two_factor_code.code != code:
+                return JsonResponse({'error': 'Invalid 2FA code. Please try again.'}, status=400)
+            
+            # Code is valid - complete login
+            from django.contrib.auth.models import User
+            user = User.objects.get(id=user_id)
+            
+            # Mark code as used
+            two_factor_code.used_at = timezone.now()
+            two_factor_code.save()
+            
+            # Clear 2FA session data
+            del request.session['2fa_user_id']
+            del request.session['2fa_code_id']
+            
+            # Login user
+            auth_login(request, user)
+            
+            # Log action
+            ip_address = get_client_ip(request)
+            log_audit_action(user, 'login', 'user', user.id, f'User {user.username} logged in with 2FA', ip_address)
+            
+            return JsonResponse({
+                'status': 'success',
+                'redirect': '/'
+            }, status=200)
+            
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    
+    # GET request - show 2FA verification page
+    if request.user.is_authenticated:
+        return redirect('index')
+    return render(request, 'registration/verify_2fa.html')
+
+
+@csrf_exempt
+@require_http_methods(["GET", "POST"])
+def poc_signup_view(request):
+    """POC signup view for organization account creation"""
+    from django.core.signing import Signer, BadSignature
+    from django.contrib.auth import login as auth_login
+    from django.contrib.auth.models import User
+    
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            token = data.get('token', '').strip()
+            email = data.get('email', '').strip()
+            password = data.get('password', '')
+            password_confirm = data.get('password_confirm', '')
+            
+            if not token:
+                return JsonResponse({'error': 'Signup token is required'}, status=400)
+            
+            # Validate passwords match
+            if password != password_confirm:
+                return JsonResponse({'error': 'Passwords do not match'}, status=400)
+            
+            if len(password) < 8:
+                return JsonResponse({'error': 'Password must be at least 8 characters long'}, status=400)
+            
+            # Verify signed token
+            try:
+                signer = Signer()
+                signed_data = signer.unsign(token)
+                org_id, poc_email = signed_data.split('|')
+                org_id = int(org_id)
+            except (BadSignature, ValueError, IndexError):
+                return JsonResponse({'error': 'Invalid or expired signup link'}, status=400)
+            
+            # Validate email matches
+            if email.lower() != poc_email.lower():
+                return JsonResponse({'error': 'Email does not match organization POC email'}, status=400)
+            
+            # Get organization
+            try:
+                organization = Organization.objects.get(id=org_id, poc_email__iexact=email)
+            except Organization.DoesNotExist:
+                return JsonResponse({'error': 'Organization not found'}, status=404)
+            
+            # Check if POC account already exists
+            if User.objects.filter(email__iexact=email).exists():
+                return JsonResponse({'error': 'An account with this email already exists. Please login instead.'}, status=400)
+            
+            # Generate username from email
+            username = email.split('@')[0]
+            base_username = username
+            counter = 1
+            while User.objects.filter(username=username).exists():
+                username = f"{base_username}{counter}"
+                counter += 1
+            
+            # Create user
+            user = User.objects.create_user(
+                username=username,
+                email=email,
+                password=password
+            )
+            
+            # Create profile as org_admin
+            profile = UserProfile.objects.create(
+                user=user,
+                organization=organization,
+                role=UserProfile.ROLE_ORG_ADMIN
+            )
+            
+            # Log action
+            ip_address = get_client_ip(request)
+            log_audit_action(user, 'create', 'user', user.id, 
+                           f'POC {username} created account for organization {organization.name}', 
+                           ip_address, organization)
+            
+            # Don't auto-login - redirect to login page instead
+            # User should login manually with their email and password
+            
+            return JsonResponse({'status': 'success', 'redirect': '/login/', 'message': 'Account created successfully. Please login with your email and password.'}, status=201)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    
+    # GET request - show signup page
+    token = request.GET.get('token', '')
+    if not token:
+        return JsonResponse({'error': 'Signup token is required'}, status=400)
+    
+    try:
+        from django.core.signing import Signer, BadSignature
+        signer = Signer()
+        signed_data = signer.unsign(token)
+        org_id, poc_email = signed_data.split('|')
+        org_id = int(org_id)
+        
+        # Get organization
+        organization = Organization.objects.get(id=org_id, poc_email__iexact=poc_email)
+        
+        # Check if POC account already exists
+        from django.contrib.auth.models import User
+        if User.objects.filter(email__iexact=poc_email).exists():
+            return render(request, 'registration/poc_signup.html', {
+                'error': 'An account with this email already exists. Please login instead.',
+                'token': token,
+                'email': poc_email,
+                'organization': organization
+            })
+        
+        return render(request, 'registration/poc_signup.html', {
+            'organization': organization,
+            'token': token,
+            'email': poc_email
+        })
+    except (BadSignature, ValueError, IndexError):
+        return render(request, 'registration/poc_signup.html', {
+            'error': 'Invalid or expired signup link',
+            'token': token,
+            'email': '',
+            'organization': None
+        })
+    except Organization.DoesNotExist:
+        return render(request, 'registration/poc_signup.html', {
+            'error': 'Organization not found',
+            'token': token,
+            'email': '',
+            'organization': None
+        })
 
 
 @csrf_exempt
@@ -166,10 +573,14 @@ def register_view(request):
                            f'User {username} accepted invitation to {invitation.organization.name}', 
                            ip_address, invitation.organization)
             
-            # Auto-login
-            auth_login(request, user)
+            # Don't auto-login - redirect to login page instead
+            # User should login manually with their credentials
             
-            return JsonResponse({'status': 'success', 'redirect': '/'}, status=201)
+            return JsonResponse({
+                'status': 'success', 
+                'redirect': '/login/',
+                'message': 'Account created successfully. Please login with your username/email and password.'
+            }, status=201)
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Invalid JSON'}, status=400)
     
@@ -206,6 +617,9 @@ def register_view(request):
 @require_authenticated
 def index(request):
     """Home page"""
+    # Redirect org_viewer to reports page
+    if hasattr(request, 'user_role') and request.user_role == 'org_viewer':
+        return redirect('report_page')
     return render(request, 'index.html')
 
 
@@ -243,12 +657,6 @@ def assets_page(request):
 def device_audits_page(request, device_identifier):
     """Device audits page - shows all audits for a specific device"""
     return render(request, 'device_audits.html', {'device_identifier': device_identifier})
-
-
-@require_authenticated
-def settings_page(request):
-    """Settings page"""
-    return render(request, 'settings.html')
 
 
 @require_authenticated
@@ -317,8 +725,20 @@ def audits_api(request):
                     audits = audits.filter(created_at__gte=cutoff_date)
                 
                 audits = audits.order_by('-created_at')
+                
+                # Pagination support
+                page = int(request.GET.get('page', 1))
+                page_size = int(request.GET.get('page_size', 10))
+                total_count = audits.count()
+                total_pages = (total_count + page_size - 1) // page_size if total_count > 0 else 0
+                
+                # Apply pagination
+                start = (page - 1) * page_size
+                end = start + page_size
+                audits_paginated = audits[start:end]
+                
                 audits_list = []
-                for audit in audits:
+                for audit in audits_paginated:
                     audit_dict = model_to_dict(audit)
                     # Count only parent findings
                     findings = Finding.objects.filter(audit=audit, parent_finding__isnull=True)
@@ -333,7 +753,19 @@ def audits_api(request):
                             audit_dict['completed_at'], timezone_str, date_format_py
                         )
                     audits_list.append(audit_dict)
-                return JsonResponse({'audits': audits_list}, status=200)
+                
+                # Return paginated response with metadata
+                return JsonResponse({
+                    'audits': audits_list,
+                    'pagination': {
+                        'page': page,
+                        'page_size': page_size,
+                        'total_count': total_count,
+                        'total_pages': total_pages,
+                        'has_next': page < total_pages,
+                        'has_previous': page > 1
+                    }
+                }, status=200)
             except Exception as e:
                 import traceback
                 traceback.print_exc()
@@ -1414,7 +1846,13 @@ def stats_api(request):
                 active_rules_count = Rule.objects.filter(enabled=True, organization=request.organization).count()
                 completed_audits = all_audits.filter(status=Audit.STATUS_COMPLETED)
             else:
-                return JsonResponse({'error': 'No organization found'}, status=403)
+                # User has no organization - return empty stats instead of error
+                # This can happen if user doesn't have a profile or organization assigned
+                all_audits = Audit.objects.none()
+                total_audits = 0
+                total_findings = 0
+                active_rules_count = 0
+                completed_audits = Audit.objects.none()
         
         # Calculate compliance for completed audits
         compliance_scores = []
@@ -1457,14 +1895,14 @@ def stats_api(request):
             traceback.print_exc()
             db_size_formatted = f'Error: {str(e)}'
         
-        # Get recent audits (last 10) - filter by organization
+        # Get recent audits (last 3) - filter by organization
         recent_audits = []
         if hasattr(request, 'user_role') and request.user_role == 'super_admin':
             # Super Admin: No individual audits
             recent_audits_query = []
         else:
             if hasattr(request, 'organization') and request.organization:
-                recent_audits_query = Audit.objects.filter(organization=request.organization).order_by('-created_at')[:10]
+                recent_audits_query = Audit.objects.filter(organization=request.organization).order_by('-created_at')[:3]
             else:
                 recent_audits_query = []
         
@@ -1810,7 +2248,21 @@ def super_admin_organization_api(request, org_id=None):
                 log_audit_action(request.user, 'create', 'organization', org.id, 
                                f'Created organization: {name}', ip_address, None)
                 
-                return JsonResponse({'id': org.id, 'status': 'created'}, status=201)
+                # Send organization creation email to POC
+                from apps.email_delivery.utils import send_organization_created_email
+                email_sent = send_organization_created_email(org, request)
+                
+                response_data = {
+                    'id': org.id,
+                    'status': 'created',
+                }
+                
+                if email_sent:
+                    response_data['message'] = f'Organization created and notification email sent to {poc_email}'
+                else:
+                    response_data['message'] = f'Organization created but email notification failed for {poc_email}'
+                
+                return JsonResponse(response_data, status=201)
             
             elif action == 'update':
                 if not org_id:
@@ -1861,6 +2313,326 @@ def super_admin_organization_api(request, org_id=None):
             return JsonResponse({'error': 'Invalid JSON'}, status=400)
 
 
+# Helper functions for rules management
+def check_rule_exists_in_org(rule_name, organization):
+    """Check if a rule with the given name exists in the organization (case-insensitive)"""
+    return Rule.objects.filter(
+        name__iexact=rule_name,
+        organization=organization
+    ).exists()
+
+
+def get_organization_rule_count(organization):
+    """Get count of rules for an organization"""
+    return Rule.objects.filter(organization=organization).count()
+
+
+def get_rule_assignment_status():
+    """Get assignment status - returns dict mapping org_id -> list of assigned rule names"""
+    assignments = {}
+    organizations = Organization.objects.all()
+    for org in organizations:
+        org_rules = Rule.objects.filter(organization=org).values_list('name', flat=True)
+        assignments[org.id] = list(org_rules)
+    return assignments
+
+
+@require_super_admin
+def super_admin_rules(request):
+    """Super Admin - Manage Rules page"""
+    # Get platform rules count
+    platform_rules_count = Rule.objects.filter(organization__isnull=True).count()
+    total_orgs = Organization.objects.count()
+    
+    # Calculate average rules per organization
+    total_org_rules = Rule.objects.exclude(organization__isnull=True).count()
+    avg_rules_per_org = total_org_rules / total_orgs if total_orgs > 0 else 0
+    
+    return render(request, 'super_admin/rules.html', {
+        'platform_rules_count': platform_rules_count,
+        'total_orgs': total_orgs,
+        'avg_rules_per_org': round(avg_rules_per_org, 1),
+    })
+
+
+@require_super_admin
+@csrf_exempt
+@require_http_methods(["GET", "POST"])
+def super_admin_rules_api(request):
+    """Super Admin rules API - manage platform rules"""
+    if request.method == 'GET':
+        # Get all platform rules
+        platform_rules = Rule.objects.filter(organization__isnull=True).order_by('name')
+        rules_list = []
+        for rule in platform_rules:
+            rules_list.append({
+                'id': rule.id,
+                'name': rule.name,
+                'description': rule.description,
+                'rule_type': rule.rule_type,
+                'category': rule.category,
+                'severity': rule.severity,
+                'yaml_content': rule.yaml_content,
+                'tags': rule.tags,
+                'enabled': rule.enabled,
+                'remediation_template': rule.remediation_template,
+                'compliance_frameworks': rule.compliance_frameworks,
+                'framework_mappings': rule.framework_mappings,
+                'risk_weight': rule.risk_weight,
+                'created_at': rule.created_at.isoformat() if rule.created_at else None,
+            })
+        
+        # Get assignment status
+        assignment_status = get_rule_assignment_status()
+        
+        return JsonResponse({
+            'rules': rules_list,
+            'assignment_status': assignment_status,
+        })
+    
+    elif request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+        
+        action = data.get('action')
+        
+        if action == 'create':
+            # Create new platform rule
+            rule = Rule.objects.create(
+                name=data['name'],
+                description=data.get('description', ''),
+                rule_type=data.get('rule_type', 'pattern'),
+                category=data.get('category', ''),
+                severity=data.get('severity', 'medium'),
+                yaml_content=data.get('yaml_content', ''),
+                tags=','.join(data.get('tags', [])) if isinstance(data.get('tags'), list) else data.get('tags', ''),
+                enabled=data.get('enabled', True),
+                remediation_template=data.get('remediation_template', ''),
+                compliance_frameworks=','.join(data.get('compliance_frameworks', [])) if isinstance(data.get('compliance_frameworks'), list) else data.get('compliance_frameworks', ''),
+                framework_mappings=data.get('framework_mappings'),
+                risk_weight=data.get('risk_weight', 1.0),
+                organization=None  # Platform rule
+            )
+            
+            # Log creation
+            ip_address = get_client_ip(request)
+            log_audit_action(request.user, 'create', 'rule', rule.id, 
+                           f'Created platform rule: {rule.name}', ip_address, None)
+            
+            return JsonResponse({'status': 'created', 'rule_id': rule.id}, status=201)
+        
+        elif action == 'update':
+            rule_id = data.get('rule_id')
+            if not rule_id:
+                return JsonResponse({'error': 'Rule ID required'}, status=400)
+            
+            try:
+                rule = Rule.objects.get(id=rule_id, organization__isnull=True)
+                
+                # Update fields
+                if 'name' in data:
+                    rule.name = data['name']
+                if 'description' in data:
+                    rule.description = data.get('description', '')
+                if 'rule_type' in data:
+                    rule.rule_type = data['rule_type']
+                if 'category' in data:
+                    rule.category = data.get('category', '')
+                if 'severity' in data:
+                    rule.severity = data.get('severity', 'medium')
+                if 'yaml_content' in data:
+                    rule.yaml_content = data.get('yaml_content', '')
+                if 'tags' in data:
+                    rule.tags = ','.join(data['tags']) if isinstance(data['tags'], list) else data.get('tags', '')
+                if 'enabled' in data:
+                    rule.enabled = data['enabled']
+                if 'remediation_template' in data:
+                    rule.remediation_template = data.get('remediation_template', '')
+                if 'compliance_frameworks' in data:
+                    rule.compliance_frameworks = ','.join(data['compliance_frameworks']) if isinstance(data['compliance_frameworks'], list) else data.get('compliance_frameworks', '')
+                if 'framework_mappings' in data:
+                    rule.framework_mappings = data.get('framework_mappings')
+                if 'risk_weight' in data:
+                    rule.risk_weight = data.get('risk_weight', 1.0)
+                
+                rule.save()
+                
+                # Log update
+                ip_address = get_client_ip(request)
+                log_audit_action(request.user, 'update', 'rule', rule.id, 
+                               f'Updated platform rule: {rule.name}', ip_address, None)
+                
+                return JsonResponse({'status': 'updated'}, status=200)
+            except Rule.DoesNotExist:
+                return JsonResponse({'error': 'Rule not found'}, status=404)
+        
+        elif action == 'delete':
+            rule_id = data.get('rule_id')
+            if not rule_id:
+                return JsonResponse({'error': 'Rule ID required'}, status=400)
+            
+            try:
+                rule = Rule.objects.get(id=rule_id, organization__isnull=True)
+                rule_name = rule.name
+                rule_id_val = rule.id
+                rule.delete()
+                
+                # Log deletion
+                ip_address = get_client_ip(request)
+                log_audit_action(request.user, 'delete', 'rule', rule_id_val, 
+                               f'Deleted platform rule: {rule_name}', ip_address, None)
+                
+                return JsonResponse({'status': 'deleted'}, status=200)
+            except Rule.DoesNotExist:
+                return JsonResponse({'error': 'Rule not found'}, status=404)
+        
+        return JsonResponse({'error': 'Invalid action'}, status=400)
+
+
+@require_super_admin
+@csrf_exempt
+@require_http_methods(["POST"])
+def super_admin_assign_rules(request):
+    """Assign platform rules to organizations"""
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    
+    rule_ids = data.get('rule_ids', [])
+    organization_ids = data.get('organization_ids', [])
+    
+    if not rule_ids or not organization_ids:
+        return JsonResponse({'error': 'Rule IDs and Organization IDs required'}, status=400)
+    
+    assigned_count = 0
+    skipped_count = 0
+    errors = []
+    
+    for rule_id in rule_ids:
+        try:
+            rule = Rule.objects.get(id=rule_id, organization__isnull=True)
+        except Rule.DoesNotExist:
+            errors.append(f'Rule {rule_id} not found')
+            continue
+        
+        for org_id in organization_ids:
+            try:
+                organization = Organization.objects.get(id=org_id)
+            except Organization.DoesNotExist:
+                errors.append(f'Organization {org_id} not found')
+                continue
+            
+            # Check if rule with same name already exists (case-insensitive)
+            if check_rule_exists_in_org(rule.name, organization):
+                skipped_count += 1
+                continue
+            
+            # Copy rule to organization
+            try:
+                rule.copy_to_organization(organization)
+                assigned_count += 1
+            except Exception as e:
+                errors.append(f'Error assigning rule {rule.name} to {organization.name}: {str(e)}')
+    
+    # Log assignment
+    if assigned_count > 0:
+        ip_address = get_client_ip(request)
+        log_audit_action(request.user, 'assign', 'rule', None, 
+                       f'Assigned {assigned_count} rules to organizations', ip_address, None)
+    
+    return JsonResponse({
+        'assigned_count': assigned_count,
+        'skipped_count': skipped_count,
+        'errors': errors if errors else None,
+    }, status=200)
+
+
+@require_super_admin
+@csrf_exempt
+@require_http_methods(["POST"])
+def super_admin_unassign_rules(request):
+    """Unassign (delete) a rule from an organization"""
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    
+    rule_id = data.get('rule_id')
+    organization_id = data.get('organization_id')
+    
+    if not rule_id or not organization_id:
+        return JsonResponse({'error': 'Rule ID and Organization ID required'}, status=400)
+    
+    try:
+        organization = Organization.objects.get(id=organization_id)
+        rule = Rule.objects.get(id=rule_id, organization=organization)
+        rule_name = rule.name
+        org_name = organization.name
+        rule.delete()
+        
+        # Log unassignment
+        ip_address = get_client_ip(request)
+        log_audit_action(request.user, 'unassign', 'rule', rule_id, 
+                       f'Unassigned rule {rule_name} from {org_name}', ip_address, None)
+        
+        return JsonResponse({'status': 'unassigned'}, status=200)
+    except Organization.DoesNotExist:
+        return JsonResponse({'error': 'Organization not found'}, status=404)
+    except Rule.DoesNotExist:
+        return JsonResponse({'error': 'Rule not found in organization'}, status=404)
+
+
+@require_super_admin
+@csrf_exempt
+@require_http_methods(["POST"])
+def super_admin_reset_rules(request):
+    """Reset all rules for an organization (delete all, then copy all platform rules)"""
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    
+    organization_id = data.get('organization_id')
+    
+    if not organization_id:
+        return JsonResponse({'error': 'Organization ID required'}, status=400)
+    
+    try:
+        organization = Organization.objects.get(id=organization_id)
+        
+        # Delete all existing rules for this organization
+        deleted_count = Rule.objects.filter(organization=organization).delete()[0]
+        
+        # Get all platform rules
+        platform_rules = Rule.objects.filter(organization__isnull=True)
+        
+        # Copy all platform rules to organization
+        assigned_count = 0
+        for rule in platform_rules:
+            try:
+                rule.copy_to_organization(organization)
+                assigned_count += 1
+            except Exception as e:
+                # Log error but continue
+                pass
+        
+        # Log reset
+        ip_address = get_client_ip(request)
+        log_audit_action(request.user, 'reset', 'rule', None, 
+                       f'Reset all rules for organization {organization.name} ({assigned_count} rules)', ip_address, None)
+        
+        return JsonResponse({
+            'status': 'reset',
+            'deleted_count': deleted_count,
+            'assigned_count': assigned_count,
+        }, status=200)
+    except Organization.DoesNotExist:
+        return JsonResponse({'error': 'Organization not found'}, status=404)
+
+
 # Organization Admin Views
 @require_org_admin
 def org_admin_users(request):
@@ -1868,6 +2640,7 @@ def org_admin_users(request):
     if not hasattr(request, 'organization') or not request.organization:
         return HttpResponse('No organization found', status=403)
     
+    # Get joined users
     users = UserProfile.objects.filter(organization=request.organization).select_related('user')
     users_list = []
     for profile in users:
@@ -1878,7 +2651,34 @@ def org_admin_users(request):
             'role': profile.role,
             'role_display': profile.get_role_display(),
             'created_at': profile.created_at,
+            'status': 'joined',
+            'invitation_id': None,
         })
+    
+    # Get pending invitations
+    pending_invitations = UserInvitation.objects.filter(
+        organization=request.organization,
+        accepted_at__isnull=True
+    ).select_related('invited_by')
+    
+    for invitation in pending_invitations:
+        # Check if invitation is expired
+        is_expired = invitation.is_expired()
+        users_list.append({
+            'id': None,
+            'username': None,
+            'email': invitation.email,
+            'role': invitation.role,
+            'role_display': dict(UserProfile.ROLE_CHOICES).get(invitation.role, invitation.role),
+            'created_at': invitation.created_at,
+            'status': 'expired' if is_expired else 'pending',
+            'invitation_id': invitation.id,
+            'expires_at': invitation.expires_at,
+            'invited_by': invitation.invited_by.username if invitation.invited_by else None,
+        })
+    
+    # Sort by created_at (most recent first)
+    users_list.sort(key=lambda x: x['created_at'], reverse=True)
     
     return render(request, 'org_admin/users.html', {'users': users_list})
 
@@ -1929,24 +2729,195 @@ def org_admin_invite_user(request):
                        f'Invited user {email} to {request.organization.name}', 
                        ip_address, request.organization)
         
-        # TODO: Send email with invitation link
-        # For now, return the invitation token
+        # Send invitation email
+        from apps.email_delivery.utils import send_invitation_email
+        email_sent = send_invitation_email(invitation, request)
+        
         invite_url = request.build_absolute_uri(f'/register/?token={invitation.token}')
         
         return JsonResponse({
-            'status': 'invited',
-            'invitation_id': invitation.id,
-            'invite_url': invite_url,
-            'message': f'Invitation sent to {email}. Share this link: {invite_url}'
+            'status': 'success',
+            'message': 'Invitation sent successfully' if email_sent else 'Invitation created but email failed to send',
+            'invite_url': invite_url
         }, status=201)
     except json.JSONDecodeError:
         return JsonResponse({'error': 'Invalid JSON'}, status=400)
-    """Handle database optimization request (VACUUM)"""
+
+
+@require_org_admin
+@csrf_exempt
+@require_http_methods(["POST"])
+def org_admin_resend_invite(request, invitation_id):
+    """Organization Admin - Resend invitation email"""
+    if not hasattr(request, 'organization') or not request.organization:
+        return JsonResponse({'error': 'No organization found'}, status=403)
+    
     try:
-        with connection.cursor() as cursor:
-            cursor.execute('VACUUM')
-        return JsonResponse({'message': 'Database optimized successfully'}, status=200)
-    except Exception as e:
-        import traceback
-        traceback.print_exc()
-        return JsonResponse({'error': f'Failed to optimize database: {str(e)}'}, status=500)
+        invitation = UserInvitation.objects.get(
+            id=invitation_id,
+            organization=request.organization,
+            accepted_at__isnull=True
+        )
+        
+        # Update expiry date (extend by 7 days)
+        invitation.expires_at = timezone.now() + timedelta(days=7)
+        invitation.save()
+        
+        # Send invitation email
+        from apps.email_delivery.utils import send_invitation_email
+        email_sent = send_invitation_email(invitation, request)
+        
+        # Log action
+        ip_address = get_client_ip(request)
+        log_audit_action(request.user, 'invite', 'user', None, 
+                       f'Resent invitation to {invitation.email} for {request.organization.name}', 
+                       ip_address, request.organization)
+        
+        return JsonResponse({
+            'status': 'success',
+            'message': 'Invitation resent successfully' if email_sent else 'Invitation updated but email failed to send'
+        }, status=200)
+    except UserInvitation.DoesNotExist:
+        return JsonResponse({'error': 'Invitation not found'}, status=404)
+
+
+@require_org_admin
+@csrf_exempt
+@require_http_methods(["POST"])
+def org_admin_cancel_invite(request, invitation_id):
+    """Organization Admin - Cancel invitation"""
+    if not hasattr(request, 'organization') or not request.organization:
+        return JsonResponse({'error': 'No organization found'}, status=403)
+    
+    try:
+        invitation = UserInvitation.objects.get(
+            id=invitation_id,
+            organization=request.organization,
+            accepted_at__isnull=True
+        )
+        
+        email = invitation.email
+        invitation.delete()
+        
+        # Log action
+        ip_address = get_client_ip(request)
+        log_audit_action(request.user, 'delete', 'user', None, 
+                       f'Cancelled invitation for {email} in {request.organization.name}', 
+                       ip_address, request.organization)
+        
+        return JsonResponse({
+            'status': 'success',
+            'message': 'Invitation cancelled successfully'
+        }, status=200)
+    except UserInvitation.DoesNotExist:
+        return JsonResponse({'error': 'Invitation not found'}, status=404)
+
+
+@require_org_admin
+@csrf_exempt
+@require_http_methods(["GET", "POST"])
+def org_admin_user_api(request, user_id):
+    """Organization Admin - Get or update user"""
+    if not hasattr(request, 'organization') or not request.organization:
+        return JsonResponse({'error': 'No organization found'}, status=403)
+    
+    try:
+        from django.contrib.auth.models import User
+        user = User.objects.get(id=user_id)
+        profile = user.userprofile
+        
+        # Verify user belongs to the organization
+        if profile.organization != request.organization:
+            return JsonResponse({'error': 'User not found in your organization'}, status=404)
+        
+        if request.method == 'GET':
+            # Return user details
+            is_own_account = (user == request.user)
+            return JsonResponse({
+                'id': user.id,
+                'username': user.username,
+                'email': user.email,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'role': profile.role,
+                'phone': profile.phone or '',
+                'is_own_account': is_own_account,
+            }, status=200)
+        
+        elif request.method == 'POST':
+            # Update user
+            try:
+                data = json.loads(request.body)
+                action = data.get('action', 'update')
+                
+                if action == 'update':
+                    # Update user fields
+                    if 'email' in data:
+                        email = data['email'].strip().lower()
+                        # Check if email is already taken by another user
+                        if User.objects.filter(email=email).exclude(id=user.id).exists():
+                            return JsonResponse({'error': 'Email already in use by another user'}, status=400)
+                        user.email = email
+                    
+                    if 'first_name' in data:
+                        user.first_name = data['first_name'].strip()
+                    
+                    if 'last_name' in data:
+                        user.last_name = data['last_name'].strip()
+                    
+                    user.save()
+                    
+                    # Update profile fields
+                    if 'role' in data:
+                        role = data['role']
+                        # Validate role
+                        if role not in [choice[0] for choice in UserProfile.ROLE_CHOICES]:
+                            return JsonResponse({'error': 'Invalid role'}, status=400)
+                        # Prevent changing own role (security measure)
+                        if user == request.user and role != profile.role:
+                            return JsonResponse({'error': 'You cannot change your own role'}, status=400)
+                        profile.role = role
+                    
+                    if 'phone' in data:
+                        profile.phone = data['phone'].strip() or None
+                    
+                    profile.save()
+                    
+                    # Log action
+                    ip_address = get_client_ip(request)
+                    log_audit_action(request.user, 'update', 'user', user.id, 
+                                   f'Updated user {user.username} in {request.organization.name}', 
+                                   ip_address, request.organization)
+                    
+                    return JsonResponse({
+                        'status': 'success',
+                        'message': 'User updated successfully'
+                    }, status=200)
+                
+                elif action == 'delete':
+                    # Prevent deleting own account
+                    if user == request.user:
+                        return JsonResponse({'error': 'You cannot delete your own account'}, status=400)
+                    
+                    username = user.username
+                    user.delete()  # This will cascade delete the profile
+                    
+                    # Log action
+                    ip_address = get_client_ip(request)
+                    log_audit_action(request.user, 'delete', 'user', user_id, 
+                                   f'Deleted user {username} from {request.organization.name}', 
+                                   ip_address, request.organization)
+                    
+                    return JsonResponse({
+                        'status': 'success',
+                        'message': 'User deleted successfully'
+                    }, status=200)
+                
+                return JsonResponse({'error': 'Invalid action'}, status=400)
+            except json.JSONDecodeError:
+                return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    
+    except User.DoesNotExist:
+        return JsonResponse({'error': 'User not found'}, status=404)
+    except UserProfile.DoesNotExist:
+        return JsonResponse({'error': 'User profile not found'}, status=404)

@@ -1,0 +1,22 @@
+You're Invited to Join {{ organization.name }}
+
+Hello,
+
+You have been invited by {{ invited_by.get_full_name|default:invited_by.username }} to join {{ organization.name }} on the ConfigAudit platform.
+
+To accept this invitation, please click on the following link or copy and paste it into your browser:
+
+{{ invite_url }}
+
+Invitation Details:
+- Organization: {{ organization.name }}
+- Role: {{ invitation.get_role_display|default:invitation.role }}
+- Expires: {{ expires_at|date:"F d, Y g:i A" }}
+
+IMPORTANT: This invitation will expire on {{ expires_at|date:"F d, Y" }}. Please accept it before then.
+
+If you did not expect this invitation, you can safely ignore this email.
+
+---
+This is an automated message from ConfigAudit. Please do not reply to this email.
+© {{ "now"|date:"Y" }} ConfigAudit. All rights reserved.

@@ -1,0 +1,20 @@
+Two-Factor Authentication
+
+Hello,
+
+You are attempting to log in to your NCRT account. Please use the following verification code to complete your login:
+
+{{ code }}
+
+Security Notice:
+- This code will expire in 10 minutes.
+- If you did not attempt to log in, please ignore this email and consider changing your password.
+
+Username: {{ user.username }}
+Time: {{ created_at|date:"F d, Y g:i A" }}
+
+Enter this code on the verification page to complete your login.
+
+This is an automated message from ConfigAudit. Please do not reply to this email.
+
+© {{ "now"|date:"Y" }} ConfigAudit. All rights reserved.

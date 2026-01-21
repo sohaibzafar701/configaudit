@@ -22,9 +22,15 @@ class OrganizationMiddleware(MiddlewareMixin):
                     request.organization = profile.organization
                     request.user_role = profile.role
             except AttributeError:
-                # User has no profile, treat as unauthenticated
-                request.organization = None
-                request.user_role = None
+                # User has no profile - check if Django superuser
+                if request.user.is_superuser:
+                    # Django superuser without profile - treat as super_admin
+                    request.organization = None
+                    request.user_role = 'super_admin'
+                else:
+                    # Regular user without profile - no organization
+                    request.organization = None
+                    request.user_role = None
         else:
             request.organization = None
             request.user_role = None

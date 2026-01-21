@@ -409,6 +409,33 @@ class FindingAdapter:
                 except DjangoFinding.DoesNotExist:
                     pass
             
+            # Check for duplicate parent findings (same audit, rule, and no parent)
+            if parent_finding_id is None:
+                existing_parent = DjangoFinding.objects.filter(
+                    audit=audit,
+                    rule=rule,
+                    parent_finding__isnull=True,
+                    message=message,
+                    severity=severity
+                ).first()
+                if existing_parent:
+                    # Parent finding already exists, return its ID instead of creating duplicate
+                    return existing_parent.id
+            
+            # Check for duplicate child findings (same audit, rule, parent, message, config_path)
+            if parent_finding_id is not None:
+                existing_child = DjangoFinding.objects.filter(
+                    audit=audit,
+                    rule=rule,
+                    parent_finding_id=parent_finding_id,
+                    message=message,
+                    config_path=config_path,
+                    severity=severity
+                ).first()
+                if existing_child:
+                    # Child finding already exists, return its ID instead of creating duplicate
+                    return existing_child.id
+            
             finding = DjangoFinding.objects.create(
                 audit=audit,
                 rule=rule,
@@ -489,8 +516,19 @@ class FindingAdapter:
             audit = DjangoAudit.objects.get(id=audit_id)
             parents = DjangoFinding.objects.filter(audit=audit, parent_finding__isnull=True).select_related('rule').order_by('id')
             
-            result = []
+            # Deduplicate parent findings - keep only the first occurrence of each unique (rule_name, message, severity) combination
+            # This handles cases where multiple rules have the same name but different IDs
+            seen_parents = {}
+            unique_parents = []
             for parent in parents:
+                # Use rule name instead of rule_id to catch duplicate rules with same name
+                parent_key = (parent.rule.name, parent.message, parent.severity)
+                if parent_key not in seen_parents:
+                    seen_parents[parent_key] = parent
+                    unique_parents.append(parent)
+            
+            result = []
+            for parent in unique_parents:
                 parent_dict = FindingAdapter._finding_to_dict(parent)
                 parent_dict['rule_name'] = parent.rule.name
                 parent_dict['rule_description'] = parent.rule.description
@@ -499,13 +537,18 @@ class FindingAdapter:
                 
                 children = DjangoFinding.objects.filter(parent_finding=parent).select_related('rule').order_by('id')
                 parent_dict['children'] = []
+                # Deduplicate children as well
+                seen_children = set()
                 for child in children:
-                    child_dict = FindingAdapter._finding_to_dict(child)
-                    child_dict['rule_name'] = child.rule.name
-                    child_dict['rule_description'] = child.rule.description
-                    child_dict['rule_category'] = child.rule.category
-                    child_dict['rule_type'] = child.rule.rule_type
-                    parent_dict['children'].append(child_dict)
+                    child_key = (child.message, child.config_path, child.severity)
+                    if child_key not in seen_children:
+                        seen_children.add(child_key)
+                        child_dict = FindingAdapter._finding_to_dict(child)
+                        child_dict['rule_name'] = child.rule.name
+                        child_dict['rule_description'] = child.rule.description
+                        child_dict['rule_category'] = child.rule.category
+                        child_dict['rule_type'] = child.rule.rule_type
+                        parent_dict['children'].append(child_dict)
                 
                 result.append(parent_dict)
             

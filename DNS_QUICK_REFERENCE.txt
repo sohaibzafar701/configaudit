@@ -1,0 +1,83 @@
+================================================================================
+DNS QUICK REFERENCE CARD - pdsconfigaudit.com
+================================================================================
+
+BASIC DNS RECORDS (Required for website)
+-----------------------------------------
+Type: A
+Name: @
+Value: 203.175.66.63
+TTL: 3600
+
+Type: A
+Name: www
+Value: 203.175.66.63
+TTL: 3600
+
+
+SPF RECORD (Email authentication)
+----------------------------------
+Type: TXT
+Name: @
+Value: v=spf1 mx a ip4:203.175.66.63 ~all
+TTL: 3600
+
+Note: If using third-party email service, add include: statement
+Example with SendGrid: v=spf1 include:sendgrid.net ip4:203.175.66.63 ~all
+
+
+DKIM RECORD (Email authentication)
+-----------------------------------
+Type: TXT
+Name: default._domainkey (or selector provided by your email service)
+Value: v=DKIM1; k=rsa; p=YOUR_PUBLIC_KEY_HERE
+TTL: 3600
+
+Note: Generate keys or get from your email service provider
+      Remove spaces and line breaks from public key
+
+
+DMARC RECORD (Email authentication)
+------------------------------------
+Type: TXT
+Name: _dmarc
+Value: v=DMARC1; p=none; rua=mailto:dmarc@pdsconfigaudit.com; ruf=mailto:dmarc@pdsconfigaudit.com; fo=1
+TTL: 3600
+
+Note: Start with p=none (monitoring), then change to p=quarantine, then p=reject
+      Make sure dmarc@pdsconfigaudit.com email exists!
+
+
+VERIFICATION COMMANDS
+---------------------
+# Check A records
+dig pdsconfigaudit.com A +short
+dig www.pdsconfigaudit.com A +short
+
+# Check SPF
+dig pdsconfigaudit.com TXT +short | grep spf
+
+# Check DKIM
+dig default._domainkey.pdsconfigaudit.com TXT +short
+
+# Check DMARC
+dig _dmarc.pdsconfigaudit.com TXT +short
+
+
+ONLINE VERIFICATION TOOLS
+--------------------------
+DNS Propagation: https://dnschecker.org/
+SPF Check: https://mxtoolbox.com/spf.aspx
+DKIM Check: https://mxtoolbox.com/dkim.aspx
+DMARC Check: https://mxtoolbox.com/dmarc.aspx
+Email Test: https://www.mail-tester.com/
+
+
+AFTER DNS IS CONFIGURED
+------------------------
+1. Wait 5-60 minutes for DNS propagation
+2. Verify records using commands above
+3. Set up SSL certificate:
+   sudo certbot --nginx -d pdsconfigaudit.com -d www.pdsconfigaudit.com
+
+================================================================================

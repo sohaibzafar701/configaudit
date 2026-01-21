@@ -1,0 +1,1175 @@
+WARNING 2026-01-21 17:13:35,067 log Not Found: /favicon.ico
+WARNING 2026-01-21 17:14:49,982 log Method Not Allowed (HEAD): /login/
+WARNING 2026-01-21 17:15:48,415 log Forbidden (Referer checking failed - Referer is insecure while host is secure.): /
+ERROR 2026-01-21 17:18:15,148 log Internal Server Error: /api/super-admin/organizations/
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/apps/core/decorators.py", line 23, in _wrapped_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/views/decorators/csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/views/decorators/http.py", line 64, in inner
+    return func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/apps/core/views.py", line 1820, in super_admin_organization_api
+    from apps.email_delivery.utils import send_organization_created_email
+  File "/home/phisimuser/configaudit/apps/email_delivery/utils.py", line 9, in <module>
+    from .services.template_service import TemplateService
+  File "/home/phisimuser/configaudit/apps/email_delivery/services/__init__.py", line 5, in <module>
+    from .dns_service import DNSService
+ModuleNotFoundError: No module named 'apps.email_delivery.services.dns_service'
+WARNING 2026-01-21 17:21:17,297 log Forbidden (Referer checking failed - Referer is insecure while host is secure.): /
+ERROR 2026-01-21 17:21:59,458 log Internal Server Error: /api/super-admin/organizations/
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/db/backends/sqlite3/base.py", line 359, in execute
+    return super().execute(query, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.IntegrityError: UNIQUE constraint failed: core_organization.domain
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/apps/core/decorators.py", line 23, in _wrapped_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/views/decorators/csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/views/decorators/http.py", line 64, in inner
+    return func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/apps/core/views.py", line 1807, in super_admin_organization_api
+    org = Organization.objects.create(
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/db/models/query.py", line 669, in create
+    obj.save(force_insert=True, using=self.db)
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/db/models/base.py", line 874, in save
+    self.save_base(
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/db/models/base.py", line 966, in save_base
+    updated = self._save_table(
+              ^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/db/models/base.py", line 1167, in _save_table
+    results = self._do_insert(
+              ^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/db/models/base.py", line 1218, in _do_insert
+    return manager._insert(
+           ^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/db/models/query.py", line 1918, in _insert
+    return query.get_compiler(using=using).execute_sql(returning_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/db/models/sql/compiler.py", line 1925, in execute_sql
+    cursor.execute(sql, params)
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 122, in execute
+    return super().execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/db/utils.py", line 94, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/db/backends/sqlite3/base.py", line 359, in execute
+    return super().execute(query, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+django.db.utils.IntegrityError: UNIQUE constraint failed: core_organization.domain
+INFO 2026-01-21 17:24:15,106 dns_service Resolving MX records for domain: gmail.com
+INFO 2026-01-21 17:24:15,145 dns_service Found 5 MX record(s) for gmail.com: [(5, 'gmail-smtp-in.l.google.com'), (10, 'alt1.gmail-smtp-in.l.google.com'), (20, 'alt2.gmail-smtp-in.l.google.com'), (30, 'alt3.gmail-smtp-in.l.google.com'), (40, 'alt4.gmail-smtp-in.l.google.com')]
+INFO 2026-01-21 17:24:15,145 email_service Attempting to send email to MX server: gmail-smtp-in.l.google.com (priority: 5)
+INFO 2026-01-21 17:24:19,019 email_service Successfully sent email via MX server: gmail-smtp-in.l.google.com
+INFO 2026-01-21 17:24:19,442 email_service Successfully sent email to domain gmail.com via MX server
+INFO 2026-01-21 17:24:19,442 utils Organization creation email sent to tournamentshelp@gmail.com
+WARNING 2026-01-21 17:25:08,706 log Not Found: /favicon.ico
+WARNING 2026-01-21 17:25:08,943 log Not Found: /favicon.png
+INFO 2026-01-21 17:33:25,486 dns_service Resolving MX records for domain: gmail.com
+INFO 2026-01-21 17:33:25,490 dns_service Found 5 MX record(s) for gmail.com: [(5, 'gmail-smtp-in.l.google.com'), (10, 'alt1.gmail-smtp-in.l.google.com'), (20, 'alt2.gmail-smtp-in.l.google.com'), (30, 'alt3.gmail-smtp-in.l.google.com'), (40, 'alt4.gmail-smtp-in.l.google.com')]
+INFO 2026-01-21 17:33:25,490 email_service Attempting to send email to MX server: gmail-smtp-in.l.google.com (priority: 5)
+INFO 2026-01-21 17:33:29,717 email_service Successfully sent email via MX server: gmail-smtp-in.l.google.com
+INFO 2026-01-21 17:33:30,139 email_service Successfully sent email to domain gmail.com via MX server
+INFO 2026-01-21 17:33:30,139 utils Organization creation email sent to tournamentshelp@gmail.com
+WARNING 2026-01-21 17:34:12,196 log Not Found: /favicon.ico
+WARNING 2026-01-21 17:34:41,241 log Not Found: /poc-signup/
+WARNING 2026-01-21 17:34:47,242 log Not Found: /poc-signup/
+WARNING 2026-01-21 17:35:08,079 log Not Found: /poc-signup/
+WARNING 2026-01-21 17:35:10,924 log Not Found: /poc-signup/
+WARNING 2026-01-21 17:37:49,345 log Unauthorized: /login/
+WARNING 2026-01-21 17:37:51,608 log Method Not Allowed (HEAD): /login/
+WARNING 2026-01-21 17:38:36,547 django.request log log_message 249 Bad Request: /poc-signup/
+DEBUG 2026-01-21 17:39:04,328 django.template base _resolve_lookup 1016 Exception while resolving variable 'organization' in template 'registration/poc_signup.html'.
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/apps/core/views.py", line 197, in poc_signup_view
+    signed_data = signer.unsign(token)
+                  ^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/core/signing.py", line 209, in unsign
+    raise BadSignature('No "%s" found in value' % self.sep)
+django.core.signing.BadSignature: No ":" found in value
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 965, in _resolve_lookup
+    current = current[bit]
+              ~~~~~~~^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/context.py", line 91, in __getitem__
+    raise KeyError(key)
+KeyError: 'organization'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 972, in _resolve_lookup
+    if isinstance(current, BaseContext) and getattr(
+                                            ^^^^^^^^
+AttributeError: type object 'RequestContext' has no attribute 'organization'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 982, in _resolve_lookup
+    current = current[int(bit)]
+                      ^^^^^^^^
+ValueError: invalid literal for int() with base 10: 'organization'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 989, in _resolve_lookup
+    raise VariableDoesNotExist(
+django.template.base.VariableDoesNotExist: Failed lookup for key [organization] in [{'True': True, 'False': False, 'None': None}, {'csrf_token': <SimpleLazyObject: <function csrf.<locals>._get_val at 0x7f171bf08d60>>, 'request': <WSGIRequest: GET '/poc-signup/?token=test'>, 'user': <SimpleLazyObject: <django.contrib.auth.models.AnonymousUser object at 0x7f171c02fc80>>, 'perms': PermWrapper(<SimpleLazyObject: <django.contrib.auth.models.AnonymousUser object at 0x7f171c02fc80>>), 'messages': <FallbackStorage: request=<WSGIRequest: GET '/poc-signup/?token=test'>>, 'DEFAULT_MESSAGE_LEVELS': {'DEBUG': 10, 'INFO': 20, 'SUCCESS': 25, 'WARNING': 30, 'ERROR': 40}}, {}, {'error': 'Invalid or expired signup link', 'token': 'test'}]
+DEBUG 2026-01-21 17:39:04,331 django.template base _resolve_lookup 1016 Exception while resolving variable 'email' in template 'registration/poc_signup.html'.
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/apps/core/views.py", line 197, in poc_signup_view
+    signed_data = signer.unsign(token)
+                  ^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/core/signing.py", line 209, in unsign
+    raise BadSignature('No "%s" found in value' % self.sep)
+django.core.signing.BadSignature: No ":" found in value
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 965, in _resolve_lookup
+    current = current[bit]
+              ~~~~~~~^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/context.py", line 91, in __getitem__
+    raise KeyError(key)
+KeyError: 'email'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 972, in _resolve_lookup
+    if isinstance(current, BaseContext) and getattr(
+                                            ^^^^^^^^
+AttributeError: type object 'RequestContext' has no attribute 'email'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 982, in _resolve_lookup
+    current = current[int(bit)]
+                      ^^^^^^^^
+ValueError: invalid literal for int() with base 10: 'email'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 989, in _resolve_lookup
+    raise VariableDoesNotExist(
+django.template.base.VariableDoesNotExist: Failed lookup for key [email] in [{'True': True, 'False': False, 'None': None}, {'csrf_token': <SimpleLazyObject: <function csrf.<locals>._get_val at 0x7f171bf08d60>>, 'request': <WSGIRequest: GET '/poc-signup/?token=test'>, 'user': <SimpleLazyObject: <django.contrib.auth.models.AnonymousUser object at 0x7f171c02fc80>>, 'perms': PermWrapper(<SimpleLazyObject: <django.contrib.auth.models.AnonymousUser object at 0x7f171c02fc80>>), 'messages': <FallbackStorage: request=<WSGIRequest: GET '/poc-signup/?token=test'>>, 'DEFAULT_MESSAGE_LEVELS': {'DEBUG': 10, 'INFO': 20, 'SUCCESS': 25, 'WARNING': 30, 'ERROR': 40}}, {}, {'error': 'Invalid or expired signup link', 'token': 'test'}]
+DEBUG 2026-01-21 17:39:32,703 django.template base _resolve_lookup 1016 Exception while resolving variable 'name' in template 'unknown'.
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 182, in _get_response
+    callback, callback_args, callback_kwargs = self.resolve_request(request)
+                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 314, in resolve_request
+    resolver_match = resolver.resolve(request.path_info)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/urls/resolvers.py", line 716, in resolve
+    raise Resolver404({"tried": tried, "path": new_path})
+django.urls.exceptions.Resolver404: {'tried': [[<URLResolver <URLPattern list> (admin:admin) 'admin/'>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'login/' [name='login']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'logout/' [name='logout']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'register/' [name='register']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'poc-signup/' [name='poc_signup']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern '' [name='index']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'audit/' [name='audit_page']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'rules/' [name='rules_page']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'report/' [name='report_page']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'report-detail/' [name='report_detail_page']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'assets/' [name='assets_page']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'assets/<str:device_identifier>/audits' [name='device_audits_page']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'settings/' [name='settings_page']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'analysis/' [name='analysis_page']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'help/' [name='help_page']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/audits' [name='audits_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/rules/filter-options' [name='rules_filter_options_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/rules/tags' [name='rules_tags_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/rules/<int:rule_id>' [name='rules_detail_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/rules' [name='rules_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/reports' [name='reports_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/upload' [name='upload_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/stats' [name='stats_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/assets/<str:device_identifier>/latest' [name='assets_latest_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/assets/<str:device_identifier>' [name='assets_detail_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/assets' [name='assets_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/settings/backup' [name='settings_backup_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/settings/optimize' [name='settings_optimize_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'super-admin/' [name='super_admin_dashboard']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'super-admin/organizations/' [name='super_admin_organizations']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/super-admin/organizations/' [name='super_admin_organizations_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/super-admin/organizations/<int:org_id>/' [name='super_admin_organization_detail_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'org-admin/users/' [name='org_admin_users']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/org-admin/invite-user/' [name='org_admin_invite_user']>], [<URLPattern '^media/(?P<path>.*)$'>], [<URLPattern '^static/(?P<path>.*)$'>]], 'path': 'favicon.ico'}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 964, in _resolve_lookup
+    raise TypeError
+TypeError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 976, in _resolve_lookup
+    current = getattr(current, bit)
+              ^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'URLResolver' object has no attribute 'name'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 982, in _resolve_lookup
+    current = current[int(bit)]
+                      ^^^^^^^^
+ValueError: invalid literal for int() with base 10: 'name'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 989, in _resolve_lookup
+    raise VariableDoesNotExist(
+django.template.base.VariableDoesNotExist: Failed lookup for key [name] in <URLResolver <URLPattern list> (admin:admin) 'admin/'>
+WARNING 2026-01-21 17:39:32,707 django.request log log_message 249 Not Found: /favicon.ico
+DEBUG 2026-01-21 17:39:33,617 django.template base _resolve_lookup 1016 Exception while resolving variable 'name' in template 'unknown'.
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 182, in _get_response
+    callback, callback_args, callback_kwargs = self.resolve_request(request)
+                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 314, in resolve_request
+    resolver_match = resolver.resolve(request.path_info)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/urls/resolvers.py", line 716, in resolve
+    raise Resolver404({"tried": tried, "path": new_path})
+django.urls.exceptions.Resolver404: {'tried': [[<URLResolver <URLPattern list> (admin:admin) 'admin/'>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'login/' [name='login']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'logout/' [name='logout']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'register/' [name='register']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'poc-signup/' [name='poc_signup']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern '' [name='index']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'audit/' [name='audit_page']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'rules/' [name='rules_page']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'report/' [name='report_page']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'report-detail/' [name='report_detail_page']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'assets/' [name='assets_page']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'assets/<str:device_identifier>/audits' [name='device_audits_page']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'settings/' [name='settings_page']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'analysis/' [name='analysis_page']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'help/' [name='help_page']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/audits' [name='audits_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/rules/filter-options' [name='rules_filter_options_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/rules/tags' [name='rules_tags_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/rules/<int:rule_id>' [name='rules_detail_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/rules' [name='rules_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/reports' [name='reports_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/upload' [name='upload_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/stats' [name='stats_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/assets/<str:device_identifier>/latest' [name='assets_latest_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/assets/<str:device_identifier>' [name='assets_detail_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/assets' [name='assets_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/settings/backup' [name='settings_backup_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/settings/optimize' [name='settings_optimize_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'super-admin/' [name='super_admin_dashboard']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'super-admin/organizations/' [name='super_admin_organizations']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/super-admin/organizations/' [name='super_admin_organizations_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/super-admin/organizations/<int:org_id>/' [name='super_admin_organization_detail_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'org-admin/users/' [name='org_admin_users']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/org-admin/invite-user/' [name='org_admin_invite_user']>], [<URLPattern '^media/(?P<path>.*)$'>], [<URLPattern '^static/(?P<path>.*)$'>]], 'path': 'login/favicon.ico'}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 964, in _resolve_lookup
+    raise TypeError
+TypeError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 976, in _resolve_lookup
+    current = getattr(current, bit)
+              ^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'URLResolver' object has no attribute 'name'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 982, in _resolve_lookup
+    current = current[int(bit)]
+                      ^^^^^^^^
+ValueError: invalid literal for int() with base 10: 'name'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 989, in _resolve_lookup
+    raise VariableDoesNotExist(
+django.template.base.VariableDoesNotExist: Failed lookup for key [name] in <URLResolver <URLPattern list> (admin:admin) 'admin/'>
+WARNING 2026-01-21 17:39:33,620 django.request log log_message 249 Not Found: /login/favicon.ico
+DEBUG 2026-01-21 17:39:58,011 django.db.backends utils debug_sql 151 (0.001) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2026-01-21 17:39:58.008137' AND "django_session"."session_key" = '57jixdbs56ptfks9k02up6ve5p8hcejx') LIMIT 21; args=('2026-01-21 17:39:58.008137', '57jixdbs56ptfks9k02up6ve5p8hcejx'); alias=default
+DEBUG 2026-01-21 17:39:58,012 django.db.backends utils debug_sql 151 (0.000) SELECT "auth_user"."id", "auth_user"."password", "auth_user"."last_login", "auth_user"."is_superuser", "auth_user"."username", "auth_user"."first_name", "auth_user"."last_name", "auth_user"."email", "auth_user"."is_staff", "auth_user"."is_active", "auth_user"."date_joined" FROM "auth_user" WHERE "auth_user"."id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2026-01-21 17:39:58,013 django.db.backends utils debug_sql 151 (0.000) SELECT "core_userprofile"."id", "core_userprofile"."user_id", "core_userprofile"."organization_id", "core_userprofile"."role", "core_userprofile"."phone", "core_userprofile"."created_at", "core_userprofile"."updated_at" FROM "core_userprofile" WHERE "core_userprofile"."user_id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2026-01-21 17:39:58,014 django.db.backends utils debug_sql 151 (0.000) SELECT "core_organization"."id", "core_organization"."name", "core_organization"."domain", "core_organization"."poc_email", "core_organization"."status", "core_organization"."settings", "core_organization"."created_at", "core_organization"."updated_at" FROM "core_organization" WHERE "core_organization"."id" = 4 LIMIT 21; args=(4,); alias=default
+DEBUG 2026-01-21 17:39:58,016 django.db.backends utils debug_sql 151 (0.000) SELECT "core_rule"."id" FROM "core_rule" WHERE "core_rule"."organization_id" IN (4) ORDER BY "core_rule"."name" ASC; args=(4,); alias=default
+DEBUG 2026-01-21 17:39:58,017 django.db.backends utils debug_sql 151 (0.000) SELECT "core_audit"."id" FROM "core_audit" WHERE "core_audit"."organization_id" IN (4) ORDER BY "core_audit"."created_at" DESC; args=(4,); alias=default
+DEBUG 2026-01-21 17:39:58,018 django.db.backends utils debug_sql 151 (0.000) BEGIN; args=None; alias=default
+DEBUG 2026-01-21 17:39:58,018 django.db.backends utils debug_sql 151 (0.000) DELETE FROM "core_userprofile" WHERE "core_userprofile"."organization_id" IN (4); args=(4,); alias=default
+DEBUG 2026-01-21 17:39:58,018 django.db.backends utils debug_sql 151 (0.000) DELETE FROM "core_userinvitation" WHERE "core_userinvitation"."organization_id" IN (4); args=(4,); alias=default
+DEBUG 2026-01-21 17:39:58,019 django.db.backends utils debug_sql 151 (0.000) UPDATE "core_auditlog" SET "organization_id" = NULL WHERE "core_auditlog"."organization_id" IN (4); args=(4,); alias=default
+DEBUG 2026-01-21 17:39:58,019 django.db.backends utils debug_sql 151 (0.000) DELETE FROM "core_organization" WHERE "core_organization"."id" IN (4); args=(4,); alias=default
+DEBUG 2026-01-21 17:39:58,023 django.db.backends utils debug_transaction 181 (0.003) COMMIT; args=None; alias=default
+DEBUG 2026-01-21 17:39:58,024 django.db.backends utils debug_sql 151 (0.000) INSERT INTO "core_auditlog" ("user_id", "organization_id", "action_type", "resource_type", "resource_id", "description", "ip_address", "created_at") VALUES (1, NULL, 'delete', 'organization', 4, 'Deleted organization: mmbl', '223.123.73.179', '2026-01-21 17:39:58.023636') RETURNING "core_auditlog"."id"; args=(1, None, 'delete', 'organization', 4, 'Deleted organization: mmbl', '223.123.73.179', '2026-01-21 17:39:58.023636'); alias=default
+DEBUG 2026-01-21 17:39:59,185 django.db.backends utils debug_sql 151 (0.001) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2026-01-21 17:39:59.181988' AND "django_session"."session_key" = '57jixdbs56ptfks9k02up6ve5p8hcejx') LIMIT 21; args=('2026-01-21 17:39:59.181988', '57jixdbs56ptfks9k02up6ve5p8hcejx'); alias=default
+DEBUG 2026-01-21 17:39:59,186 django.db.backends utils debug_sql 151 (0.000) SELECT "auth_user"."id", "auth_user"."password", "auth_user"."last_login", "auth_user"."is_superuser", "auth_user"."username", "auth_user"."first_name", "auth_user"."last_name", "auth_user"."email", "auth_user"."is_staff", "auth_user"."is_active", "auth_user"."date_joined" FROM "auth_user" WHERE "auth_user"."id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2026-01-21 17:39:59,187 django.db.backends utils debug_sql 151 (0.000) SELECT "core_userprofile"."id", "core_userprofile"."user_id", "core_userprofile"."organization_id", "core_userprofile"."role", "core_userprofile"."phone", "core_userprofile"."created_at", "core_userprofile"."updated_at" FROM "core_userprofile" WHERE "core_userprofile"."user_id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2026-01-21 17:39:59,189 django.db.backends utils debug_sql 151 (0.000) SELECT "core_organization"."id", "core_organization"."name", "core_organization"."domain", "core_organization"."poc_email", "core_organization"."status", "core_organization"."settings", "core_organization"."created_at", "core_organization"."updated_at" FROM "core_organization" ORDER BY "core_organization"."name" ASC; args=(); alias=default
+DEBUG 2026-01-21 17:40:21,536 django.db.backends utils debug_sql 151 (0.000) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2026-01-21 17:40:21.534632' AND "django_session"."session_key" = '57jixdbs56ptfks9k02up6ve5p8hcejx') LIMIT 21; args=('2026-01-21 17:40:21.534632', '57jixdbs56ptfks9k02up6ve5p8hcejx'); alias=default
+DEBUG 2026-01-21 17:40:21,537 django.db.backends utils debug_sql 151 (0.000) SELECT "auth_user"."id", "auth_user"."password", "auth_user"."last_login", "auth_user"."is_superuser", "auth_user"."username", "auth_user"."first_name", "auth_user"."last_name", "auth_user"."email", "auth_user"."is_staff", "auth_user"."is_active", "auth_user"."date_joined" FROM "auth_user" WHERE "auth_user"."id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2026-01-21 17:40:21,538 django.db.backends utils debug_sql 151 (0.000) SELECT "core_userprofile"."id", "core_userprofile"."user_id", "core_userprofile"."organization_id", "core_userprofile"."role", "core_userprofile"."phone", "core_userprofile"."created_at", "core_userprofile"."updated_at" FROM "core_userprofile" WHERE "core_userprofile"."user_id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2026-01-21 17:40:21,540 django.db.backends utils debug_sql 151 (0.000) INSERT INTO "core_organization" ("name", "domain", "poc_email", "status", "settings", "created_at", "updated_at") VALUES ('test', 'tt', 'tournamentshelp@gmail.com', 'Active', '{}', '2026-01-21 17:40:21.539579', '2026-01-21 17:40:21.539612') RETURNING "core_organization"."id"; args=('test', 'tt', 'tournamentshelp@gmail.com', 'Active', '{}', '2026-01-21 17:40:21.539579', '2026-01-21 17:40:21.539612'); alias=default
+DEBUG 2026-01-21 17:40:21,544 django.db.backends utils debug_sql 151 (0.000) SELECT "core_rule"."id", "core_rule"."name", "core_rule"."description", "core_rule"."rule_type", "core_rule"."category", "core_rule"."severity", "core_rule"."yaml_content", "core_rule"."tags", "core_rule"."enabled", "core_rule"."remediation_template", "core_rule"."compliance_frameworks", "core_rule"."framework_mappings", "core_rule"."risk_weight", "core_rule"."organization_id", "core_rule"."created_at" FROM "core_rule" WHERE "core_rule"."organization_id" IS NULL ORDER BY "core_rule"."name" ASC; args=(); alias=default
+DEBUG 2026-01-21 17:40:21,546 django.db.backends utils debug_sql 151 (0.000) INSERT INTO "core_auditlog" ("user_id", "organization_id", "action_type", "resource_type", "resource_id", "description", "ip_address", "created_at") VALUES (1, NULL, 'create', 'organization', 5, 'Created organization: test', '223.123.73.179', '2026-01-21 17:40:21.545571') RETURNING "core_auditlog"."id"; args=(1, None, 'create', 'organization', 5, 'Created organization: test', '223.123.73.179', '2026-01-21 17:40:21.545571'); alias=default
+INFO 2026-01-21 17:40:21,729 apps.email_delivery.services.dns_service dns_service get_mx_records 71 Resolving MX records for domain: gmail.com
+INFO 2026-01-21 17:40:21,732 apps.email_delivery.services.dns_service dns_service get_mx_records 87 Found 5 MX record(s) for gmail.com: [(5, 'gmail-smtp-in.l.google.com'), (10, 'alt1.gmail-smtp-in.l.google.com'), (20, 'alt2.gmail-smtp-in.l.google.com'), (30, 'alt3.gmail-smtp-in.l.google.com'), (40, 'alt4.gmail-smtp-in.l.google.com')]
+INFO 2026-01-21 17:40:21,733 apps.email_delivery.services.email_service email_service send_to_mx_server 108 Attempting to send email to MX server: gmail-smtp-in.l.google.com (priority: 5)
+DEBUG 2026-01-21 17:40:23,128 apps.email_delivery.services.email_service email_service send_to_mx_server 116 EHLO response from gmail-smtp-in.l.google.com: 250 b'mx.google.com at your service, [203.175.66.63]\nSIZE 157286400\n8BITMIME\nSTARTTLS\nENHANCEDSTATUSCODES\nPIPELINING\nCHUNKING\nSMTPUTF8'
+DEBUG 2026-01-21 17:40:23,547 apps.email_delivery.services.email_service email_service send_to_mx_server 120 MAIL FROM response from gmail-smtp-in.l.google.com: 250 b'2.1.0 OK d2e1a72fcca58-81fa106bffcsi28934928b3a.47 - gsmtp'
+DEBUG 2026-01-21 17:40:24,213 apps.email_delivery.services.email_service email_service send_to_mx_server 133 RCPT TO tournamentshelp@gmail.com response from gmail-smtp-in.l.google.com: 250 b'2.1.5 OK d2e1a72fcca58-81fa106bffcsi28934928b3a.47 - gsmtp'
+DEBUG 2026-01-21 17:40:25,300 apps.email_delivery.services.email_service email_service send_to_mx_server 139 DATA response from gmail-smtp-in.l.google.com: 250 b'2.0.0 OK  1769017225 d2e1a72fcca58-81fa106bffcsi28934928b3a.47 - gsmtp'
+INFO 2026-01-21 17:40:25,301 apps.email_delivery.services.email_service email_service send_to_mx_server 143 Successfully sent email via MX server: gmail-smtp-in.l.google.com
+INFO 2026-01-21 17:40:25,719 apps.email_delivery.services.email_service email_service send_email_direct 224 Successfully sent email to domain gmail.com via MX server
+INFO 2026-01-21 17:40:25,720 apps.email_delivery.utils utils send_organization_created_email 125 Organization creation email sent to tournamentshelp@gmail.com
+DEBUG 2026-01-21 17:40:26,811 django.db.backends utils debug_sql 151 (0.001) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2026-01-21 17:40:26.808149' AND "django_session"."session_key" = '57jixdbs56ptfks9k02up6ve5p8hcejx') LIMIT 21; args=('2026-01-21 17:40:26.808149', '57jixdbs56ptfks9k02up6ve5p8hcejx'); alias=default
+DEBUG 2026-01-21 17:40:26,813 django.db.backends utils debug_sql 151 (0.000) SELECT "auth_user"."id", "auth_user"."password", "auth_user"."last_login", "auth_user"."is_superuser", "auth_user"."username", "auth_user"."first_name", "auth_user"."last_name", "auth_user"."email", "auth_user"."is_staff", "auth_user"."is_active", "auth_user"."date_joined" FROM "auth_user" WHERE "auth_user"."id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2026-01-21 17:40:26,814 django.db.backends utils debug_sql 151 (0.000) SELECT "core_userprofile"."id", "core_userprofile"."user_id", "core_userprofile"."organization_id", "core_userprofile"."role", "core_userprofile"."phone", "core_userprofile"."created_at", "core_userprofile"."updated_at" FROM "core_userprofile" WHERE "core_userprofile"."user_id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2026-01-21 17:40:26,816 django.db.backends utils debug_sql 151 (0.000) SELECT "core_organization"."id", "core_organization"."name", "core_organization"."domain", "core_organization"."poc_email", "core_organization"."status", "core_organization"."settings", "core_organization"."created_at", "core_organization"."updated_at" FROM "core_organization" ORDER BY "core_organization"."name" ASC; args=(); alias=default
+DEBUG 2026-01-21 17:40:26,817 django.db.backends utils debug_sql 151 (0.000) SELECT COUNT(*) AS "__count" FROM "auth_user" INNER JOIN "core_userprofile" ON ("auth_user"."id" = "core_userprofile"."user_id") WHERE "core_userprofile"."organization_id" = 5; args=(5,); alias=default
+DEBUG 2026-01-21 17:40:26,818 django.db.backends utils debug_sql 151 (0.000) SELECT COUNT(*) AS "__count" FROM "core_audit" WHERE "core_audit"."organization_id" = 5; args=(5,); alias=default
+DEBUG 2026-01-21 17:40:37,286 django.db.backends utils debug_sql 151 (0.001) SELECT "core_organization"."id", "core_organization"."name", "core_organization"."domain", "core_organization"."poc_email", "core_organization"."status", "core_organization"."settings", "core_organization"."created_at", "core_organization"."updated_at" FROM "core_organization" WHERE ("core_organization"."id" = 4 AND "core_organization"."poc_email" LIKE 'tournamentshelp@gmail.com' ESCAPE '\') LIMIT 21; args=(4, 'tournamentshelp@gmail.com'); alias=default
+DEBUG 2026-01-21 17:40:41,247 django.template base _resolve_lookup 1016 Exception while resolving variable 'name' in template 'unknown'.
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 182, in _get_response
+    callback, callback_args, callback_kwargs = self.resolve_request(request)
+                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 314, in resolve_request
+    resolver_match = resolver.resolve(request.path_info)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/urls/resolvers.py", line 716, in resolve
+    raise Resolver404({"tried": tried, "path": new_path})
+django.urls.exceptions.Resolver404: {'tried': [[<URLResolver <URLPattern list> (admin:admin) 'admin/'>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'login/' [name='login']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'logout/' [name='logout']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'register/' [name='register']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'poc-signup/' [name='poc_signup']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern '' [name='index']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'audit/' [name='audit_page']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'rules/' [name='rules_page']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'report/' [name='report_page']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'report-detail/' [name='report_detail_page']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'assets/' [name='assets_page']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'assets/<str:device_identifier>/audits' [name='device_audits_page']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'settings/' [name='settings_page']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'analysis/' [name='analysis_page']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'help/' [name='help_page']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/audits' [name='audits_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/rules/filter-options' [name='rules_filter_options_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/rules/tags' [name='rules_tags_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/rules/<int:rule_id>' [name='rules_detail_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/rules' [name='rules_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/reports' [name='reports_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/upload' [name='upload_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/stats' [name='stats_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/assets/<str:device_identifier>/latest' [name='assets_latest_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/assets/<str:device_identifier>' [name='assets_detail_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/assets' [name='assets_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/settings/backup' [name='settings_backup_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/settings/optimize' [name='settings_optimize_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'super-admin/' [name='super_admin_dashboard']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'super-admin/organizations/' [name='super_admin_organizations']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/super-admin/organizations/' [name='super_admin_organizations_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/super-admin/organizations/<int:org_id>/' [name='super_admin_organization_detail_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'org-admin/users/' [name='org_admin_users']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/org-admin/invite-user/' [name='org_admin_invite_user']>], [<URLPattern '^media/(?P<path>.*)$'>], [<URLPattern '^static/(?P<path>.*)$'>]], 'path': 'favicon.ico'}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 964, in _resolve_lookup
+    raise TypeError
+TypeError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 976, in _resolve_lookup
+    current = getattr(current, bit)
+              ^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'URLResolver' object has no attribute 'name'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 982, in _resolve_lookup
+    current = current[int(bit)]
+                      ^^^^^^^^
+ValueError: invalid literal for int() with base 10: 'name'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 989, in _resolve_lookup
+    raise VariableDoesNotExist(
+django.template.base.VariableDoesNotExist: Failed lookup for key [name] in <URLResolver <URLPattern list> (admin:admin) 'admin/'>
+WARNING 2026-01-21 17:40:41,251 django.request log log_message 249 Not Found: /favicon.ico
+DEBUG 2026-01-21 17:42:03,899 django.template base _resolve_lookup 1016 Exception while resolving variable 'name' in template 'unknown'.
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 182, in _get_response
+    callback, callback_args, callback_kwargs = self.resolve_request(request)
+                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 314, in resolve_request
+    resolver_match = resolver.resolve(request.path_info)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/urls/resolvers.py", line 716, in resolve
+    raise Resolver404({"tried": tried, "path": new_path})
+django.urls.exceptions.Resolver404: {'tried': [[<URLResolver <URLPattern list> (admin:admin) 'admin/'>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'login/' [name='login']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'logout/' [name='logout']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'register/' [name='register']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'poc-signup/' [name='poc_signup']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern '' [name='index']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'audit/' [name='audit_page']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'rules/' [name='rules_page']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'report/' [name='report_page']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'report-detail/' [name='report_detail_page']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'assets/' [name='assets_page']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'assets/<str:device_identifier>/audits' [name='device_audits_page']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'settings/' [name='settings_page']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'analysis/' [name='analysis_page']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'help/' [name='help_page']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/audits' [name='audits_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/rules/filter-options' [name='rules_filter_options_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/rules/tags' [name='rules_tags_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/rules/<int:rule_id>' [name='rules_detail_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/rules' [name='rules_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/reports' [name='reports_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/upload' [name='upload_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/stats' [name='stats_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/assets/<str:device_identifier>/latest' [name='assets_latest_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/assets/<str:device_identifier>' [name='assets_detail_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/assets' [name='assets_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/settings/backup' [name='settings_backup_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/settings/optimize' [name='settings_optimize_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'super-admin/' [name='super_admin_dashboard']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'super-admin/organizations/' [name='super_admin_organizations']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/super-admin/organizations/' [name='super_admin_organizations_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/super-admin/organizations/<int:org_id>/' [name='super_admin_organization_detail_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'org-admin/users/' [name='org_admin_users']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/org-admin/invite-user/' [name='org_admin_invite_user']>], [<URLPattern '^media/(?P<path>.*)$'>], [<URLPattern '^static/(?P<path>.*)$'>]], 'path': '.git/objects/'}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 964, in _resolve_lookup
+    raise TypeError
+TypeError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 976, in _resolve_lookup
+    current = getattr(current, bit)
+              ^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'URLResolver' object has no attribute 'name'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 982, in _resolve_lookup
+    current = current[int(bit)]
+                      ^^^^^^^^
+ValueError: invalid literal for int() with base 10: 'name'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 989, in _resolve_lookup
+    raise VariableDoesNotExist(
+django.template.base.VariableDoesNotExist: Failed lookup for key [name] in <URLResolver <URLPattern list> (admin:admin) 'admin/'>
+WARNING 2026-01-21 17:42:03,903 django.request log log_message 249 Not Found: /.git/objects/
+WARNING 2026-01-21 17:42:09,100 django.request log log_message 249 Bad Request: /poc-signup/
+WARNING 2026-01-21 17:42:18,247 django.request log log_message 249 Bad Request: /poc-signup/
+DEBUG 2026-01-21 17:42:45,983 django.db.backends utils debug_sql 151 (0.001) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2026-01-21 17:42:45.980751' AND "django_session"."session_key" = '57jixdbs56ptfks9k02up6ve5p8hcejx') LIMIT 21; args=('2026-01-21 17:42:45.980751', '57jixdbs56ptfks9k02up6ve5p8hcejx'); alias=default
+DEBUG 2026-01-21 17:42:45,985 django.db.backends utils debug_sql 151 (0.000) SELECT "auth_user"."id", "auth_user"."password", "auth_user"."last_login", "auth_user"."is_superuser", "auth_user"."username", "auth_user"."first_name", "auth_user"."last_name", "auth_user"."email", "auth_user"."is_staff", "auth_user"."is_active", "auth_user"."date_joined" FROM "auth_user" WHERE "auth_user"."id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2026-01-21 17:42:45,987 django.db.backends utils debug_sql 151 (0.002) SELECT "core_userprofile"."id", "core_userprofile"."user_id", "core_userprofile"."organization_id", "core_userprofile"."role", "core_userprofile"."phone", "core_userprofile"."created_at", "core_userprofile"."updated_at" FROM "core_userprofile" WHERE "core_userprofile"."user_id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2026-01-21 17:42:46,018 django.db.backends utils debug_sql 151 (0.000) SELECT "core_organization"."id", "core_organization"."name", "core_organization"."domain", "core_organization"."poc_email", "core_organization"."status", "core_organization"."settings", "core_organization"."created_at", "core_organization"."updated_at" FROM "core_organization" WHERE "core_organization"."id" = 5 LIMIT 21; args=(5,); alias=default
+DEBUG 2026-01-21 17:42:46,020 django.db.backends utils debug_sql 151 (0.000) SELECT "core_rule"."id" FROM "core_rule" WHERE "core_rule"."organization_id" IN (5) ORDER BY "core_rule"."name" ASC; args=(5,); alias=default
+DEBUG 2026-01-21 17:42:46,021 django.db.backends utils debug_sql 151 (0.000) SELECT "core_audit"."id" FROM "core_audit" WHERE "core_audit"."organization_id" IN (5) ORDER BY "core_audit"."created_at" DESC; args=(5,); alias=default
+DEBUG 2026-01-21 17:42:46,021 django.db.backends utils debug_sql 151 (0.000) BEGIN; args=None; alias=default
+DEBUG 2026-01-21 17:42:46,022 django.db.backends utils debug_sql 151 (0.000) DELETE FROM "core_userprofile" WHERE "core_userprofile"."organization_id" IN (5); args=(5,); alias=default
+DEBUG 2026-01-21 17:42:46,022 django.db.backends utils debug_sql 151 (0.000) DELETE FROM "core_userinvitation" WHERE "core_userinvitation"."organization_id" IN (5); args=(5,); alias=default
+DEBUG 2026-01-21 17:42:46,023 django.db.backends utils debug_sql 151 (0.000) UPDATE "core_auditlog" SET "organization_id" = NULL WHERE "core_auditlog"."organization_id" IN (5); args=(5,); alias=default
+DEBUG 2026-01-21 17:42:46,023 django.db.backends utils debug_sql 151 (0.000) DELETE FROM "core_organization" WHERE "core_organization"."id" IN (5); args=(5,); alias=default
+DEBUG 2026-01-21 17:42:46,026 django.db.backends utils debug_transaction 181 (0.003) COMMIT; args=None; alias=default
+DEBUG 2026-01-21 17:42:46,027 django.db.backends utils debug_sql 151 (0.000) INSERT INTO "core_auditlog" ("user_id", "organization_id", "action_type", "resource_type", "resource_id", "description", "ip_address", "created_at") VALUES (1, NULL, 'delete', 'organization', 5, 'Deleted organization: test', '223.123.73.179', '2026-01-21 17:42:46.027039') RETURNING "core_auditlog"."id"; args=(1, None, 'delete', 'organization', 5, 'Deleted organization: test', '223.123.73.179', '2026-01-21 17:42:46.027039'); alias=default
+DEBUG 2026-01-21 17:42:47,254 django.db.backends utils debug_sql 151 (0.001) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2026-01-21 17:42:47.251528' AND "django_session"."session_key" = '57jixdbs56ptfks9k02up6ve5p8hcejx') LIMIT 21; args=('2026-01-21 17:42:47.251528', '57jixdbs56ptfks9k02up6ve5p8hcejx'); alias=default
+DEBUG 2026-01-21 17:42:47,256 django.db.backends utils debug_sql 151 (0.000) SELECT "auth_user"."id", "auth_user"."password", "auth_user"."last_login", "auth_user"."is_superuser", "auth_user"."username", "auth_user"."first_name", "auth_user"."last_name", "auth_user"."email", "auth_user"."is_staff", "auth_user"."is_active", "auth_user"."date_joined" FROM "auth_user" WHERE "auth_user"."id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2026-01-21 17:42:47,258 django.db.backends utils debug_sql 151 (0.002) SELECT "core_userprofile"."id", "core_userprofile"."user_id", "core_userprofile"."organization_id", "core_userprofile"."role", "core_userprofile"."phone", "core_userprofile"."created_at", "core_userprofile"."updated_at" FROM "core_userprofile" WHERE "core_userprofile"."user_id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2026-01-21 17:42:47,290 django.db.backends utils debug_sql 151 (0.000) SELECT "core_organization"."id", "core_organization"."name", "core_organization"."domain", "core_organization"."poc_email", "core_organization"."status", "core_organization"."settings", "core_organization"."created_at", "core_organization"."updated_at" FROM "core_organization" ORDER BY "core_organization"."name" ASC; args=(); alias=default
+DEBUG 2026-01-21 17:43:00,060 django.db.backends utils debug_sql 151 (0.001) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2026-01-21 17:43:00.057581' AND "django_session"."session_key" = '57jixdbs56ptfks9k02up6ve5p8hcejx') LIMIT 21; args=('2026-01-21 17:43:00.057581', '57jixdbs56ptfks9k02up6ve5p8hcejx'); alias=default
+DEBUG 2026-01-21 17:43:00,062 django.db.backends utils debug_sql 151 (0.000) SELECT "auth_user"."id", "auth_user"."password", "auth_user"."last_login", "auth_user"."is_superuser", "auth_user"."username", "auth_user"."first_name", "auth_user"."last_name", "auth_user"."email", "auth_user"."is_staff", "auth_user"."is_active", "auth_user"."date_joined" FROM "auth_user" WHERE "auth_user"."id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2026-01-21 17:43:00,064 django.db.backends utils debug_sql 151 (0.002) SELECT "core_userprofile"."id", "core_userprofile"."user_id", "core_userprofile"."organization_id", "core_userprofile"."role", "core_userprofile"."phone", "core_userprofile"."created_at", "core_userprofile"."updated_at" FROM "core_userprofile" WHERE "core_userprofile"."user_id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2026-01-21 17:43:00,099 django.db.backends utils debug_sql 151 (0.000) INSERT INTO "core_organization" ("name", "domain", "poc_email", "status", "settings", "created_at", "updated_at") VALUES ('MMBL', 'test', 'tournamentshelp@gmail.com', 'Active', '{}', '2026-01-21 17:43:00.098517', '2026-01-21 17:43:00.098563') RETURNING "core_organization"."id"; args=('MMBL', 'test', 'tournamentshelp@gmail.com', 'Active', '{}', '2026-01-21 17:43:00.098517', '2026-01-21 17:43:00.098563'); alias=default
+DEBUG 2026-01-21 17:43:00,103 django.db.backends utils debug_sql 151 (0.000) SELECT "core_rule"."id", "core_rule"."name", "core_rule"."description", "core_rule"."rule_type", "core_rule"."category", "core_rule"."severity", "core_rule"."yaml_content", "core_rule"."tags", "core_rule"."enabled", "core_rule"."remediation_template", "core_rule"."compliance_frameworks", "core_rule"."framework_mappings", "core_rule"."risk_weight", "core_rule"."organization_id", "core_rule"."created_at" FROM "core_rule" WHERE "core_rule"."organization_id" IS NULL ORDER BY "core_rule"."name" ASC; args=(); alias=default
+DEBUG 2026-01-21 17:43:00,104 django.db.backends utils debug_sql 151 (0.000) INSERT INTO "core_auditlog" ("user_id", "organization_id", "action_type", "resource_type", "resource_id", "description", "ip_address", "created_at") VALUES (1, NULL, 'create', 'organization', 6, 'Created organization: MMBL', '223.123.73.179', '2026-01-21 17:43:00.104356') RETURNING "core_auditlog"."id"; args=(1, None, 'create', 'organization', 6, 'Created organization: MMBL', '223.123.73.179', '2026-01-21 17:43:00.104356'); alias=default
+INFO 2026-01-21 17:43:00,245 apps.email_delivery.services.dns_service dns_service get_mx_records 71 Resolving MX records for domain: gmail.com
+INFO 2026-01-21 17:43:00,249 apps.email_delivery.services.dns_service dns_service get_mx_records 87 Found 5 MX record(s) for gmail.com: [(5, 'gmail-smtp-in.l.google.com'), (10, 'alt1.gmail-smtp-in.l.google.com'), (20, 'alt2.gmail-smtp-in.l.google.com'), (30, 'alt3.gmail-smtp-in.l.google.com'), (40, 'alt4.gmail-smtp-in.l.google.com')]
+INFO 2026-01-21 17:43:00,249 apps.email_delivery.services.email_service email_service send_to_mx_server 108 Attempting to send email to MX server: gmail-smtp-in.l.google.com (priority: 5)
+DEBUG 2026-01-21 17:43:01,501 apps.email_delivery.services.email_service email_service send_to_mx_server 116 EHLO response from gmail-smtp-in.l.google.com: 250 b'mx.google.com at your service, [203.175.66.63]\nSIZE 157286400\n8BITMIME\nSTARTTLS\nENHANCEDSTATUSCODES\nPIPELINING\nCHUNKING\nSMTPUTF8'
+DEBUG 2026-01-21 17:43:01,923 apps.email_delivery.services.email_service email_service send_to_mx_server 120 MAIL FROM response from gmail-smtp-in.l.google.com: 250 b'2.1.0 OK d2e1a72fcca58-81fa1270f4dsi24772407b3a.198 - gsmtp'
+DEBUG 2026-01-21 17:43:02,451 apps.email_delivery.services.email_service email_service send_to_mx_server 133 RCPT TO tournamentshelp@gmail.com response from gmail-smtp-in.l.google.com: 250 b'2.1.5 OK d2e1a72fcca58-81fa1270f4dsi24772407b3a.198 - gsmtp'
+DEBUG 2026-01-21 17:43:03,856 apps.email_delivery.services.email_service email_service send_to_mx_server 139 DATA response from gmail-smtp-in.l.google.com: 250 b'2.0.0 OK  1769017383 d2e1a72fcca58-81fa1270f4dsi24772407b3a.198 - gsmtp'
+INFO 2026-01-21 17:43:03,857 apps.email_delivery.services.email_service email_service send_to_mx_server 143 Successfully sent email via MX server: gmail-smtp-in.l.google.com
+INFO 2026-01-21 17:43:04,278 apps.email_delivery.services.email_service email_service send_email_direct 224 Successfully sent email to domain gmail.com via MX server
+INFO 2026-01-21 17:43:04,278 apps.email_delivery.utils utils send_organization_created_email 125 Organization creation email sent to tournamentshelp@gmail.com
+DEBUG 2026-01-21 17:43:05,392 django.db.backends utils debug_sql 151 (0.001) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2026-01-21 17:43:05.388682' AND "django_session"."session_key" = '57jixdbs56ptfks9k02up6ve5p8hcejx') LIMIT 21; args=('2026-01-21 17:43:05.388682', '57jixdbs56ptfks9k02up6ve5p8hcejx'); alias=default
+DEBUG 2026-01-21 17:43:05,393 django.db.backends utils debug_sql 151 (0.000) SELECT "auth_user"."id", "auth_user"."password", "auth_user"."last_login", "auth_user"."is_superuser", "auth_user"."username", "auth_user"."first_name", "auth_user"."last_name", "auth_user"."email", "auth_user"."is_staff", "auth_user"."is_active", "auth_user"."date_joined" FROM "auth_user" WHERE "auth_user"."id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2026-01-21 17:43:05,394 django.db.backends utils debug_sql 151 (0.000) SELECT "core_userprofile"."id", "core_userprofile"."user_id", "core_userprofile"."organization_id", "core_userprofile"."role", "core_userprofile"."phone", "core_userprofile"."created_at", "core_userprofile"."updated_at" FROM "core_userprofile" WHERE "core_userprofile"."user_id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2026-01-21 17:43:05,395 django.db.backends utils debug_sql 151 (0.000) SELECT "core_organization"."id", "core_organization"."name", "core_organization"."domain", "core_organization"."poc_email", "core_organization"."status", "core_organization"."settings", "core_organization"."created_at", "core_organization"."updated_at" FROM "core_organization" ORDER BY "core_organization"."name" ASC; args=(); alias=default
+DEBUG 2026-01-21 17:43:05,397 django.db.backends utils debug_sql 151 (0.000) SELECT COUNT(*) AS "__count" FROM "auth_user" INNER JOIN "core_userprofile" ON ("auth_user"."id" = "core_userprofile"."user_id") WHERE "core_userprofile"."organization_id" = 6; args=(6,); alias=default
+DEBUG 2026-01-21 17:43:05,398 django.db.backends utils debug_sql 151 (0.000) SELECT COUNT(*) AS "__count" FROM "core_audit" WHERE "core_audit"."organization_id" = 6; args=(6,); alias=default
+DEBUG 2026-01-21 17:43:20,250 django.db.backends utils debug_sql 151 (0.000) SELECT "core_organization"."id", "core_organization"."name", "core_organization"."domain", "core_organization"."poc_email", "core_organization"."status", "core_organization"."settings", "core_organization"."created_at", "core_organization"."updated_at" FROM "core_organization" WHERE ("core_organization"."id" = 6 AND "core_organization"."poc_email" LIKE 'tournamentshelp@gmail.com' ESCAPE '\') LIMIT 21; args=(6, 'tournamentshelp@gmail.com'); alias=default
+DEBUG 2026-01-21 17:43:20,251 django.db.backends utils debug_sql 151 (0.000) SELECT 1 AS "a" FROM "auth_user" WHERE "auth_user"."email" LIKE 'tournamentshelp@gmail.com' ESCAPE '\' LIMIT 1; args=(1, 'tournamentshelp@gmail.com'); alias=default
+DEBUG 2026-01-21 17:43:20,259 django.template base _resolve_lookup 1016 Exception while resolving variable 'error' in template 'registration/poc_signup.html'.
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 965, in _resolve_lookup
+    current = current[bit]
+              ~~~~~~~^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/context.py", line 91, in __getitem__
+    raise KeyError(key)
+KeyError: 'error'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 972, in _resolve_lookup
+    if isinstance(current, BaseContext) and getattr(
+                                            ^^^^^^^^
+AttributeError: type object 'RequestContext' has no attribute 'error'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 982, in _resolve_lookup
+    current = current[int(bit)]
+                      ^^^^^^^^
+ValueError: invalid literal for int() with base 10: 'error'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 989, in _resolve_lookup
+    raise VariableDoesNotExist(
+django.template.base.VariableDoesNotExist: Failed lookup for key [error] in [{'True': True, 'False': False, 'None': None}, {'csrf_token': <SimpleLazyObject: <function csrf.<locals>._get_val at 0x7e9a3fc882c0>>, 'request': <WSGIRequest: GET '/poc-signup/?token=6%7Ctournamentshelp@gmail.com:vXz6hiTOC8JSSHv00furjtSL2X4Gx09AdwG8hVt8pOc'>, 'user': <SimpleLazyObject: <django.contrib.auth.models.AnonymousUser object at 0x7e9a3fdd01d0>>, 'perms': PermWrapper(<SimpleLazyObject: <django.contrib.auth.models.AnonymousUser object at 0x7e9a3fdd01d0>>), 'messages': <FallbackStorage: request=<WSGIRequest: GET '/poc-signup/?token=6%7Ctournamentshelp@gmail.com:vXz6hiTOC8JSSHv00furjtSL2X4Gx09AdwG8hVt8pOc'>>, 'DEFAULT_MESSAGE_LEVELS': {'DEBUG': 10, 'INFO': 20, 'SUCCESS': 25, 'WARNING': 30, 'ERROR': 40}}, {}, {'organization': <Organization: MMBL>, 'token': '6|tournamentshelp@gmail.com:vXz6hiTOC8JSSHv00furjtSL2X4Gx09AdwG8hVt8pOc', 'email': 'tournamentshelp@gmail.com'}]
+DEBUG 2026-01-21 17:43:29,870 django.db.backends utils debug_sql 151 (0.001) SELECT "core_organization"."id", "core_organization"."name", "core_organization"."domain", "core_organization"."poc_email", "core_organization"."status", "core_organization"."settings", "core_organization"."created_at", "core_organization"."updated_at" FROM "core_organization" WHERE ("core_organization"."id" = 6 AND "core_organization"."poc_email" LIKE 'tournamentshelp@gmail.com' ESCAPE '\') LIMIT 21; args=(6, 'tournamentshelp@gmail.com'); alias=default
+DEBUG 2026-01-21 17:43:29,872 django.db.backends utils debug_sql 151 (0.000) SELECT 1 AS "a" FROM "auth_user" WHERE "auth_user"."email" LIKE 'tournamentshelp@gmail.com' ESCAPE '\' LIMIT 1; args=(1, 'tournamentshelp@gmail.com'); alias=default
+DEBUG 2026-01-21 17:43:29,872 django.db.backends utils debug_sql 151 (0.000) SELECT 1 AS "a" FROM "auth_user" WHERE "auth_user"."username" = 'tournamentshelp' LIMIT 1; args=(1, 'tournamentshelp'); alias=default
+DEBUG 2026-01-21 17:43:30,804 django.db.backends utils debug_sql 151 (0.000) INSERT INTO "auth_user" ("password", "last_login", "is_superuser", "username", "first_name", "last_name", "email", "is_staff", "is_active", "date_joined") VALUES ('pbkdf2_sha256$1200000$8tMx4QH4vvAVJBxWzwf1rQ$vn6KtJ7vE6O2NVsVNESbCKfpwOY4+XZLqKqrVPGPleI=', NULL, 0, 'tournamentshelp', '', '', 'tournamentshelp@gmail.com', 0, 1, '2026-01-21 17:43:29.872871') RETURNING "auth_user"."id"; args=('pbkdf2_sha256$1200000$8tMx4QH4vvAVJBxWzwf1rQ$vn6KtJ7vE6O2NVsVNESbCKfpwOY4+XZLqKqrVPGPleI=', None, False, 'tournamentshelp', '', '', 'tournamentshelp@gmail.com', False, True, '2026-01-21 17:43:29.872871'); alias=default
+DEBUG 2026-01-21 17:43:30,808 django.db.backends utils debug_sql 151 (0.000) INSERT INTO "core_userprofile" ("user_id", "organization_id", "role", "phone", "created_at", "updated_at") VALUES (2, 6, 'org_admin', NULL, '2026-01-21 17:43:30.808024', '2026-01-21 17:43:30.808052') RETURNING "core_userprofile"."id"; args=(2, 6, 'org_admin', None, '2026-01-21 17:43:30.808024', '2026-01-21 17:43:30.808052'); alias=default
+DEBUG 2026-01-21 17:43:30,811 django.db.backends utils debug_sql 151 (0.000) INSERT INTO "core_auditlog" ("user_id", "organization_id", "action_type", "resource_type", "resource_id", "description", "ip_address", "created_at") VALUES (2, 6, 'create', 'user', 2, 'POC tournamentshelp created account for organization MMBL', '223.123.73.179', '2026-01-21 17:43:30.811107') RETURNING "core_auditlog"."id"; args=(2, 6, 'create', 'user', 2, 'POC tournamentshelp created account for organization MMBL', '223.123.73.179', '2026-01-21 17:43:30.811107'); alias=default
+DEBUG 2026-01-21 17:43:30,814 django.db.backends utils debug_sql 151 (0.000) SELECT 1 AS "a" FROM "django_session" WHERE "django_session"."session_key" = 'wgugq79w0rxzgi0iwr8129dkz0kjieok' LIMIT 1; args=(1, 'wgugq79w0rxzgi0iwr8129dkz0kjieok'); alias=default
+DEBUG 2026-01-21 17:43:30,814 django.db.backends utils debug_sql 151 (0.000) BEGIN; args=None; alias=default
+DEBUG 2026-01-21 17:43:30,815 django.db.backends utils debug_sql 151 (0.000) INSERT INTO "django_session" ("session_key", "session_data", "expire_date") VALUES ('wgugq79w0rxzgi0iwr8129dkz0kjieok', 'e30:1vicEs:LHPU46Ftl76GQ1LN_gts-YgZPoNP9FN_Ze0JYQImPSs', '2026-02-04 17:43:30.814645'); args=('wgugq79w0rxzgi0iwr8129dkz0kjieok', 'e30:1vicEs:LHPU46Ftl76GQ1LN_gts-YgZPoNP9FN_Ze0JYQImPSs', '2026-02-04 17:43:30.814645'); alias=default
+DEBUG 2026-01-21 17:43:30,817 django.db.backends utils debug_transaction 181 (0.002) COMMIT; args=None; alias=default
+DEBUG 2026-01-21 17:43:30,820 django.db.backends utils debug_sql 151 (0.002) UPDATE "auth_user" SET "last_login" = '2026-01-21 17:43:30.817743' WHERE "auth_user"."id" = 2; args=('2026-01-21 17:43:30.817743', 2); alias=default
+DEBUG 2026-01-21 17:43:30,821 django.db.backends utils debug_sql 151 (0.000) BEGIN; args=None; alias=default
+DEBUG 2026-01-21 17:43:30,821 django.db.backends utils debug_sql 151 (0.000) UPDATE "django_session" SET "session_data" = '.eJxVjDsOwjAQRO_iGlkO_u1S0nMGy_aucQA5UpxUiLuTSCmgG817M28R4rrUsHaew0jiIs7i9NulmJ_cdkCP2O6TzFNb5jHJXZEH7fI2Eb-uh_t3UGOv2xrQ2wTKAWzJedbZFwN6oOw1a0aL1gENwLooRmKFRtlCFlUiMBTF5wu6XjdT:1vicEs:NheNDkHK0ce3PnFP6OHwfuL0ZE44CrxwxPXMh-Nq0TM', "expire_date" = '2026-02-04 17:43:30.821161' WHERE "django_session"."session_key" = 'wgugq79w0rxzgi0iwr8129dkz0kjieok'; args=('.eJxVjDsOwjAQRO_iGlkO_u1S0nMGy_aucQA5UpxUiLuTSCmgG817M28R4rrUsHaew0jiIs7i9NulmJ_cdkCP2O6TzFNb5jHJXZEH7fI2Eb-uh_t3UGOv2xrQ2wTKAWzJedbZFwN6oOw1a0aL1gENwLooRmKFRtlCFlUiMBTF5wu6XjdT:1vicEs:NheNDkHK0ce3PnFP6OHwfuL0ZE44CrxwxPXMh-Nq0TM', '2026-02-04 17:43:30.821161', 'wgugq79w0rxzgi0iwr8129dkz0kjieok'); alias=default
+DEBUG 2026-01-21 17:43:30,823 django.db.backends utils debug_transaction 181 (0.002) COMMIT; args=None; alias=default
+DEBUG 2026-01-21 17:43:30,989 django.db.backends utils debug_sql 151 (0.000) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2026-01-21 17:43:30.988162' AND "django_session"."session_key" = 'wgugq79w0rxzgi0iwr8129dkz0kjieok') LIMIT 21; args=('2026-01-21 17:43:30.988162', 'wgugq79w0rxzgi0iwr8129dkz0kjieok'); alias=default
+DEBUG 2026-01-21 17:43:30,990 django.db.backends utils debug_sql 151 (0.000) SELECT "auth_user"."id", "auth_user"."password", "auth_user"."last_login", "auth_user"."is_superuser", "auth_user"."username", "auth_user"."first_name", "auth_user"."last_name", "auth_user"."email", "auth_user"."is_staff", "auth_user"."is_active", "auth_user"."date_joined" FROM "auth_user" WHERE "auth_user"."id" = 2 LIMIT 21; args=(2,); alias=default
+DEBUG 2026-01-21 17:43:30,991 django.db.backends utils debug_sql 151 (0.000) SELECT "core_userprofile"."id", "core_userprofile"."user_id", "core_userprofile"."organization_id", "core_userprofile"."role", "core_userprofile"."phone", "core_userprofile"."created_at", "core_userprofile"."updated_at" FROM "core_userprofile" WHERE "core_userprofile"."user_id" = 2 LIMIT 21; args=(2,); alias=default
+DEBUG 2026-01-21 17:43:30,992 django.db.backends utils debug_sql 151 (0.000) SELECT "core_organization"."id", "core_organization"."name", "core_organization"."domain", "core_organization"."poc_email", "core_organization"."status", "core_organization"."settings", "core_organization"."created_at", "core_organization"."updated_at" FROM "core_organization" WHERE "core_organization"."id" = 6 LIMIT 21; args=(6,); alias=default
+DEBUG 2026-01-21 17:43:31,495 django.db.backends utils debug_sql 151 (0.001) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2026-01-21 17:43:31.491990' AND "django_session"."session_key" = 'wgugq79w0rxzgi0iwr8129dkz0kjieok') LIMIT 21; args=('2026-01-21 17:43:31.491990', 'wgugq79w0rxzgi0iwr8129dkz0kjieok'); alias=default
+DEBUG 2026-01-21 17:43:31,496 django.db.backends utils debug_sql 151 (0.000) SELECT "auth_user"."id", "auth_user"."password", "auth_user"."last_login", "auth_user"."is_superuser", "auth_user"."username", "auth_user"."first_name", "auth_user"."last_name", "auth_user"."email", "auth_user"."is_staff", "auth_user"."is_active", "auth_user"."date_joined" FROM "auth_user" WHERE "auth_user"."id" = 2 LIMIT 21; args=(2,); alias=default
+DEBUG 2026-01-21 17:43:31,499 django.db.backends utils debug_sql 151 (0.000) SELECT "core_userprofile"."id", "core_userprofile"."user_id", "core_userprofile"."organization_id", "core_userprofile"."role", "core_userprofile"."phone", "core_userprofile"."created_at", "core_userprofile"."updated_at" FROM "core_userprofile" WHERE "core_userprofile"."user_id" = 2 LIMIT 21; args=(2,); alias=default
+DEBUG 2026-01-21 17:43:31,500 django.db.backends utils debug_sql 151 (0.000) SELECT "core_organization"."id", "core_organization"."name", "core_organization"."domain", "core_organization"."poc_email", "core_organization"."status", "core_organization"."settings", "core_organization"."created_at", "core_organization"."updated_at" FROM "core_organization" WHERE "core_organization"."id" = 6 LIMIT 21; args=(6,); alias=default
+DEBUG 2026-01-21 17:43:31,533 django.db.backends utils debug_sql 151 (0.000) SELECT COUNT(*) AS "__count" FROM "core_audit" WHERE "core_audit"."organization_id" = 6; args=(6,); alias=default
+DEBUG 2026-01-21 17:43:31,534 django.db.backends utils debug_sql 151 (0.000) SELECT COUNT(*) AS "__count" FROM "core_finding" INNER JOIN "core_audit" ON ("core_finding"."audit_id" = "core_audit"."id") WHERE "core_audit"."organization_id" = 6; args=(6,); alias=default
+DEBUG 2026-01-21 17:43:31,534 django.db.backends utils debug_sql 151 (0.000) SELECT COUNT(*) AS "__count" FROM "core_rule" WHERE ("core_rule"."enabled" AND "core_rule"."organization_id" = 6); args=(6,); alias=default
+DEBUG 2026-01-21 17:43:31,536 django.db.backends utils debug_sql 151 (0.000) SELECT "core_audit"."id", "core_audit"."organization_id", "core_audit"."created_by_id", "core_audit"."status", "core_audit"."device_identifier", "core_audit"."device_family", "core_audit"."config_file", "core_audit"."parsed_config", "core_audit"."created_at", "core_audit"."completed_at", "core_audit"."snapshot_name", "core_audit"."parent_audit_id", "core_audit"."device_hostname", "core_audit"."device_model", "core_audit"."device_firmware", "core_audit"."device_location", "core_audit"."device_make", "core_audit"."device_type", "core_audit"."progress" FROM "core_audit" WHERE ("core_audit"."organization_id" = 6 AND "core_audit"."status" = 'Completed') ORDER BY "core_audit"."created_at" DESC; args=(6, 'Completed'); alias=default
+DEBUG 2026-01-21 17:43:31,537 django.db.backends utils debug_sql 151 (0.000) SELECT "core_audit"."id", "core_audit"."organization_id", "core_audit"."created_by_id", "core_audit"."status", "core_audit"."device_identifier", "core_audit"."device_family", "core_audit"."config_file", "core_audit"."parsed_config", "core_audit"."created_at", "core_audit"."completed_at", "core_audit"."snapshot_name", "core_audit"."parent_audit_id", "core_audit"."device_hostname", "core_audit"."device_model", "core_audit"."device_firmware", "core_audit"."device_location", "core_audit"."device_make", "core_audit"."device_type", "core_audit"."progress" FROM "core_audit" WHERE "core_audit"."organization_id" = 6 ORDER BY "core_audit"."created_at" DESC LIMIT 10; args=(6,); alias=default
+DEBUG 2026-01-21 17:43:31,685 django.db.backends utils debug_sql 151 (0.000) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2026-01-21 17:43:31.683951' AND "django_session"."session_key" = 'wgugq79w0rxzgi0iwr8129dkz0kjieok') LIMIT 21; args=('2026-01-21 17:43:31.683951', 'wgugq79w0rxzgi0iwr8129dkz0kjieok'); alias=default
+DEBUG 2026-01-21 17:43:31,686 django.db.backends utils debug_sql 151 (0.000) SELECT "auth_user"."id", "auth_user"."password", "auth_user"."last_login", "auth_user"."is_superuser", "auth_user"."username", "auth_user"."first_name", "auth_user"."last_name", "auth_user"."email", "auth_user"."is_staff", "auth_user"."is_active", "auth_user"."date_joined" FROM "auth_user" WHERE "auth_user"."id" = 2 LIMIT 21; args=(2,); alias=default
+DEBUG 2026-01-21 17:43:31,687 django.db.backends utils debug_sql 151 (0.000) SELECT "core_userprofile"."id", "core_userprofile"."user_id", "core_userprofile"."organization_id", "core_userprofile"."role", "core_userprofile"."phone", "core_userprofile"."created_at", "core_userprofile"."updated_at" FROM "core_userprofile" WHERE "core_userprofile"."user_id" = 2 LIMIT 21; args=(2,); alias=default
+DEBUG 2026-01-21 17:43:31,687 django.db.backends utils debug_sql 151 (0.000) SELECT "core_organization"."id", "core_organization"."name", "core_organization"."domain", "core_organization"."poc_email", "core_organization"."status", "core_organization"."settings", "core_organization"."created_at", "core_organization"."updated_at" FROM "core_organization" WHERE "core_organization"."id" = 6 LIMIT 21; args=(6,); alias=default
+DEBUG 2026-01-21 17:43:31,688 django.db.backends utils debug_sql 151 (0.000) SELECT COUNT(*) AS "__count" FROM "core_audit" WHERE "core_audit"."organization_id" = 6; args=(6,); alias=default
+DEBUG 2026-01-21 17:43:31,689 django.db.backends utils debug_sql 151 (0.000) SELECT COUNT(*) AS "__count" FROM "core_finding" INNER JOIN "core_audit" ON ("core_finding"."audit_id" = "core_audit"."id") WHERE "core_audit"."organization_id" = 6; args=(6,); alias=default
+DEBUG 2026-01-21 17:43:31,690 django.db.backends utils debug_sql 151 (0.000) SELECT COUNT(*) AS "__count" FROM "core_rule" WHERE ("core_rule"."enabled" AND "core_rule"."organization_id" = 6); args=(6,); alias=default
+DEBUG 2026-01-21 17:43:31,691 django.db.backends utils debug_sql 151 (0.000) SELECT "core_audit"."id", "core_audit"."organization_id", "core_audit"."created_by_id", "core_audit"."status", "core_audit"."device_identifier", "core_audit"."device_family", "core_audit"."config_file", "core_audit"."parsed_config", "core_audit"."created_at", "core_audit"."completed_at", "core_audit"."snapshot_name", "core_audit"."parent_audit_id", "core_audit"."device_hostname", "core_audit"."device_model", "core_audit"."device_firmware", "core_audit"."device_location", "core_audit"."device_make", "core_audit"."device_type", "core_audit"."progress" FROM "core_audit" WHERE ("core_audit"."organization_id" = 6 AND "core_audit"."status" = 'Completed') ORDER BY "core_audit"."created_at" DESC; args=(6, 'Completed'); alias=default
+DEBUG 2026-01-21 17:43:31,692 django.db.backends utils debug_sql 151 (0.000) SELECT "core_audit"."id", "core_audit"."organization_id", "core_audit"."created_by_id", "core_audit"."status", "core_audit"."device_identifier", "core_audit"."device_family", "core_audit"."config_file", "core_audit"."parsed_config", "core_audit"."created_at", "core_audit"."completed_at", "core_audit"."snapshot_name", "core_audit"."parent_audit_id", "core_audit"."device_hostname", "core_audit"."device_model", "core_audit"."device_firmware", "core_audit"."device_location", "core_audit"."device_make", "core_audit"."device_type", "core_audit"."progress" FROM "core_audit" WHERE "core_audit"."organization_id" = 6 ORDER BY "core_audit"."created_at" DESC LIMIT 10; args=(6,); alias=default
+DEBUG 2026-01-21 17:43:44,103 django.db.backends utils debug_sql 151 (0.001) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2026-01-21 17:43:44.100081' AND "django_session"."session_key" = 'wgugq79w0rxzgi0iwr8129dkz0kjieok') LIMIT 21; args=('2026-01-21 17:43:44.100081', 'wgugq79w0rxzgi0iwr8129dkz0kjieok'); alias=default
+DEBUG 2026-01-21 17:43:44,105 django.db.backends utils debug_sql 151 (0.000) SELECT "auth_user"."id", "auth_user"."password", "auth_user"."last_login", "auth_user"."is_superuser", "auth_user"."username", "auth_user"."first_name", "auth_user"."last_name", "auth_user"."email", "auth_user"."is_staff", "auth_user"."is_active", "auth_user"."date_joined" FROM "auth_user" WHERE "auth_user"."id" = 2 LIMIT 21; args=(2,); alias=default
+DEBUG 2026-01-21 17:43:44,107 django.db.backends utils debug_sql 151 (0.002) SELECT "core_userprofile"."id", "core_userprofile"."user_id", "core_userprofile"."organization_id", "core_userprofile"."role", "core_userprofile"."phone", "core_userprofile"."created_at", "core_userprofile"."updated_at" FROM "core_userprofile" WHERE "core_userprofile"."user_id" = 2 LIMIT 21; args=(2,); alias=default
+DEBUG 2026-01-21 17:43:44,108 django.db.backends utils debug_sql 151 (0.000) SELECT "core_organization"."id", "core_organization"."name", "core_organization"."domain", "core_organization"."poc_email", "core_organization"."status", "core_organization"."settings", "core_organization"."created_at", "core_organization"."updated_at" FROM "core_organization" WHERE "core_organization"."id" = 6 LIMIT 21; args=(6,); alias=default
+DEBUG 2026-01-21 17:43:44,569 django.db.backends utils debug_sql 151 (0.000) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2026-01-21 17:43:44.568029' AND "django_session"."session_key" = 'wgugq79w0rxzgi0iwr8129dkz0kjieok') LIMIT 21; args=('2026-01-21 17:43:44.568029', 'wgugq79w0rxzgi0iwr8129dkz0kjieok'); alias=default
+DEBUG 2026-01-21 17:43:44,570 django.db.backends utils debug_sql 151 (0.000) SELECT "auth_user"."id", "auth_user"."password", "auth_user"."last_login", "auth_user"."is_superuser", "auth_user"."username", "auth_user"."first_name", "auth_user"."last_name", "auth_user"."email", "auth_user"."is_staff", "auth_user"."is_active", "auth_user"."date_joined" FROM "auth_user" WHERE "auth_user"."id" = 2 LIMIT 21; args=(2,); alias=default
+DEBUG 2026-01-21 17:43:44,571 django.db.backends utils debug_sql 151 (0.000) SELECT "core_userprofile"."id", "core_userprofile"."user_id", "core_userprofile"."organization_id", "core_userprofile"."role", "core_userprofile"."phone", "core_userprofile"."created_at", "core_userprofile"."updated_at" FROM "core_userprofile" WHERE "core_userprofile"."user_id" = 2 LIMIT 21; args=(2,); alias=default
+DEBUG 2026-01-21 17:43:44,572 django.db.backends utils debug_sql 151 (0.000) SELECT "core_organization"."id", "core_organization"."name", "core_organization"."domain", "core_organization"."poc_email", "core_organization"."status", "core_organization"."settings", "core_organization"."created_at", "core_organization"."updated_at" FROM "core_organization" WHERE "core_organization"."id" = 6 LIMIT 21; args=(6,); alias=default
+DEBUG 2026-01-21 17:43:44,573 django.db.backends utils debug_sql 151 (0.000) SELECT COUNT(*) AS "__count" FROM "core_audit" WHERE "core_audit"."organization_id" = 6; args=(6,); alias=default
+DEBUG 2026-01-21 17:43:44,574 django.db.backends utils debug_sql 151 (0.000) SELECT COUNT(*) AS "__count" FROM "core_finding" INNER JOIN "core_audit" ON ("core_finding"."audit_id" = "core_audit"."id") WHERE "core_audit"."organization_id" = 6; args=(6,); alias=default
+DEBUG 2026-01-21 17:43:44,575 django.db.backends utils debug_sql 151 (0.000) SELECT COUNT(*) AS "__count" FROM "core_rule" WHERE ("core_rule"."enabled" AND "core_rule"."organization_id" = 6); args=(6,); alias=default
+DEBUG 2026-01-21 17:43:44,576 django.db.backends utils debug_sql 151 (0.000) SELECT "core_audit"."id", "core_audit"."organization_id", "core_audit"."created_by_id", "core_audit"."status", "core_audit"."device_identifier", "core_audit"."device_family", "core_audit"."config_file", "core_audit"."parsed_config", "core_audit"."created_at", "core_audit"."completed_at", "core_audit"."snapshot_name", "core_audit"."parent_audit_id", "core_audit"."device_hostname", "core_audit"."device_model", "core_audit"."device_firmware", "core_audit"."device_location", "core_audit"."device_make", "core_audit"."device_type", "core_audit"."progress" FROM "core_audit" WHERE ("core_audit"."organization_id" = 6 AND "core_audit"."status" = 'Completed') ORDER BY "core_audit"."created_at" DESC; args=(6, 'Completed'); alias=default
+DEBUG 2026-01-21 17:43:44,577 django.db.backends utils debug_sql 151 (0.000) SELECT "core_audit"."id", "core_audit"."organization_id", "core_audit"."created_by_id", "core_audit"."status", "core_audit"."device_identifier", "core_audit"."device_family", "core_audit"."config_file", "core_audit"."parsed_config", "core_audit"."created_at", "core_audit"."completed_at", "core_audit"."snapshot_name", "core_audit"."parent_audit_id", "core_audit"."device_hostname", "core_audit"."device_model", "core_audit"."device_firmware", "core_audit"."device_location", "core_audit"."device_make", "core_audit"."device_type", "core_audit"."progress" FROM "core_audit" WHERE "core_audit"."organization_id" = 6 ORDER BY "core_audit"."created_at" DESC LIMIT 10; args=(6,); alias=default
+DEBUG 2026-01-21 17:43:44,639 django.db.backends utils debug_sql 151 (0.000) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2026-01-21 17:43:44.638547' AND "django_session"."session_key" = 'wgugq79w0rxzgi0iwr8129dkz0kjieok') LIMIT 21; args=('2026-01-21 17:43:44.638547', 'wgugq79w0rxzgi0iwr8129dkz0kjieok'); alias=default
+DEBUG 2026-01-21 17:43:44,641 django.db.backends utils debug_sql 151 (0.000) SELECT "auth_user"."id", "auth_user"."password", "auth_user"."last_login", "auth_user"."is_superuser", "auth_user"."username", "auth_user"."first_name", "auth_user"."last_name", "auth_user"."email", "auth_user"."is_staff", "auth_user"."is_active", "auth_user"."date_joined" FROM "auth_user" WHERE "auth_user"."id" = 2 LIMIT 21; args=(2,); alias=default
+DEBUG 2026-01-21 17:43:44,641 django.db.backends utils debug_sql 151 (0.000) SELECT "core_userprofile"."id", "core_userprofile"."user_id", "core_userprofile"."organization_id", "core_userprofile"."role", "core_userprofile"."phone", "core_userprofile"."created_at", "core_userprofile"."updated_at" FROM "core_userprofile" WHERE "core_userprofile"."user_id" = 2 LIMIT 21; args=(2,); alias=default
+DEBUG 2026-01-21 17:43:44,642 django.db.backends utils debug_sql 151 (0.000) SELECT "core_organization"."id", "core_organization"."name", "core_organization"."domain", "core_organization"."poc_email", "core_organization"."status", "core_organization"."settings", "core_organization"."created_at", "core_organization"."updated_at" FROM "core_organization" WHERE "core_organization"."id" = 6 LIMIT 21; args=(6,); alias=default
+DEBUG 2026-01-21 17:43:44,643 django.db.backends utils debug_sql 151 (0.000) SELECT COUNT(*) AS "__count" FROM "core_audit" WHERE "core_audit"."organization_id" = 6; args=(6,); alias=default
+DEBUG 2026-01-21 17:43:44,644 django.db.backends utils debug_sql 151 (0.000) SELECT COUNT(*) AS "__count" FROM "core_finding" INNER JOIN "core_audit" ON ("core_finding"."audit_id" = "core_audit"."id") WHERE "core_audit"."organization_id" = 6; args=(6,); alias=default
+DEBUG 2026-01-21 17:43:44,645 django.db.backends utils debug_sql 151 (0.000) SELECT COUNT(*) AS "__count" FROM "core_rule" WHERE ("core_rule"."enabled" AND "core_rule"."organization_id" = 6); args=(6,); alias=default
+DEBUG 2026-01-21 17:43:44,646 django.db.backends utils debug_sql 151 (0.000) SELECT "core_audit"."id", "core_audit"."organization_id", "core_audit"."created_by_id", "core_audit"."status", "core_audit"."device_identifier", "core_audit"."device_family", "core_audit"."config_file", "core_audit"."parsed_config", "core_audit"."created_at", "core_audit"."completed_at", "core_audit"."snapshot_name", "core_audit"."parent_audit_id", "core_audit"."device_hostname", "core_audit"."device_model", "core_audit"."device_firmware", "core_audit"."device_location", "core_audit"."device_make", "core_audit"."device_type", "core_audit"."progress" FROM "core_audit" WHERE ("core_audit"."organization_id" = 6 AND "core_audit"."status" = 'Completed') ORDER BY "core_audit"."created_at" DESC; args=(6, 'Completed'); alias=default
+DEBUG 2026-01-21 17:43:44,647 django.db.backends utils debug_sql 151 (0.000) SELECT "core_audit"."id", "core_audit"."organization_id", "core_audit"."created_by_id", "core_audit"."status", "core_audit"."device_identifier", "core_audit"."device_family", "core_audit"."config_file", "core_audit"."parsed_config", "core_audit"."created_at", "core_audit"."completed_at", "core_audit"."snapshot_name", "core_audit"."parent_audit_id", "core_audit"."device_hostname", "core_audit"."device_model", "core_audit"."device_firmware", "core_audit"."device_location", "core_audit"."device_make", "core_audit"."device_type", "core_audit"."progress" FROM "core_audit" WHERE "core_audit"."organization_id" = 6 ORDER BY "core_audit"."created_at" DESC LIMIT 10; args=(6,); alias=default
+DEBUG 2026-01-21 17:43:51,314 django.db.backends utils debug_sql 151 (0.001) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2026-01-21 17:43:51.311534' AND "django_session"."session_key" = 'wgugq79w0rxzgi0iwr8129dkz0kjieok') LIMIT 21; args=('2026-01-21 17:43:51.311534', 'wgugq79w0rxzgi0iwr8129dkz0kjieok'); alias=default
+DEBUG 2026-01-21 17:43:51,315 django.db.backends utils debug_sql 151 (0.000) SELECT "auth_user"."id", "auth_user"."password", "auth_user"."last_login", "auth_user"."is_superuser", "auth_user"."username", "auth_user"."first_name", "auth_user"."last_name", "auth_user"."email", "auth_user"."is_staff", "auth_user"."is_active", "auth_user"."date_joined" FROM "auth_user" WHERE "auth_user"."id" = 2 LIMIT 21; args=(2,); alias=default
+DEBUG 2026-01-21 17:43:51,318 django.db.backends utils debug_sql 151 (0.000) SELECT "core_userprofile"."id", "core_userprofile"."user_id", "core_userprofile"."organization_id", "core_userprofile"."role", "core_userprofile"."phone", "core_userprofile"."created_at", "core_userprofile"."updated_at" FROM "core_userprofile" WHERE "core_userprofile"."user_id" = 2 LIMIT 21; args=(2,); alias=default
+DEBUG 2026-01-21 17:43:51,319 django.db.backends utils debug_sql 151 (0.000) SELECT "core_organization"."id", "core_organization"."name", "core_organization"."domain", "core_organization"."poc_email", "core_organization"."status", "core_organization"."settings", "core_organization"."created_at", "core_organization"."updated_at" FROM "core_organization" WHERE "core_organization"."id" = 6 LIMIT 21; args=(6,); alias=default
+DEBUG 2026-01-21 17:43:51,706 django.db.backends utils debug_sql 151 (0.000) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2026-01-21 17:43:51.704805' AND "django_session"."session_key" = 'wgugq79w0rxzgi0iwr8129dkz0kjieok') LIMIT 21; args=('2026-01-21 17:43:51.704805', 'wgugq79w0rxzgi0iwr8129dkz0kjieok'); alias=default
+DEBUG 2026-01-21 17:43:51,706 django.db.backends utils debug_sql 151 (0.000) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2026-01-21 17:43:51.704881' AND "django_session"."session_key" = 'wgugq79w0rxzgi0iwr8129dkz0kjieok') LIMIT 21; args=('2026-01-21 17:43:51.704881', 'wgugq79w0rxzgi0iwr8129dkz0kjieok'); alias=default
+DEBUG 2026-01-21 17:43:51,707 django.db.backends utils debug_sql 151 (0.000) SELECT "auth_user"."id", "auth_user"."password", "auth_user"."last_login", "auth_user"."is_superuser", "auth_user"."username", "auth_user"."first_name", "auth_user"."last_name", "auth_user"."email", "auth_user"."is_staff", "auth_user"."is_active", "auth_user"."date_joined" FROM "auth_user" WHERE "auth_user"."id" = 2 LIMIT 21; args=(2,); alias=default
+DEBUG 2026-01-21 17:43:51,707 django.db.backends utils debug_sql 151 (0.000) SELECT "auth_user"."id", "auth_user"."password", "auth_user"."last_login", "auth_user"."is_superuser", "auth_user"."username", "auth_user"."first_name", "auth_user"."last_name", "auth_user"."email", "auth_user"."is_staff", "auth_user"."is_active", "auth_user"."date_joined" FROM "auth_user" WHERE "auth_user"."id" = 2 LIMIT 21; args=(2,); alias=default
+DEBUG 2026-01-21 17:43:51,707 django.db.backends utils debug_sql 151 (0.000) SELECT "core_userprofile"."id", "core_userprofile"."user_id", "core_userprofile"."organization_id", "core_userprofile"."role", "core_userprofile"."phone", "core_userprofile"."created_at", "core_userprofile"."updated_at" FROM "core_userprofile" WHERE "core_userprofile"."user_id" = 2 LIMIT 21; args=(2,); alias=default
+DEBUG 2026-01-21 17:43:51,708 django.db.backends utils debug_sql 151 (0.000) SELECT "core_userprofile"."id", "core_userprofile"."user_id", "core_userprofile"."organization_id", "core_userprofile"."role", "core_userprofile"."phone", "core_userprofile"."created_at", "core_userprofile"."updated_at" FROM "core_userprofile" WHERE "core_userprofile"."user_id" = 2 LIMIT 21; args=(2,); alias=default
+DEBUG 2026-01-21 17:43:51,708 django.db.backends utils debug_sql 151 (0.000) SELECT "core_organization"."id", "core_organization"."name", "core_organization"."domain", "core_organization"."poc_email", "core_organization"."status", "core_organization"."settings", "core_organization"."created_at", "core_organization"."updated_at" FROM "core_organization" WHERE "core_organization"."id" = 6 LIMIT 21; args=(6,); alias=default
+DEBUG 2026-01-21 17:43:51,708 django.db.backends utils debug_sql 151 (0.000) SELECT "core_organization"."id", "core_organization"."name", "core_organization"."domain", "core_organization"."poc_email", "core_organization"."status", "core_organization"."settings", "core_organization"."created_at", "core_organization"."updated_at" FROM "core_organization" WHERE "core_organization"."id" = 6 LIMIT 21; args=(6,); alias=default
+DEBUG 2026-01-21 17:43:51,710 django.db.backends utils debug_sql 151 (0.000) SELECT "core_rule"."id", "core_rule"."name", "core_rule"."description", "core_rule"."rule_type", "core_rule"."category", "core_rule"."severity", "core_rule"."yaml_content", "core_rule"."tags", "core_rule"."enabled", "core_rule"."remediation_template", "core_rule"."compliance_frameworks", "core_rule"."framework_mappings", "core_rule"."risk_weight", "core_rule"."organization_id", "core_rule"."created_at" FROM "core_rule" WHERE ("core_rule"."enabled" AND "core_rule"."organization_id" = 6 AND "core_rule"."tags" IS NOT NULL AND NOT ("core_rule"."tags" = '' AND "core_rule"."tags" IS NOT NULL)) ORDER BY "core_rule"."name" ASC; args=(6, ''); alias=default
+DEBUG 2026-01-21 17:43:51,711 django.db.backends utils debug_sql 151 (0.000) SELECT "core_audit"."id", "core_audit"."organization_id", "core_audit"."created_by_id", "core_audit"."status", "core_audit"."device_identifier", "core_audit"."device_family", "core_audit"."config_file", "core_audit"."parsed_config", "core_audit"."created_at", "core_audit"."completed_at", "core_audit"."snapshot_name", "core_audit"."parent_audit_id", "core_audit"."device_hostname", "core_audit"."device_model", "core_audit"."device_firmware", "core_audit"."device_location", "core_audit"."device_make", "core_audit"."device_type", "core_audit"."progress" FROM "core_audit" WHERE "core_audit"."organization_id" = 6 ORDER BY "core_audit"."created_at" DESC; args=(6,); alias=default
+DEBUG 2026-01-21 17:43:57,274 django.db.backends utils debug_sql 151 (0.001) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2026-01-21 17:43:57.271541' AND "django_session"."session_key" = '57jixdbs56ptfks9k02up6ve5p8hcejx') LIMIT 21; args=('2026-01-21 17:43:57.271541', '57jixdbs56ptfks9k02up6ve5p8hcejx'); alias=default
+DEBUG 2026-01-21 17:43:57,276 django.db.backends utils debug_sql 151 (0.000) SELECT "auth_user"."id", "auth_user"."password", "auth_user"."last_login", "auth_user"."is_superuser", "auth_user"."username", "auth_user"."first_name", "auth_user"."last_name", "auth_user"."email", "auth_user"."is_staff", "auth_user"."is_active", "auth_user"."date_joined" FROM "auth_user" WHERE "auth_user"."id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2026-01-21 17:43:57,278 django.db.backends utils debug_sql 151 (0.002) SELECT "core_userprofile"."id", "core_userprofile"."user_id", "core_userprofile"."organization_id", "core_userprofile"."role", "core_userprofile"."phone", "core_userprofile"."created_at", "core_userprofile"."updated_at" FROM "core_userprofile" WHERE "core_userprofile"."user_id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2026-01-21 17:43:57,311 django.db.backends utils debug_sql 151 (0.000) SELECT "core_organization"."id", "core_organization"."name", "core_organization"."domain", "core_organization"."poc_email", "core_organization"."status", "core_organization"."settings", "core_organization"."created_at", "core_organization"."updated_at" FROM "core_organization" ORDER BY "core_organization"."name" ASC; args=(); alias=default
+DEBUG 2026-01-21 17:43:57,312 django.db.backends utils debug_sql 151 (0.000) SELECT COUNT(*) AS "__count" FROM "auth_user" INNER JOIN "core_userprofile" ON ("auth_user"."id" = "core_userprofile"."user_id") WHERE "core_userprofile"."organization_id" = 6; args=(6,); alias=default
+DEBUG 2026-01-21 17:43:57,313 django.db.backends utils debug_sql 151 (0.000) SELECT COUNT(*) AS "__count" FROM "core_audit" WHERE "core_audit"."organization_id" = 6; args=(6,); alias=default
+DEBUG 2026-01-21 17:43:59,985 django.db.backends utils debug_sql 151 (0.001) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2026-01-21 17:43:59.982562' AND "django_session"."session_key" = '57jixdbs56ptfks9k02up6ve5p8hcejx') LIMIT 21; args=('2026-01-21 17:43:59.982562', '57jixdbs56ptfks9k02up6ve5p8hcejx'); alias=default
+DEBUG 2026-01-21 17:43:59,987 django.db.backends utils debug_sql 151 (0.000) SELECT "auth_user"."id", "auth_user"."password", "auth_user"."last_login", "auth_user"."is_superuser", "auth_user"."username", "auth_user"."first_name", "auth_user"."last_name", "auth_user"."email", "auth_user"."is_staff", "auth_user"."is_active", "auth_user"."date_joined" FROM "auth_user" WHERE "auth_user"."id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2026-01-21 17:43:59,989 django.db.backends utils debug_sql 151 (0.000) SELECT "core_userprofile"."id", "core_userprofile"."user_id", "core_userprofile"."organization_id", "core_userprofile"."role", "core_userprofile"."phone", "core_userprofile"."created_at", "core_userprofile"."updated_at" FROM "core_userprofile" WHERE "core_userprofile"."user_id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2026-01-21 17:44:00,020 django.db.backends utils debug_sql 151 (0.000) SELECT COUNT(*) AS "__count" FROM "core_organization"; args=(); alias=default
+DEBUG 2026-01-21 17:44:00,021 django.db.backends utils debug_sql 151 (0.000) SELECT COUNT(*) AS "__count" FROM "core_userprofile" WHERE NOT ("core_userprofile"."role" = 'super_admin'); args=('super_admin',); alias=default
+DEBUG 2026-01-21 17:44:00,021 django.db.backends utils debug_sql 151 (0.000) SELECT COUNT(*) AS "__count" FROM "core_audit"; args=(); alias=default
+DEBUG 2026-01-21 17:44:00,022 django.db.backends utils debug_sql 151 (0.000) SELECT COUNT(*) AS "__count" FROM "core_finding"; args=(); alias=default
+DEBUG 2026-01-21 17:44:00,023 django.db.backends utils debug_sql 151 (0.000) SELECT COUNT(*) AS "__count" FROM "core_rule" WHERE ("core_rule"."enabled" AND "core_rule"."organization_id" IS NULL); args=(); alias=default
+DEBUG 2026-01-21 17:44:06,545 django.db.backends utils debug_sql 151 (0.000) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2026-01-21 17:44:06.543613' AND "django_session"."session_key" = '57jixdbs56ptfks9k02up6ve5p8hcejx') LIMIT 21; args=('2026-01-21 17:44:06.543613', '57jixdbs56ptfks9k02up6ve5p8hcejx'); alias=default
+DEBUG 2026-01-21 17:44:06,547 django.db.backends utils debug_sql 151 (0.000) SELECT "auth_user"."id", "auth_user"."password", "auth_user"."last_login", "auth_user"."is_superuser", "auth_user"."username", "auth_user"."first_name", "auth_user"."last_name", "auth_user"."email", "auth_user"."is_staff", "auth_user"."is_active", "auth_user"."date_joined" FROM "auth_user" WHERE "auth_user"."id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2026-01-21 17:44:06,548 django.db.backends utils debug_sql 151 (0.000) SELECT "core_userprofile"."id", "core_userprofile"."user_id", "core_userprofile"."organization_id", "core_userprofile"."role", "core_userprofile"."phone", "core_userprofile"."created_at", "core_userprofile"."updated_at" FROM "core_userprofile" WHERE "core_userprofile"."user_id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2026-01-21 17:44:06,550 django.db.backends utils debug_sql 151 (0.000) INSERT INTO "core_auditlog" ("user_id", "organization_id", "action_type", "resource_type", "resource_id", "description", "ip_address", "created_at") VALUES (1, NULL, 'logout', 'user', 1, 'User admin logged out', '223.123.73.179', '2026-01-21 17:44:06.549491') RETURNING "core_auditlog"."id"; args=(1, None, 'logout', 'user', 1, 'User admin logged out', '223.123.73.179', '2026-01-21 17:44:06.549491'); alias=default
+DEBUG 2026-01-21 17:44:06,553 django.db.backends utils debug_sql 151 (0.000) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE "django_session"."session_key" = '57jixdbs56ptfks9k02up6ve5p8hcejx' LIMIT 21; args=('57jixdbs56ptfks9k02up6ve5p8hcejx',); alias=default
+DEBUG 2026-01-21 17:44:06,556 django.db.backends utils debug_sql 151 (0.002) DELETE FROM "django_session" WHERE "django_session"."session_key" IN ('57jixdbs56ptfks9k02up6ve5p8hcejx'); args=('57jixdbs56ptfks9k02up6ve5p8hcejx',); alias=default
+DEBUG 2026-01-21 17:44:17,224 django.db.backends utils debug_sql 151 (0.001) SELECT "auth_user"."id", "auth_user"."password", "auth_user"."last_login", "auth_user"."is_superuser", "auth_user"."username", "auth_user"."first_name", "auth_user"."last_name", "auth_user"."email", "auth_user"."is_staff", "auth_user"."is_active", "auth_user"."date_joined" FROM "auth_user" WHERE "auth_user"."username" = 'tournamentshelp@gmail.com' LIMIT 21; args=('tournamentshelp@gmail.com',); alias=default
+WARNING 2026-01-21 17:44:18,156 django.request log log_message 249 Unauthorized: /login/
+DEBUG 2026-01-21 17:44:23,318 django.db.backends utils debug_sql 151 (0.000) SELECT "auth_user"."id", "auth_user"."password", "auth_user"."last_login", "auth_user"."is_superuser", "auth_user"."username", "auth_user"."first_name", "auth_user"."last_name", "auth_user"."email", "auth_user"."is_staff", "auth_user"."is_active", "auth_user"."date_joined" FROM "auth_user" WHERE "auth_user"."username" = 'tournamentshelp@gmail.com' LIMIT 21; args=('tournamentshelp@gmail.com',); alias=default
+WARNING 2026-01-21 17:44:24,226 django.request log log_message 249 Unauthorized: /login/
+DEBUG 2026-01-21 17:44:57,230 django.db.backends utils debug_sql 151 (0.000) SELECT "core_organization"."id", "core_organization"."name", "core_organization"."domain", "core_organization"."poc_email", "core_organization"."status", "core_organization"."settings", "core_organization"."created_at", "core_organization"."updated_at" FROM "core_organization" WHERE ("core_organization"."id" = 6 AND "core_organization"."poc_email" LIKE 'tournamentshelp@gmail.com' ESCAPE '\') LIMIT 21; args=(6, 'tournamentshelp@gmail.com'); alias=default
+DEBUG 2026-01-21 17:44:57,231 django.db.backends utils debug_sql 151 (0.000) SELECT 1 AS "a" FROM "auth_user" WHERE "auth_user"."email" LIKE 'tournamentshelp@gmail.com' ESCAPE '\' LIMIT 1; args=(1, 'tournamentshelp@gmail.com'); alias=default
+DEBUG 2026-01-21 17:45:01,320 django.template base _resolve_lookup 1016 Exception while resolving variable 'name' in template 'unknown'.
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 182, in _get_response
+    callback, callback_args, callback_kwargs = self.resolve_request(request)
+                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 314, in resolve_request
+    resolver_match = resolver.resolve(request.path_info)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/urls/resolvers.py", line 716, in resolve
+    raise Resolver404({"tried": tried, "path": new_path})
+django.urls.exceptions.Resolver404: {'tried': [[<URLResolver <URLPattern list> (admin:admin) 'admin/'>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'login/' [name='login']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'logout/' [name='logout']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'register/' [name='register']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'poc-signup/' [name='poc_signup']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern '' [name='index']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'audit/' [name='audit_page']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'rules/' [name='rules_page']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'report/' [name='report_page']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'report-detail/' [name='report_detail_page']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'assets/' [name='assets_page']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'assets/<str:device_identifier>/audits' [name='device_audits_page']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'settings/' [name='settings_page']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'analysis/' [name='analysis_page']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'help/' [name='help_page']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/audits' [name='audits_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/rules/filter-options' [name='rules_filter_options_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/rules/tags' [name='rules_tags_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/rules/<int:rule_id>' [name='rules_detail_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/rules' [name='rules_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/reports' [name='reports_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/upload' [name='upload_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/stats' [name='stats_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/assets/<str:device_identifier>/latest' [name='assets_latest_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/assets/<str:device_identifier>' [name='assets_detail_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/assets' [name='assets_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/settings/backup' [name='settings_backup_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/settings/optimize' [name='settings_optimize_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'super-admin/' [name='super_admin_dashboard']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'super-admin/organizations/' [name='super_admin_organizations']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/super-admin/organizations/' [name='super_admin_organizations_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/super-admin/organizations/<int:org_id>/' [name='super_admin_organization_detail_api']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'org-admin/users/' [name='org_admin_users']>], [<URLResolver <module 'apps.core.urls' from '/home/phisimuser/configaudit/apps/core/urls.py'> (None:None) ''>, <URLPattern 'api/org-admin/invite-user/' [name='org_admin_invite_user']>], [<URLPattern '^media/(?P<path>.*)$'>], [<URLPattern '^static/(?P<path>.*)$'>]], 'path': 'favicon.ico'}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 964, in _resolve_lookup
+    raise TypeError
+TypeError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 976, in _resolve_lookup
+    current = getattr(current, bit)
+              ^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'URLResolver' object has no attribute 'name'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 982, in _resolve_lookup
+    current = current[int(bit)]
+                      ^^^^^^^^
+ValueError: invalid literal for int() with base 10: 'name'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 989, in _resolve_lookup
+    raise VariableDoesNotExist(
+django.template.base.VariableDoesNotExist: Failed lookup for key [name] in <URLResolver <URLPattern list> (admin:admin) 'admin/'>
+WARNING 2026-01-21 17:45:01,325 django.request log log_message 249 Not Found: /favicon.ico
+DEBUG 2026-01-21 17:45:46,112 django.db.backends utils debug_sql 151 (0.001) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2026-01-21 17:45:46.109693' AND "django_session"."session_key" = 'wgugq79w0rxzgi0iwr8129dkz0kjieok') LIMIT 21; args=('2026-01-21 17:45:46.109693', 'wgugq79w0rxzgi0iwr8129dkz0kjieok'); alias=default
+DEBUG 2026-01-21 17:45:46,114 django.db.backends utils debug_sql 151 (0.000) SELECT "auth_user"."id", "auth_user"."password", "auth_user"."last_login", "auth_user"."is_superuser", "auth_user"."username", "auth_user"."first_name", "auth_user"."last_name", "auth_user"."email", "auth_user"."is_staff", "auth_user"."is_active", "auth_user"."date_joined" FROM "auth_user" WHERE "auth_user"."id" = 2 LIMIT 21; args=(2,); alias=default
+DEBUG 2026-01-21 17:45:46,115 django.db.backends utils debug_sql 151 (0.000) SELECT "core_userprofile"."id", "core_userprofile"."user_id", "core_userprofile"."organization_id", "core_userprofile"."role", "core_userprofile"."phone", "core_userprofile"."created_at", "core_userprofile"."updated_at" FROM "core_userprofile" WHERE "core_userprofile"."user_id" = 2 LIMIT 21; args=(2,); alias=default
+DEBUG 2026-01-21 17:45:46,115 django.db.backends utils debug_sql 151 (0.000) SELECT "core_organization"."id", "core_organization"."name", "core_organization"."domain", "core_organization"."poc_email", "core_organization"."status", "core_organization"."settings", "core_organization"."created_at", "core_organization"."updated_at" FROM "core_organization" WHERE "core_organization"."id" = 6 LIMIT 21; args=(6,); alias=default
+DEBUG 2026-01-21 17:45:46,572 django.db.backends utils debug_sql 151 (0.000) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2026-01-21 17:45:46.571323' AND "django_session"."session_key" = 'wgugq79w0rxzgi0iwr8129dkz0kjieok') LIMIT 21; args=('2026-01-21 17:45:46.571323', 'wgugq79w0rxzgi0iwr8129dkz0kjieok'); alias=default
+DEBUG 2026-01-21 17:45:46,574 django.db.backends utils debug_sql 151 (0.000) SELECT "auth_user"."id", "auth_user"."password", "auth_user"."last_login", "auth_user"."is_superuser", "auth_user"."username", "auth_user"."first_name", "auth_user"."last_name", "auth_user"."email", "auth_user"."is_staff", "auth_user"."is_active", "auth_user"."date_joined" FROM "auth_user" WHERE "auth_user"."id" = 2 LIMIT 21; args=(2,); alias=default
+DEBUG 2026-01-21 17:45:46,574 django.db.backends utils debug_sql 151 (0.000) SELECT "core_userprofile"."id", "core_userprofile"."user_id", "core_userprofile"."organization_id", "core_userprofile"."role", "core_userprofile"."phone", "core_userprofile"."created_at", "core_userprofile"."updated_at" FROM "core_userprofile" WHERE "core_userprofile"."user_id" = 2 LIMIT 21; args=(2,); alias=default
+DEBUG 2026-01-21 17:45:46,575 django.db.backends utils debug_sql 151 (0.000) SELECT "core_organization"."id", "core_organization"."name", "core_organization"."domain", "core_organization"."poc_email", "core_organization"."status", "core_organization"."settings", "core_organization"."created_at", "core_organization"."updated_at" FROM "core_organization" WHERE "core_organization"."id" = 6 LIMIT 21; args=(6,); alias=default
+DEBUG 2026-01-21 17:45:46,577 django.db.backends utils debug_sql 151 (0.000) SELECT COUNT(*) AS "__count" FROM "core_audit" WHERE "core_audit"."organization_id" = 6; args=(6,); alias=default
+DEBUG 2026-01-21 17:45:46,578 django.db.backends utils debug_sql 151 (0.000) SELECT COUNT(*) AS "__count" FROM "core_finding" INNER JOIN "core_audit" ON ("core_finding"."audit_id" = "core_audit"."id") WHERE "core_audit"."organization_id" = 6; args=(6,); alias=default
+DEBUG 2026-01-21 17:45:46,579 django.db.backends utils debug_sql 151 (0.000) SELECT COUNT(*) AS "__count" FROM "core_rule" WHERE ("core_rule"."enabled" AND "core_rule"."organization_id" = 6); args=(6,); alias=default
+DEBUG 2026-01-21 17:45:46,580 django.db.backends utils debug_sql 151 (0.000) SELECT "core_audit"."id", "core_audit"."organization_id", "core_audit"."created_by_id", "core_audit"."status", "core_audit"."device_identifier", "core_audit"."device_family", "core_audit"."config_file", "core_audit"."parsed_config", "core_audit"."created_at", "core_audit"."completed_at", "core_audit"."snapshot_name", "core_audit"."parent_audit_id", "core_audit"."device_hostname", "core_audit"."device_model", "core_audit"."device_firmware", "core_audit"."device_location", "core_audit"."device_make", "core_audit"."device_type", "core_audit"."progress" FROM "core_audit" WHERE ("core_audit"."organization_id" = 6 AND "core_audit"."status" = 'Completed') ORDER BY "core_audit"."created_at" DESC; args=(6, 'Completed'); alias=default
+DEBUG 2026-01-21 17:45:46,581 django.db.backends utils debug_sql 151 (0.000) SELECT "core_audit"."id", "core_audit"."organization_id", "core_audit"."created_by_id", "core_audit"."status", "core_audit"."device_identifier", "core_audit"."device_family", "core_audit"."config_file", "core_audit"."parsed_config", "core_audit"."created_at", "core_audit"."completed_at", "core_audit"."snapshot_name", "core_audit"."parent_audit_id", "core_audit"."device_hostname", "core_audit"."device_model", "core_audit"."device_firmware", "core_audit"."device_location", "core_audit"."device_make", "core_audit"."device_type", "core_audit"."progress" FROM "core_audit" WHERE "core_audit"."organization_id" = 6 ORDER BY "core_audit"."created_at" DESC LIMIT 10; args=(6,); alias=default
+DEBUG 2026-01-21 17:45:46,643 django.db.backends utils debug_sql 151 (0.001) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2026-01-21 17:45:46.640734' AND "django_session"."session_key" = 'wgugq79w0rxzgi0iwr8129dkz0kjieok') LIMIT 21; args=('2026-01-21 17:45:46.640734', 'wgugq79w0rxzgi0iwr8129dkz0kjieok'); alias=default
+DEBUG 2026-01-21 17:45:46,645 django.db.backends utils debug_sql 151 (0.000) SELECT "auth_user"."id", "auth_user"."password", "auth_user"."last_login", "auth_user"."is_superuser", "auth_user"."username", "auth_user"."first_name", "auth_user"."last_name", "auth_user"."email", "auth_user"."is_staff", "auth_user"."is_active", "auth_user"."date_joined" FROM "auth_user" WHERE "auth_user"."id" = 2 LIMIT 21; args=(2,); alias=default
+DEBUG 2026-01-21 17:45:46,647 django.db.backends utils debug_sql 151 (0.000) SELECT "core_userprofile"."id", "core_userprofile"."user_id", "core_userprofile"."organization_id", "core_userprofile"."role", "core_userprofile"."phone", "core_userprofile"."created_at", "core_userprofile"."updated_at" FROM "core_userprofile" WHERE "core_userprofile"."user_id" = 2 LIMIT 21; args=(2,); alias=default
+DEBUG 2026-01-21 17:45:46,648 django.db.backends utils debug_sql 151 (0.000) SELECT "core_organization"."id", "core_organization"."name", "core_organization"."domain", "core_organization"."poc_email", "core_organization"."status", "core_organization"."settings", "core_organization"."created_at", "core_organization"."updated_at" FROM "core_organization" WHERE "core_organization"."id" = 6 LIMIT 21; args=(6,); alias=default
+DEBUG 2026-01-21 17:45:46,680 django.db.backends utils debug_sql 151 (0.000) SELECT COUNT(*) AS "__count" FROM "core_audit" WHERE "core_audit"."organization_id" = 6; args=(6,); alias=default
+DEBUG 2026-01-21 17:45:46,681 django.db.backends utils debug_sql 151 (0.000) SELECT COUNT(*) AS "__count" FROM "core_finding" INNER JOIN "core_audit" ON ("core_finding"."audit_id" = "core_audit"."id") WHERE "core_audit"."organization_id" = 6; args=(6,); alias=default
+DEBUG 2026-01-21 17:45:46,682 django.db.backends utils debug_sql 151 (0.000) SELECT COUNT(*) AS "__count" FROM "core_rule" WHERE ("core_rule"."enabled" AND "core_rule"."organization_id" = 6); args=(6,); alias=default
+DEBUG 2026-01-21 17:45:46,684 django.db.backends utils debug_sql 151 (0.000) SELECT "core_audit"."id", "core_audit"."organization_id", "core_audit"."created_by_id", "core_audit"."status", "core_audit"."device_identifier", "core_audit"."device_family", "core_audit"."config_file", "core_audit"."parsed_config", "core_audit"."created_at", "core_audit"."completed_at", "core_audit"."snapshot_name", "core_audit"."parent_audit_id", "core_audit"."device_hostname", "core_audit"."device_model", "core_audit"."device_firmware", "core_audit"."device_location", "core_audit"."device_make", "core_audit"."device_type", "core_audit"."progress" FROM "core_audit" WHERE ("core_audit"."organization_id" = 6 AND "core_audit"."status" = 'Completed') ORDER BY "core_audit"."created_at" DESC; args=(6, 'Completed'); alias=default
+DEBUG 2026-01-21 17:45:46,685 django.db.backends utils debug_sql 151 (0.000) SELECT "core_audit"."id", "core_audit"."organization_id", "core_audit"."created_by_id", "core_audit"."status", "core_audit"."device_identifier", "core_audit"."device_family", "core_audit"."config_file", "core_audit"."parsed_config", "core_audit"."created_at", "core_audit"."completed_at", "core_audit"."snapshot_name", "core_audit"."parent_audit_id", "core_audit"."device_hostname", "core_audit"."device_model", "core_audit"."device_firmware", "core_audit"."device_location", "core_audit"."device_make", "core_audit"."device_type", "core_audit"."progress" FROM "core_audit" WHERE "core_audit"."organization_id" = 6 ORDER BY "core_audit"."created_at" DESC LIMIT 10; args=(6,); alias=default
+DEBUG 2026-01-21 17:45:47,151 django.db.backends utils debug_sql 151 (0.000) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2026-01-21 17:45:47.150137' AND "django_session"."session_key" = 'wgugq79w0rxzgi0iwr8129dkz0kjieok') LIMIT 21; args=('2026-01-21 17:45:47.150137', 'wgugq79w0rxzgi0iwr8129dkz0kjieok'); alias=default
+DEBUG 2026-01-21 17:45:47,152 django.db.backends utils debug_sql 151 (0.000) SELECT "auth_user"."id", "auth_user"."password", "auth_user"."last_login", "auth_user"."is_superuser", "auth_user"."username", "auth_user"."first_name", "auth_user"."last_name", "auth_user"."email", "auth_user"."is_staff", "auth_user"."is_active", "auth_user"."date_joined" FROM "auth_user" WHERE "auth_user"."id" = 2 LIMIT 21; args=(2,); alias=default
+DEBUG 2026-01-21 17:45:47,153 django.db.backends utils debug_sql 151 (0.000) SELECT "core_userprofile"."id", "core_userprofile"."user_id", "core_userprofile"."organization_id", "core_userprofile"."role", "core_userprofile"."phone", "core_userprofile"."created_at", "core_userprofile"."updated_at" FROM "core_userprofile" WHERE "core_userprofile"."user_id" = 2 LIMIT 21; args=(2,); alias=default
+DEBUG 2026-01-21 17:45:47,154 django.db.backends utils debug_sql 151 (0.000) SELECT "core_organization"."id", "core_organization"."name", "core_organization"."domain", "core_organization"."poc_email", "core_organization"."status", "core_organization"."settings", "core_organization"."created_at", "core_organization"."updated_at" FROM "core_organization" WHERE "core_organization"."id" = 6 LIMIT 21; args=(6,); alias=default
+DEBUG 2026-01-21 17:45:47,468 django.db.backends utils debug_sql 151 (0.001) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2026-01-21 17:45:47.466551' AND "django_session"."session_key" = 'wgugq79w0rxzgi0iwr8129dkz0kjieok') LIMIT 21; args=('2026-01-21 17:45:47.466551', 'wgugq79w0rxzgi0iwr8129dkz0kjieok'); alias=default
+DEBUG 2026-01-21 17:45:47,469 django.db.backends utils debug_sql 151 (0.000) SELECT "auth_user"."id", "auth_user"."password", "auth_user"."last_login", "auth_user"."is_superuser", "auth_user"."username", "auth_user"."first_name", "auth_user"."last_name", "auth_user"."email", "auth_user"."is_staff", "auth_user"."is_active", "auth_user"."date_joined" FROM "auth_user" WHERE "auth_user"."id" = 2 LIMIT 21; args=(2,); alias=default
+DEBUG 2026-01-21 17:45:47,469 django.db.backends utils debug_sql 151 (0.000) SELECT "core_userprofile"."id", "core_userprofile"."user_id", "core_userprofile"."organization_id", "core_userprofile"."role", "core_userprofile"."phone", "core_userprofile"."created_at", "core_userprofile"."updated_at" FROM "core_userprofile" WHERE "core_userprofile"."user_id" = 2 LIMIT 21; args=(2,); alias=default
+DEBUG 2026-01-21 17:45:47,470 django.db.backends utils debug_sql 151 (0.000) SELECT "core_organization"."id", "core_organization"."name", "core_organization"."domain", "core_organization"."poc_email", "core_organization"."status", "core_organization"."settings", "core_organization"."created_at", "core_organization"."updated_at" FROM "core_organization" WHERE "core_organization"."id" = 6 LIMIT 21; args=(6,); alias=default
+DEBUG 2026-01-21 17:45:47,471 django.db.backends utils debug_sql 151 (0.000) SELECT COUNT(*) AS "__count" FROM "core_audit" WHERE "core_audit"."organization_id" = 6; args=(6,); alias=default
+DEBUG 2026-01-21 17:45:47,472 django.db.backends utils debug_sql 151 (0.000) SELECT COUNT(*) AS "__count" FROM "core_finding" INNER JOIN "core_audit" ON ("core_finding"."audit_id" = "core_audit"."id") WHERE "core_audit"."organization_id" = 6; args=(6,); alias=default
+DEBUG 2026-01-21 17:45:47,473 django.db.backends utils debug_sql 151 (0.000) SELECT COUNT(*) AS "__count" FROM "core_rule" WHERE ("core_rule"."enabled" AND "core_rule"."organization_id" = 6); args=(6,); alias=default
+DEBUG 2026-01-21 17:45:47,473 django.db.backends utils debug_sql 151 (0.000) SELECT "core_audit"."id", "core_audit"."organization_id", "core_audit"."created_by_id", "core_audit"."status", "core_audit"."device_identifier", "core_audit"."device_family", "core_audit"."config_file", "core_audit"."parsed_config", "core_audit"."created_at", "core_audit"."completed_at", "core_audit"."snapshot_name", "core_audit"."parent_audit_id", "core_audit"."device_hostname", "core_audit"."device_model", "core_audit"."device_firmware", "core_audit"."device_location", "core_audit"."device_make", "core_audit"."device_type", "core_audit"."progress" FROM "core_audit" WHERE ("core_audit"."organization_id" = 6 AND "core_audit"."status" = 'Completed') ORDER BY "core_audit"."created_at" DESC; args=(6, 'Completed'); alias=default
+DEBUG 2026-01-21 17:45:47,474 django.db.backends utils debug_sql 151 (0.000) SELECT "core_audit"."id", "core_audit"."organization_id", "core_audit"."created_by_id", "core_audit"."status", "core_audit"."device_identifier", "core_audit"."device_family", "core_audit"."config_file", "core_audit"."parsed_config", "core_audit"."created_at", "core_audit"."completed_at", "core_audit"."snapshot_name", "core_audit"."parent_audit_id", "core_audit"."device_hostname", "core_audit"."device_model", "core_audit"."device_firmware", "core_audit"."device_location", "core_audit"."device_make", "core_audit"."device_type", "core_audit"."progress" FROM "core_audit" WHERE "core_audit"."organization_id" = 6 ORDER BY "core_audit"."created_at" DESC LIMIT 10; args=(6,); alias=default
+DEBUG 2026-01-21 17:45:47,537 django.db.backends utils debug_sql 151 (0.001) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2026-01-21 17:45:47.532783' AND "django_session"."session_key" = 'wgugq79w0rxzgi0iwr8129dkz0kjieok') LIMIT 21; args=('2026-01-21 17:45:47.532783', 'wgugq79w0rxzgi0iwr8129dkz0kjieok'); alias=default
+DEBUG 2026-01-21 17:45:47,538 django.db.backends utils debug_sql 151 (0.000) SELECT "auth_user"."id", "auth_user"."password", "auth_user"."last_login", "auth_user"."is_superuser", "auth_user"."username", "auth_user"."first_name", "auth_user"."last_name", "auth_user"."email", "auth_user"."is_staff", "auth_user"."is_active", "auth_user"."date_joined" FROM "auth_user" WHERE "auth_user"."id" = 2 LIMIT 21; args=(2,); alias=default
+DEBUG 2026-01-21 17:45:47,542 django.db.backends utils debug_sql 151 (0.000) SELECT "core_userprofile"."id", "core_userprofile"."user_id", "core_userprofile"."organization_id", "core_userprofile"."role", "core_userprofile"."phone", "core_userprofile"."created_at", "core_userprofile"."updated_at" FROM "core_userprofile" WHERE "core_userprofile"."user_id" = 2 LIMIT 21; args=(2,); alias=default
+DEBUG 2026-01-21 17:45:47,543 django.db.backends utils debug_sql 151 (0.000) SELECT "core_organization"."id", "core_organization"."name", "core_organization"."domain", "core_organization"."poc_email", "core_organization"."status", "core_organization"."settings", "core_organization"."created_at", "core_organization"."updated_at" FROM "core_organization" WHERE "core_organization"."id" = 6 LIMIT 21; args=(6,); alias=default
+DEBUG 2026-01-21 17:45:47,592 django.db.backends utils debug_sql 151 (0.000) SELECT COUNT(*) AS "__count" FROM "core_audit" WHERE "core_audit"."organization_id" = 6; args=(6,); alias=default
+DEBUG 2026-01-21 17:45:47,593 django.db.backends utils debug_sql 151 (0.000) SELECT COUNT(*) AS "__count" FROM "core_finding" INNER JOIN "core_audit" ON ("core_finding"."audit_id" = "core_audit"."id") WHERE "core_audit"."organization_id" = 6; args=(6,); alias=default
+DEBUG 2026-01-21 17:45:47,593 django.db.backends utils debug_sql 151 (0.000) SELECT COUNT(*) AS "__count" FROM "core_rule" WHERE ("core_rule"."enabled" AND "core_rule"."organization_id" = 6); args=(6,); alias=default
+DEBUG 2026-01-21 17:45:47,595 django.db.backends utils debug_sql 151 (0.000) SELECT "core_audit"."id", "core_audit"."organization_id", "core_audit"."created_by_id", "core_audit"."status", "core_audit"."device_identifier", "core_audit"."device_family", "core_audit"."config_file", "core_audit"."parsed_config", "core_audit"."created_at", "core_audit"."completed_at", "core_audit"."snapshot_name", "core_audit"."parent_audit_id", "core_audit"."device_hostname", "core_audit"."device_model", "core_audit"."device_firmware", "core_audit"."device_location", "core_audit"."device_make", "core_audit"."device_type", "core_audit"."progress" FROM "core_audit" WHERE ("core_audit"."organization_id" = 6 AND "core_audit"."status" = 'Completed') ORDER BY "core_audit"."created_at" DESC; args=(6, 'Completed'); alias=default
+DEBUG 2026-01-21 17:45:47,597 django.db.backends utils debug_sql 151 (0.000) SELECT "core_audit"."id", "core_audit"."organization_id", "core_audit"."created_by_id", "core_audit"."status", "core_audit"."device_identifier", "core_audit"."device_family", "core_audit"."config_file", "core_audit"."parsed_config", "core_audit"."created_at", "core_audit"."completed_at", "core_audit"."snapshot_name", "core_audit"."parent_audit_id", "core_audit"."device_hostname", "core_audit"."device_model", "core_audit"."device_firmware", "core_audit"."device_location", "core_audit"."device_make", "core_audit"."device_type", "core_audit"."progress" FROM "core_audit" WHERE "core_audit"."organization_id" = 6 ORDER BY "core_audit"."created_at" DESC LIMIT 10; args=(6,); alias=default
+DEBUG 2026-01-21 17:45:52,765 django.db.backends utils debug_sql 151 (0.001) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2026-01-21 17:45:52.764470' AND "django_session"."session_key" = 'wgugq79w0rxzgi0iwr8129dkz0kjieok') LIMIT 21; args=('2026-01-21 17:45:52.764470', 'wgugq79w0rxzgi0iwr8129dkz0kjieok'); alias=default
+DEBUG 2026-01-21 17:45:52,766 django.db.backends utils debug_sql 151 (0.000) SELECT "auth_user"."id", "auth_user"."password", "auth_user"."last_login", "auth_user"."is_superuser", "auth_user"."username", "auth_user"."first_name", "auth_user"."last_name", "auth_user"."email", "auth_user"."is_staff", "auth_user"."is_active", "auth_user"."date_joined" FROM "auth_user" WHERE "auth_user"."id" = 2 LIMIT 21; args=(2,); alias=default
+DEBUG 2026-01-21 17:45:52,767 django.db.backends utils debug_sql 151 (0.000) SELECT "core_userprofile"."id", "core_userprofile"."user_id", "core_userprofile"."organization_id", "core_userprofile"."role", "core_userprofile"."phone", "core_userprofile"."created_at", "core_userprofile"."updated_at" FROM "core_userprofile" WHERE "core_userprofile"."user_id" = 2 LIMIT 21; args=(2,); alias=default
+DEBUG 2026-01-21 17:45:52,768 django.db.backends utils debug_sql 151 (0.000) SELECT "core_organization"."id", "core_organization"."name", "core_organization"."domain", "core_organization"."poc_email", "core_organization"."status", "core_organization"."settings", "core_organization"."created_at", "core_organization"."updated_at" FROM "core_organization" WHERE "core_organization"."id" = 6 LIMIT 21; args=(6,); alias=default
+DEBUG 2026-01-21 17:45:53,097 django.db.backends utils debug_sql 151 (0.000) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2026-01-21 17:45:53.095824' AND "django_session"."session_key" = 'wgugq79w0rxzgi0iwr8129dkz0kjieok') LIMIT 21; args=('2026-01-21 17:45:53.095824', 'wgugq79w0rxzgi0iwr8129dkz0kjieok'); alias=default
+DEBUG 2026-01-21 17:45:53,098 django.db.backends utils debug_sql 151 (0.000) SELECT "auth_user"."id", "auth_user"."password", "auth_user"."last_login", "auth_user"."is_superuser", "auth_user"."username", "auth_user"."first_name", "auth_user"."last_name", "auth_user"."email", "auth_user"."is_staff", "auth_user"."is_active", "auth_user"."date_joined" FROM "auth_user" WHERE "auth_user"."id" = 2 LIMIT 21; args=(2,); alias=default
+DEBUG 2026-01-21 17:45:53,099 django.db.backends utils debug_sql 151 (0.000) SELECT "core_userprofile"."id", "core_userprofile"."user_id", "core_userprofile"."organization_id", "core_userprofile"."role", "core_userprofile"."phone", "core_userprofile"."created_at", "core_userprofile"."updated_at" FROM "core_userprofile" WHERE "core_userprofile"."user_id" = 2 LIMIT 21; args=(2,); alias=default
+DEBUG 2026-01-21 17:45:53,099 django.db.backends utils debug_sql 151 (0.000) SELECT "core_organization"."id", "core_organization"."name", "core_organization"."domain", "core_organization"."poc_email", "core_organization"."status", "core_organization"."settings", "core_organization"."created_at", "core_organization"."updated_at" FROM "core_organization" WHERE "core_organization"."id" = 6 LIMIT 21; args=(6,); alias=default
+DEBUG 2026-01-21 17:45:53,100 django.db.backends utils debug_sql 151 (0.000) SELECT COUNT(*) AS "__count" FROM "core_audit" WHERE "core_audit"."organization_id" = 6; args=(6,); alias=default
+DEBUG 2026-01-21 17:45:53,101 django.db.backends utils debug_sql 151 (0.000) SELECT COUNT(*) AS "__count" FROM "core_finding" INNER JOIN "core_audit" ON ("core_finding"."audit_id" = "core_audit"."id") WHERE "core_audit"."organization_id" = 6; args=(6,); alias=default
+DEBUG 2026-01-21 17:45:53,102 django.db.backends utils debug_sql 151 (0.000) SELECT COUNT(*) AS "__count" FROM "core_rule" WHERE ("core_rule"."enabled" AND "core_rule"."organization_id" = 6); args=(6,); alias=default
+DEBUG 2026-01-21 17:45:53,103 django.db.backends utils debug_sql 151 (0.000) SELECT "core_audit"."id", "core_audit"."organization_id", "core_audit"."created_by_id", "core_audit"."status", "core_audit"."device_identifier", "core_audit"."device_family", "core_audit"."config_file", "core_audit"."parsed_config", "core_audit"."created_at", "core_audit"."completed_at", "core_audit"."snapshot_name", "core_audit"."parent_audit_id", "core_audit"."device_hostname", "core_audit"."device_model", "core_audit"."device_firmware", "core_audit"."device_location", "core_audit"."device_make", "core_audit"."device_type", "core_audit"."progress" FROM "core_audit" WHERE ("core_audit"."organization_id" = 6 AND "core_audit"."status" = 'Completed') ORDER BY "core_audit"."created_at" DESC; args=(6, 'Completed'); alias=default
+DEBUG 2026-01-21 17:45:53,104 django.db.backends utils debug_sql 151 (0.000) SELECT "core_audit"."id", "core_audit"."organization_id", "core_audit"."created_by_id", "core_audit"."status", "core_audit"."device_identifier", "core_audit"."device_family", "core_audit"."config_file", "core_audit"."parsed_config", "core_audit"."created_at", "core_audit"."completed_at", "core_audit"."snapshot_name", "core_audit"."parent_audit_id", "core_audit"."device_hostname", "core_audit"."device_model", "core_audit"."device_firmware", "core_audit"."device_location", "core_audit"."device_make", "core_audit"."device_type", "core_audit"."progress" FROM "core_audit" WHERE "core_audit"."organization_id" = 6 ORDER BY "core_audit"."created_at" DESC LIMIT 10; args=(6,); alias=default
+DEBUG 2026-01-21 17:45:53,163 django.db.backends utils debug_sql 151 (0.000) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2026-01-21 17:45:53.162280' AND "django_session"."session_key" = 'wgugq79w0rxzgi0iwr8129dkz0kjieok') LIMIT 21; args=('2026-01-21 17:45:53.162280', 'wgugq79w0rxzgi0iwr8129dkz0kjieok'); alias=default
+DEBUG 2026-01-21 17:45:53,164 django.db.backends utils debug_sql 151 (0.000) SELECT "auth_user"."id", "auth_user"."password", "auth_user"."last_login", "auth_user"."is_superuser", "auth_user"."username", "auth_user"."first_name", "auth_user"."last_name", "auth_user"."email", "auth_user"."is_staff", "auth_user"."is_active", "auth_user"."date_joined" FROM "auth_user" WHERE "auth_user"."id" = 2 LIMIT 21; args=(2,); alias=default
+DEBUG 2026-01-21 17:45:53,165 django.db.backends utils debug_sql 151 (0.000) SELECT "core_userprofile"."id", "core_userprofile"."user_id", "core_userprofile"."organization_id", "core_userprofile"."role", "core_userprofile"."phone", "core_userprofile"."created_at", "core_userprofile"."updated_at" FROM "core_userprofile" WHERE "core_userprofile"."user_id" = 2 LIMIT 21; args=(2,); alias=default
+DEBUG 2026-01-21 17:45:53,166 django.db.backends utils debug_sql 151 (0.000) SELECT "core_organization"."id", "core_organization"."name", "core_organization"."domain", "core_organization"."poc_email", "core_organization"."status", "core_organization"."settings", "core_organization"."created_at", "core_organization"."updated_at" FROM "core_organization" WHERE "core_organization"."id" = 6 LIMIT 21; args=(6,); alias=default
+DEBUG 2026-01-21 17:45:53,167 django.db.backends utils debug_sql 151 (0.000) SELECT COUNT(*) AS "__count" FROM "core_audit" WHERE "core_audit"."organization_id" = 6; args=(6,); alias=default
+DEBUG 2026-01-21 17:45:53,167 django.db.backends utils debug_sql 151 (0.000) SELECT COUNT(*) AS "__count" FROM "core_finding" INNER JOIN "core_audit" ON ("core_finding"."audit_id" = "core_audit"."id") WHERE "core_audit"."organization_id" = 6; args=(6,); alias=default
+DEBUG 2026-01-21 17:45:53,168 django.db.backends utils debug_sql 151 (0.000) SELECT COUNT(*) AS "__count" FROM "core_rule" WHERE ("core_rule"."enabled" AND "core_rule"."organization_id" = 6); args=(6,); alias=default
+DEBUG 2026-01-21 17:45:53,169 django.db.backends utils debug_sql 151 (0.000) SELECT "core_audit"."id", "core_audit"."organization_id", "core_audit"."created_by_id", "core_audit"."status", "core_audit"."device_identifier", "core_audit"."device_family", "core_audit"."config_file", "core_audit"."parsed_config", "core_audit"."created_at", "core_audit"."completed_at", "core_audit"."snapshot_name", "core_audit"."parent_audit_id", "core_audit"."device_hostname", "core_audit"."device_model", "core_audit"."device_firmware", "core_audit"."device_location", "core_audit"."device_make", "core_audit"."device_type", "core_audit"."progress" FROM "core_audit" WHERE ("core_audit"."organization_id" = 6 AND "core_audit"."status" = 'Completed') ORDER BY "core_audit"."created_at" DESC; args=(6, 'Completed'); alias=default
+DEBUG 2026-01-21 17:45:53,170 django.db.backends utils debug_sql 151 (0.000) SELECT "core_audit"."id", "core_audit"."organization_id", "core_audit"."created_by_id", "core_audit"."status", "core_audit"."device_identifier", "core_audit"."device_family", "core_audit"."config_file", "core_audit"."parsed_config", "core_audit"."created_at", "core_audit"."completed_at", "core_audit"."snapshot_name", "core_audit"."parent_audit_id", "core_audit"."device_hostname", "core_audit"."device_model", "core_audit"."device_firmware", "core_audit"."device_location", "core_audit"."device_make", "core_audit"."device_type", "core_audit"."progress" FROM "core_audit" WHERE "core_audit"."organization_id" = 6 ORDER BY "core_audit"."created_at" DESC LIMIT 10; args=(6,); alias=default
+DEBUG 2026-01-21 17:49:27,500 django.db.backends utils debug_sql 151 (0.001) SELECT "auth_user"."id", "auth_user"."password", "auth_user"."last_login", "auth_user"."is_superuser", "auth_user"."username", "auth_user"."first_name", "auth_user"."last_name", "auth_user"."email", "auth_user"."is_staff", "auth_user"."is_active", "auth_user"."date_joined" FROM "auth_user" WHERE "auth_user"."username" = 'MMBL' LIMIT 21; args=('MMBL',); alias=default
+WARNING 2026-01-21 17:49:28,387 django.request log log_message 249 Unauthorized: /login/
+WARNING 2026-01-21 17:51:07,058 django.security.csrf log log_message 249 Forbidden (Referer checking failed - Referer is insecure while host is secure.): /
+INFO 2026-01-21 17:51:45,719 apps.core.utils utils log_audit_action 35 LOGIN: User tournamentshelp logged in | User: tournamentshelp | Org: MMBL | IP: 223.123.73.179
+WARNING 2026-01-21 17:51:58,556 django.request log log_message 249 Not Found: /favicon.ico
+INFO 2026-01-21 17:52:17,766 apps.core.utils utils log_audit_action 35 LOGIN: User tournamentshelp logged in | User: tournamentshelp | Org: MMBL | IP: 127.0.0.1
+INFO 2026-01-21 17:52:22,955 apps.core.utils utils log_audit_action 35 LOGIN: User tournamentshelp logged in | User: tournamentshelp | Org: MMBL | IP: 127.0.0.1
+INFO 2026-01-21 17:53:06,105 apps.core.utils utils log_audit_action 35 LOGIN: User tournamentshelp logged in | User: tournamentshelp | Org: MMBL | IP: 127.0.0.1
+INFO 2026-01-21 17:54:01,875 apps.core.utils utils log_audit_action 35 INVITE: Invited user sohaibzafar700@gmail.com to MMBL | User: tournamentshelp | Org: MMBL | IP: 223.123.73.179
+INFO 2026-01-21 17:54:02,017 apps.email_delivery.services.dns_service dns_service get_mx_records 71 Resolving MX records for domain: gmail.com
+INFO 2026-01-21 17:54:02,021 apps.email_delivery.services.dns_service dns_service get_mx_records 87 Found 5 MX record(s) for gmail.com: [(5, 'gmail-smtp-in.l.google.com'), (10, 'alt1.gmail-smtp-in.l.google.com'), (20, 'alt2.gmail-smtp-in.l.google.com'), (30, 'alt3.gmail-smtp-in.l.google.com'), (40, 'alt4.gmail-smtp-in.l.google.com')]
+INFO 2026-01-21 17:54:02,021 apps.email_delivery.services.email_service email_service send_to_mx_server 108 Attempting to send email to MX server: gmail-smtp-in.l.google.com (priority: 5)
+INFO 2026-01-21 17:54:05,826 apps.email_delivery.services.email_service email_service send_to_mx_server 143 Successfully sent email via MX server: gmail-smtp-in.l.google.com
+INFO 2026-01-21 17:54:06,245 apps.email_delivery.services.email_service email_service send_email_direct 224 Successfully sent email to domain gmail.com via MX server
+INFO 2026-01-21 17:54:06,245 apps.email_delivery.utils utils send_invitation_email 63 Invitation email sent to sohaibzafar700@gmail.com
+WARNING 2026-01-21 17:56:13,468 django.request log log_message 249 Not Found: /favicon.ico
+INFO 2026-01-21 17:56:32,015 apps.core.utils utils log_audit_action 35 ACCEPT_INVITE: User Sohaibzafar700 accepted invitation to MMBL | User: Sohaibzafar700 | Org: MMBL | IP: 223.123.73.179
+WARNING 2026-01-21 18:04:00,620 django.request log log_message 249 Not Found: /api/org-admin/users/3/
+WARNING 2026-01-21 18:04:08,376 django.security.csrf log log_message 249 Forbidden (Referer checking failed - Referer is insecure while host is secure.): /
+INFO 2026-01-21 18:06:00,484 apps.core.utils utils log_audit_action 35 UPDATE: Updated user Sohaibzafar700 in MMBL | User: tournamentshelp | Org: MMBL | IP: 223.123.73.179
+WARNING 2026-01-21 18:09:02,403 django.request log log_message 249 Unauthorized: /login/
+WARNING 2026-01-21 18:09:08,896 django.request log log_message 249 Unauthorized: /login/
+INFO 2026-01-21 18:09:16,848 apps.core.utils utils log_audit_action 35 LOGIN: User Sohaibzafar700 logged in | User: Sohaibzafar700 | Org: MMBL | IP: 223.123.73.179
+INFO 2026-01-21 18:12:13,775 apps.core.utils utils log_audit_action 35 DELETE: Deleted user Sohaibzafar700 from MMBL | User: tournamentshelp | Org: MMBL | IP: 223.123.73.179
+INFO 2026-01-21 18:12:37,926 apps.core.utils utils log_audit_action 35 INVITE: Invited user sohaibzafar700@gmail.com to MMBL | User: tournamentshelp | Org: MMBL | IP: 223.123.73.179
+INFO 2026-01-21 18:12:38,167 apps.email_delivery.services.dns_service dns_service get_mx_records 71 Resolving MX records for domain: gmail.com
+INFO 2026-01-21 18:12:38,171 apps.email_delivery.services.dns_service dns_service get_mx_records 87 Found 5 MX record(s) for gmail.com: [(5, 'gmail-smtp-in.l.google.com'), (10, 'alt1.gmail-smtp-in.l.google.com'), (20, 'alt2.gmail-smtp-in.l.google.com'), (30, 'alt3.gmail-smtp-in.l.google.com'), (40, 'alt4.gmail-smtp-in.l.google.com')]
+INFO 2026-01-21 18:12:38,171 apps.email_delivery.services.email_service email_service send_to_mx_server 108 Attempting to send email to MX server: gmail-smtp-in.l.google.com (priority: 5)
+WARNING 2026-01-21 18:12:39,854 django.request log log_message 249 Bad Request: /api/org-admin/invite-user/
+INFO 2026-01-21 18:12:41,871 apps.email_delivery.services.email_service email_service send_to_mx_server 143 Successfully sent email via MX server: gmail-smtp-in.l.google.com
+INFO 2026-01-21 18:12:42,294 apps.email_delivery.services.email_service email_service send_email_direct 224 Successfully sent email to domain gmail.com via MX server
+INFO 2026-01-21 18:12:42,294 apps.email_delivery.utils utils send_invitation_email 63 Invitation email sent to sohaibzafar700@gmail.com
+WARNING 2026-01-21 18:13:21,813 django.request log log_message 249 Unauthorized: /login/
+INFO 2026-01-21 18:14:34,359 apps.core.utils utils log_audit_action 35 ACCEPT_INVITE: User sohaibzafar700 accepted invitation to MMBL | User: sohaibzafar700 | Org: MMBL | IP: 223.123.73.179
+INFO 2026-01-21 18:14:46,453 apps.core.utils utils log_audit_action 35 LOGIN: User sohaibzafar700 logged in | User: sohaibzafar700 | Org: MMBL | IP: 223.123.73.179
+INFO 2026-01-21 18:20:55,210 apps.core.utils utils log_audit_action 35 DELETE: Deleted user sohaibzafar700 from MMBL | User: tournamentshelp | Org: MMBL | IP: 223.123.73.179
+WARNING 2026-01-21 18:34:53,445 django.security.csrf log log_message 249 Forbidden (Referer checking failed - Referer is insecure while host is secure.): /
+INFO 2026-01-21 18:40:23,831 apps.core.utils utils log_audit_action 35 LOGOUT: User tournamentshelp logged out | User: tournamentshelp | Org: MMBL | IP: 223.123.73.179
+INFO 2026-01-21 18:40:42,607 apps.core.utils utils log_audit_action 35 LOGIN: User admin logged in | User: admin | Org: N/A | IP: 223.123.73.179
+WARNING 2026-01-21 18:41:01,299 django.security.csrf log log_message 249 Forbidden (Referer checking failed - Referer is insecure while host is secure.): /
+WARNING 2026-01-21 18:41:49,915 django.security.csrf log log_message 249 Forbidden (Referer checking failed - Referer is insecure while host is secure.): /
+ERROR 2026-01-21 19:18:10,985 django.request log log_message 249 Internal Server Error: /
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/apps/core/decorators.py", line 101, in _wrapped_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/apps/core/views.py", line 357, in index
+    return render(request, 'index.html')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/backends/django.py", line 107, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 174, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 166, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 1091, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 1052, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/loader_tags.py", line 160, in render
+    return compiled_parent._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 166, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 1091, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 1052, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 333, in render
+    return nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 1091, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 1052, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 511, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/urls/base.py", line 98, in reverse
+    resolved_url = resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/urls/resolvers.py", line 842, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'super_admin_rules' not found. 'super_admin_rules' is not a valid view function or pattern name.
+ERROR 2026-01-21 19:18:58,774 django.request log log_message 249 Internal Server Error: /
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/apps/core/decorators.py", line 101, in _wrapped_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/apps/core/views.py", line 357, in index
+    return render(request, 'index.html')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/backends/django.py", line 107, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 174, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 166, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 1091, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 1052, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/loader_tags.py", line 160, in render
+    return compiled_parent._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 166, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 1091, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 1052, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 333, in render
+    return nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 1091, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 1052, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 511, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/urls/base.py", line 98, in reverse
+    resolved_url = resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/urls/resolvers.py", line 842, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'super_admin_rules' not found. 'super_admin_rules' is not a valid view function or pattern name.
+ERROR 2026-01-21 19:19:11,838 django.request log log_message 249 Internal Server Error: /
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/apps/core/decorators.py", line 101, in _wrapped_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/apps/core/views.py", line 357, in index
+    return render(request, 'index.html')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/backends/django.py", line 107, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 174, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 166, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 1091, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 1052, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/loader_tags.py", line 160, in render
+    return compiled_parent._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 166, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 1091, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 1052, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 333, in render
+    return nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 1091, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 1052, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 511, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/urls/base.py", line 98, in reverse
+    resolved_url = resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/urls/resolvers.py", line 842, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'super_admin_rules' not found. 'super_admin_rules' is not a valid view function or pattern name.
+ERROR 2026-01-21 19:31:46,319 django.request log log_message 249 Internal Server Error: /
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/apps/core/decorators.py", line 101, in _wrapped_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/apps/core/views.py", line 357, in index
+    # Clear 2FA session data
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/backends/django.py", line 107, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 174, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 166, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 1091, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 1052, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/loader_tags.py", line 160, in render
+    return compiled_parent._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 166, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 1091, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 1052, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 333, in render
+    return nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 1091, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 1052, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 511, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/urls/base.py", line 98, in reverse
+    resolved_url = resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/urls/resolvers.py", line 842, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'super_admin_rules' not found. 'super_admin_rules' is not a valid view function or pattern name.
+ERROR 2026-01-21 19:32:31,392 django.request log log_message 249 Internal Server Error: /
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/apps/core/decorators.py", line 101, in _wrapped_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/apps/core/views.py", line 357, in index
+    # Clear 2FA session data
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/backends/django.py", line 107, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 174, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 166, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 1091, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 1052, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/loader_tags.py", line 160, in render
+    return compiled_parent._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 166, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 1091, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 1052, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 333, in render
+    return nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 1091, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 1052, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 511, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/urls/base.py", line 98, in reverse
+    resolved_url = resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/urls/resolvers.py", line 842, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'super_admin_rules' not found. 'super_admin_rules' is not a valid view function or pattern name.
+ERROR 2026-01-21 19:34:14,598 django.request log log_message 249 Internal Server Error: /
+Traceback (most recent call last):
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/apps/core/decorators.py", line 101, in _wrapped_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/apps/core/views.py", line 357, in index
+    # Clear 2FA session data
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/backends/django.py", line 107, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 174, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 166, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 1091, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 1052, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/loader_tags.py", line 160, in render
+    return compiled_parent._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 166, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 1091, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 1052, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 333, in render
+    return nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 1091, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/base.py", line 1052, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/template/defaulttags.py", line 511, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/urls/base.py", line 98, in reverse
+    resolved_url = resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phisimuser/configaudit/venv/lib/python3.12/site-packages/django/urls/resolvers.py", line 842, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'super_admin_rules' not found. 'super_admin_rules' is not a valid view function or pattern name.
+INFO 2026-01-21 19:38:53,970 apps.core.utils utils log_audit_action 35 LOGOUT: User admin logged out | User: admin | Org: N/A | IP: 223.123.73.179
+INFO 2026-01-21 19:40:30,202 apps.email_delivery.services.dns_service dns_service get_mx_records 71 Resolving MX records for domain: gmail.com
+INFO 2026-01-21 19:40:30,241 apps.email_delivery.services.dns_service dns_service get_mx_records 87 Found 5 MX record(s) for gmail.com: [(5, 'gmail-smtp-in.l.google.com'), (10, 'alt1.gmail-smtp-in.l.google.com'), (20, 'alt2.gmail-smtp-in.l.google.com'), (30, 'alt3.gmail-smtp-in.l.google.com'), (40, 'alt4.gmail-smtp-in.l.google.com')]
+INFO 2026-01-21 19:40:30,241 apps.email_delivery.services.email_service email_service send_to_mx_server 108 Attempting to send email to MX server: gmail-smtp-in.l.google.com (priority: 5)
+INFO 2026-01-21 19:40:34,929 apps.email_delivery.services.email_service email_service send_to_mx_server 143 Successfully sent email via MX server: gmail-smtp-in.l.google.com
+INFO 2026-01-21 19:40:35,359 apps.email_delivery.services.email_service email_service send_email_direct 224 Successfully sent email to domain gmail.com via MX server
+INFO 2026-01-21 19:40:35,359 apps.email_delivery.utils utils send_2fa_code_email 248 2FA code email sent to chmsohaib701@gmail.com
+INFO 2026-01-21 19:41:31,792 apps.core.utils utils log_audit_action 35 LOGIN: User admin logged in with 2FA | User: admin | Org: N/A | IP: 223.123.73.179
+INFO 2026-01-21 19:42:54,662 apps.core.utils utils log_audit_action 35 ASSIGN: Assigned 1 rules to organizations | User: admin | Org: N/A | IP: 223.123.73.179
+INFO 2026-01-21 19:43:24,642 apps.email_delivery.services.dns_service dns_service get_mx_records 71 Resolving MX records for domain: gmail.com
+INFO 2026-01-21 19:43:24,687 apps.email_delivery.services.dns_service dns_service get_mx_records 87 Found 5 MX record(s) for gmail.com: [(5, 'gmail-smtp-in.l.google.com'), (10, 'alt1.gmail-smtp-in.l.google.com'), (20, 'alt2.gmail-smtp-in.l.google.com'), (30, 'alt3.gmail-smtp-in.l.google.com'), (40, 'alt4.gmail-smtp-in.l.google.com')]
+INFO 2026-01-21 19:43:24,687 apps.email_delivery.services.email_service email_service send_to_mx_server 108 Attempting to send email to MX server: gmail-smtp-in.l.google.com (priority: 5)
+INFO 2026-01-21 19:43:28,047 apps.email_delivery.services.email_service email_service send_to_mx_server 143 Successfully sent email via MX server: gmail-smtp-in.l.google.com
+INFO 2026-01-21 19:43:28,471 apps.email_delivery.services.email_service email_service send_email_direct 224 Successfully sent email to domain gmail.com via MX server
+INFO 2026-01-21 19:43:28,471 apps.email_delivery.utils utils send_2fa_code_email 248 2FA code email sent to tournamentshelp@gmail.com
+INFO 2026-01-21 19:43:49,250 apps.core.utils utils log_audit_action 35 LOGIN: User tournamentshelp logged in with 2FA | User: tournamentshelp | Org: MMBL | IP: 223.123.73.179
+INFO 2026-01-21 19:45:43,080 apps.core.utils utils log_audit_action 35 RESET: Reset all rules for organization MMBL (324 rules) | User: admin | Org: N/A | IP: 223.123.73.179
+INFO 2026-01-21 19:47:23,139 apps.core.utils utils log_audit_action 35 CREATE: Created audit for SW9K-I9-Core-1 | User: tournamentshelp | Org: MMBL | IP: 223.123.73.179
+INFO 2026-01-21 19:49:21,464 apps.core.utils utils log_audit_action 35 CREATE: Created audit for SW9K-I9-Core-1 | User: tournamentshelp | Org: MMBL | IP: 223.123.73.179
+INFO 2026-01-21 19:50:06,142 apps.core.utils utils log_audit_action 35 CREATE: Created audit for SW9K-I9-Core-1 | User: tournamentshelp | Org: MMBL | IP: 223.123.73.179
+INFO 2026-01-21 19:56:52,935 apps.core.utils utils log_audit_action 35 CREATE: Created audit for SW9K-I9-Core-1 | User: tournamentshelp | Org: MMBL | IP: 223.123.73.179
+INFO 2026-01-21 19:58:39,787 apps.core.utils utils log_audit_action 35 CREATE: Created audit for SW9K-I9-Core-1 | User: tournamentshelp | Org: MMBL | IP: 223.123.73.179
+WARNING 2026-01-21 20:05:00,196 django.request log log_message 249 Not Found: /favicon.ico
+INFO 2026-01-21 20:05:09,228 apps.core.utils utils log_audit_action 35 LOGOUT: User admin logged out | User: admin | Org: N/A | IP: 223.123.73.179
+INFO 2026-01-21 20:05:14,148 apps.email_delivery.services.dns_service dns_service get_mx_records 71 Resolving MX records for domain: gmail.com
+INFO 2026-01-21 20:05:14,152 apps.email_delivery.services.dns_service dns_service get_mx_records 87 Found 5 MX record(s) for gmail.com: [(5, 'gmail-smtp-in.l.google.com'), (10, 'alt1.gmail-smtp-in.l.google.com'), (20, 'alt2.gmail-smtp-in.l.google.com'), (30, 'alt3.gmail-smtp-in.l.google.com'), (40, 'alt4.gmail-smtp-in.l.google.com')]
+INFO 2026-01-21 20:05:14,152 apps.email_delivery.services.email_service email_service send_to_mx_server 108 Attempting to send email to MX server: gmail-smtp-in.l.google.com (priority: 5)
+INFO 2026-01-21 20:05:17,698 apps.email_delivery.services.email_service email_service send_to_mx_server 143 Successfully sent email via MX server: gmail-smtp-in.l.google.com
+INFO 2026-01-21 20:05:18,122 apps.email_delivery.services.email_service email_service send_email_direct 224 Successfully sent email to domain gmail.com via MX server
+INFO 2026-01-21 20:05:18,122 apps.email_delivery.utils utils send_2fa_code_email 248 2FA code email sent to tournamentshelp@gmail.com
+INFO 2026-01-21 20:05:37,782 apps.core.utils utils log_audit_action 35 LOGIN: User tournamentshelp logged in with 2FA | User: tournamentshelp | Org: MMBL | IP: 223.123.73.179
+INFO 2026-01-21 20:06:17,609 apps.core.utils utils log_audit_action 35 CREATE: Created audit for SW9K-I9-Core-1 | User: tournamentshelp | Org: MMBL | IP: 223.123.73.179
+INFO 2026-01-21 20:14:28,620 apps.core.utils utils log_audit_action 35 CREATE: Created audit for SW9K-I9-Core-1 | User: tournamentshelp | Org: MMBL | IP: 223.123.73.179
+INFO 2026-01-21 20:25:10,865 apps.core.utils utils log_audit_action 35 CREATE: Created audit for SW9K-I9-Core-1 | User: tournamentshelp | Org: MMBL | IP: 223.123.73.179
+INFO 2026-01-21 20:31:15,787 apps.core.utils utils log_audit_action 35 CREATE: Created audit for SW9K-I9-Core-1 | User: tournamentshelp | Org: MMBL | IP: 223.123.73.179
+WARNING 2026-01-21 20:32:08,880 django.request log log_message 249 Not Found: /.git/config
+WARNING 2026-01-21 20:50:29,791 django.request log log_message 249 Not Found: /favicon.ico

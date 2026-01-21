@@ -1,0 +1,634 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Rules - Super Admin - NCRT{% endblock %}
+
+{% block breadcrumb_current %}Manage Rules{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <h1 class="text-3xl font-bold text-gray-900">Manage Rules</h1>
+    </div>
+    
+    <!-- Statistics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="text-sm text-gray-600 mb-1">Total Platform Rules</div>
+            <div class="text-3xl font-bold text-blue-600" id="platformRulesCount">{{ platform_rules_count }}</div>
+        </div>
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="text-sm text-gray-600 mb-1">Total Organizations</div>
+            <div class="text-3xl font-bold text-green-600">{{ total_orgs }}</div>
+        </div>
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="text-sm text-gray-600 mb-1">Average Rules per Organization</div>
+            <div class="text-3xl font-bold text-purple-600">{{ avg_rules_per_org }}</div>
+        </div>
+    </div>
+    
+    <!-- Platform Rules Section -->
+    <div class="bg-white rounded-lg shadow p-6">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-semibold">Platform Rules</h2>
+            <button onclick="openCreateRuleModal()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                <i class="fas fa-plus mr-2"></i>Create Rule
+            </button>
+        </div>
+        
+        <!-- Search and Filter -->
+        <div class="mb-4">
+            <input type="text" id="ruleSearch" placeholder="Search rules..." 
+                   class="w-full px-4 py-2 border rounded" 
+                   onkeyup="filterRules()">
+        </div>
+        
+        <!-- Rules Table -->
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                            <input type="checkbox" id="selectAllRules" onchange="toggleSelectAllRules()">
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Severity</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200" id="rulesTableBody">
+                    <tr>
+                        <td colspan="7" class="px-6 py-4 text-center text-gray-500">Loading rules...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Assignment Section -->
+    <div class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-xl font-semibold mb-4">Assign Rules to Organizations</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Select Rules</label>
+                <div class="border rounded p-2 max-h-48 overflow-y-auto" id="rulesSelectContainer">
+                    <p class="text-gray-500 text-sm">Loading rules...</p>
+                </div>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Select Organizations</label>
+                <div class="border rounded p-2 max-h-48 overflow-y-auto" id="orgsSelectContainer">
+                    <p class="text-gray-500 text-sm">Loading organizations...</p>
+                </div>
+            </div>
+        </div>
+        
+        <button onclick="assignRules()" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+            <i class="fas fa-check mr-2"></i>Assign Selected Rules
+        </button>
+    </div>
+    
+    <!-- Assignment Status Section -->
+    <div class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-xl font-semibold mb-4">Assignment Status</h2>
+        
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Organization</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rules Count</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Assigned Rules</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200" id="assignmentTableBody">
+                    <tr>
+                        <td colspan="4" class="px-6 py-4 text-center text-gray-500">Loading assignment status...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Create/Edit Rule Modal -->
+<div id="ruleModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <h2 id="modalTitle" class="text-xl font-bold mb-4">Create Rule</h2>
+        <form id="ruleForm" onsubmit="saveRule(event)">
+            <input type="hidden" id="ruleId" value="">
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Name *</label>
+                    <input type="text" id="ruleName" required class="w-full px-3 py-2 border rounded">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <textarea id="ruleDescription" rows="3" class="w-full px-3 py-2 border rounded"></textarea>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Type *</label>
+                        <select id="ruleType" required class="w-full px-3 py-2 border rounded">
+                            <option value="pattern">Pattern</option>
+                            <option value="python">Python</option>
+                            <option value="hybrid">Hybrid</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Severity</label>
+                        <select id="ruleSeverity" class="w-full px-3 py-2 border rounded">
+                            <option value="low">Low</option>
+                            <option value="medium">Medium</option>
+                            <option value="high">High</option>
+                            <option value="critical">Critical</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                    <input type="text" id="ruleCategory" class="w-full px-3 py-2 border rounded">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">YAML Content</label>
+                    <textarea id="ruleYamlContent" rows="6" class="w-full px-3 py-2 border rounded font-mono text-sm"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Tags (comma-separated)</label>
+                    <input type="text" id="ruleTags" class="w-full px-3 py-2 border rounded" placeholder="tag1, tag2, tag3">
+                </div>
+                <div>
+                    <label class="flex items-center">
+                        <input type="checkbox" id="ruleEnabled" checked class="mr-2">
+                        <span class="text-sm font-medium text-gray-700">Enabled</span>
+                    </label>
+                </div>
+            </div>
+            <div class="mt-6 flex justify-end space-x-3">
+                <button type="button" onclick="closeRuleModal()" class="px-4 py-2 border rounded">Cancel</button>
+                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+let platformRules = [];
+let organizations = [];
+let assignmentStatus = {};
+
+// Load data on page load
+document.addEventListener('DOMContentLoaded', function() {
+    loadPlatformRules();
+    loadOrganizations();
+    loadAssignmentStatus();
+});
+
+// Load platform rules
+async function loadPlatformRules() {
+    try {
+        const response = await fetch('/api/super-admin/rules/');
+        const data = await response.json();
+        
+        if (response.ok) {
+            platformRules = data.rules || [];
+            assignmentStatus = data.assignment_status || {};
+            renderRulesTable();
+            renderRulesSelect();
+            updateStats();
+        } else {
+            showToast('Failed to load rules', 'error');
+        }
+    } catch (error) {
+        console.error('Error loading rules:', error);
+        showToast('An error occurred while loading rules', 'error');
+    }
+}
+
+// Load organizations
+async function loadOrganizations() {
+    try {
+        const response = await fetch('/api/super-admin/organizations/');
+        const data = await response.json();
+        
+        if (response.ok) {
+            organizations = data.organizations || [];
+            renderOrgsSelect();
+            renderAssignmentTable();
+        } else {
+            showToast('Failed to load organizations', 'error');
+        }
+    } catch (error) {
+        console.error('Error loading organizations:', error);
+        showToast('An error occurred while loading organizations', 'error');
+    }
+}
+
+// Load assignment status
+async function loadAssignmentStatus() {
+    try {
+        const response = await fetch('/api/super-admin/rules/');
+        const data = await response.json();
+        
+        if (response.ok) {
+            assignmentStatus = data.assignment_status || {};
+            renderAssignmentTable();
+        }
+    } catch (error) {
+        console.error('Error loading assignment status:', error);
+    }
+}
+
+// Update statistics
+function updateStats() {
+    const countElement = document.getElementById('platformRulesCount');
+    if (countElement) {
+        countElement.textContent = platformRules.length;
+    }
+}
+
+// Render rules table
+function renderRulesTable() {
+    const tbody = document.getElementById('rulesTableBody');
+    const searchTerm = document.getElementById('ruleSearch')?.value.toLowerCase() || '';
+    
+    const filteredRules = platformRules.filter(rule => 
+        rule.name.toLowerCase().includes(searchTerm) ||
+        (rule.description && rule.description.toLowerCase().includes(searchTerm)) ||
+        (rule.category && rule.category.toLowerCase().includes(searchTerm))
+    );
+    
+    if (filteredRules.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-4 text-center text-gray-500">No rules found</td></tr>';
+        return;
+    }
+    
+    tbody.innerHTML = filteredRules.map(rule => `
+        <tr>
+            <td class="px-4 py-4">
+                <input type="checkbox" class="rule-checkbox" value="${rule.id}">
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap font-medium">${escapeHtml(rule.name)}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-gray-500">${escapeHtml(rule.rule_type || 'N/A')}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-gray-500">${escapeHtml(rule.category || 'N/A')}</td>
+            <td class="px-6 py-4 whitespace-nowrap">
+                <span class="px-2 py-1 text-xs rounded ${
+                    rule.severity === 'critical' ? 'bg-red-100 text-red-800' :
+                    rule.severity === 'high' ? 'bg-orange-100 text-orange-800' :
+                    rule.severity === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+                    'bg-gray-100 text-gray-800'
+                }">${escapeHtml(rule.severity || 'N/A')}</span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+                <span class="px-2 py-1 text-xs rounded ${rule.enabled ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">
+                    ${rule.enabled ? 'Enabled' : 'Disabled'}
+                </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                <button onclick="editRule(${rule.id})" class="text-blue-600 hover:text-blue-800 mr-3">Edit</button>
+                <button onclick="deleteRule(${rule.id})" class="text-red-600 hover:text-red-800">Delete</button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+// Render rules select
+function renderRulesSelect() {
+    const container = document.getElementById('rulesSelectContainer');
+    if (platformRules.length === 0) {
+        container.innerHTML = '<p class="text-gray-500 text-sm">No rules available</p>';
+        return;
+    }
+    
+    container.innerHTML = platformRules.map(rule => `
+        <label class="flex items-center p-2 hover:bg-gray-50 cursor-pointer">
+            <input type="checkbox" class="rule-select-checkbox mr-2" value="${rule.id}">
+            <span>${escapeHtml(rule.name)}</span>
+        </label>
+    `).join('');
+}
+
+// Render organizations select
+function renderOrgsSelect() {
+    const container = document.getElementById('orgsSelectContainer');
+    if (organizations.length === 0) {
+        container.innerHTML = '<p class="text-gray-500 text-sm">No organizations available</p>';
+        return;
+    }
+    
+    container.innerHTML = organizations.map(org => `
+        <label class="flex items-center p-2 hover:bg-gray-50 cursor-pointer">
+            <input type="checkbox" class="org-select-checkbox mr-2" value="${org.id}">
+            <span>${escapeHtml(org.name)}</span>
+        </label>
+    `).join('');
+}
+
+// Render assignment table
+function renderAssignmentTable() {
+    const tbody = document.getElementById('assignmentTableBody');
+    
+    if (organizations.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-gray-500">No organizations found</td></tr>';
+        return;
+    }
+    
+    tbody.innerHTML = organizations.map(org => {
+        const assignedRuleNames = assignmentStatus[org.id] || [];
+        const ruleCount = assignedRuleNames.length;
+        
+        return `
+            <tr>
+                <td class="px-6 py-4 font-medium">${escapeHtml(org.name)}</td>
+                <td class="px-6 py-4 text-gray-500">${ruleCount}</td>
+                <td class="px-6 py-4 text-gray-500">
+                    <div class="max-w-md">
+                        ${assignedRuleNames.length > 0 
+                            ? assignedRuleNames.slice(0, 3).map(name => `<span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded mr-1 mb-1">${escapeHtml(name)}</span>`).join('') +
+                              (assignedRuleNames.length > 3 ? `<span class="text-xs text-gray-500">+${assignedRuleNames.length - 3} more</span>` : '')
+                            : '<span class="text-gray-400">No rules assigned</span>'
+                        }
+                    </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                    <button onclick="resetRules(${org.id})" class="text-orange-600 hover:text-orange-800 mr-3">
+                        <i class="fas fa-sync-alt mr-1"></i>Reset Rules
+                    </button>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+// Filter rules
+function filterRules() {
+    renderRulesTable();
+}
+
+// Toggle select all rules
+function toggleSelectAllRules() {
+    const selectAll = document.getElementById('selectAllRules').checked;
+    document.querySelectorAll('.rule-checkbox').forEach(cb => cb.checked = selectAll);
+}
+
+// Assign rules
+async function assignRules() {
+    const selectedRuleIds = Array.from(document.querySelectorAll('.rule-select-checkbox:checked')).map(cb => parseInt(cb.value));
+    const selectedOrgIds = Array.from(document.querySelectorAll('.org-select-checkbox:checked')).map(cb => parseInt(cb.value));
+    
+    if (selectedRuleIds.length === 0) {
+        showToast('Please select at least one rule', 'warning');
+        return;
+    }
+    
+    if (selectedOrgIds.length === 0) {
+        showToast('Please select at least one organization', 'warning');
+        return;
+    }
+    
+    if (!confirm(`Assign ${selectedRuleIds.length} rule(s) to ${selectedOrgIds.length} organization(s)?`)) {
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/super-admin/rules/assign/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+                rule_ids: selectedRuleIds,
+                organization_ids: selectedOrgIds
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            const message = `Assigned ${data.assigned_count} rule(s). ${data.skipped_count > 0 ? data.skipped_count + ' rule(s) already existed and were skipped.' : ''}`;
+            showToast(message, 'success');
+            // Clear selections
+            document.querySelectorAll('.rule-select-checkbox:checked').forEach(cb => cb.checked = false);
+            document.querySelectorAll('.org-select-checkbox:checked').forEach(cb => cb.checked = false);
+            // Reload assignment status
+            loadAssignmentStatus();
+        } else {
+            showToast(data.error || 'Failed to assign rules', 'error');
+        }
+    } catch (error) {
+        console.error('Error assigning rules:', error);
+        showToast('An error occurred while assigning rules', 'error');
+    }
+}
+
+// Reset rules for an organization
+async function resetRules(orgId) {
+    const org = organizations.find(o => o.id === orgId);
+    if (!org) return;
+    
+    if (!confirm(`Reset all rules for ${org.name}? This will delete all existing rules and assign all platform rules. This action cannot be undone.`)) {
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/super-admin/rules/reset/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+                organization_id: orgId
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            showToast(`Reset complete: ${data.assigned_count} rules assigned to ${org.name}`, 'success');
+            loadAssignmentStatus();
+        } else {
+            showToast(data.error || 'Failed to reset rules', 'error');
+        }
+    } catch (error) {
+        console.error('Error resetting rules:', error);
+        showToast('An error occurred while resetting rules', 'error');
+    }
+}
+
+// Unassign rule (if needed in future)
+async function unassignRule(ruleId, orgId) {
+    if (!confirm('Are you sure you want to unassign this rule from the organization?')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/super-admin/rules/unassign/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+                rule_id: ruleId,
+                organization_id: orgId
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            showToast('Rule unassigned successfully', 'success');
+            loadAssignmentStatus();
+        } else {
+            showToast(data.error || 'Failed to unassign rule', 'error');
+        }
+    } catch (error) {
+        console.error('Error unassigning rule:', error);
+        showToast('An error occurred while unassigning rule', 'error');
+    }
+}
+
+// Open create rule modal
+function openCreateRuleModal() {
+    document.getElementById('ruleId').value = '';
+    document.getElementById('ruleName').value = '';
+    document.getElementById('ruleDescription').value = '';
+    document.getElementById('ruleType').value = 'pattern';
+    document.getElementById('ruleCategory').value = '';
+    document.getElementById('ruleSeverity').value = 'medium';
+    document.getElementById('ruleYamlContent').value = '';
+    document.getElementById('ruleTags').value = '';
+    document.getElementById('ruleEnabled').checked = true;
+    document.getElementById('modalTitle').textContent = 'Create Rule';
+    document.getElementById('ruleModal').classList.remove('hidden');
+}
+
+// Edit rule
+function editRule(ruleId) {
+    const rule = platformRules.find(r => r.id === ruleId);
+    if (!rule) return;
+    
+    document.getElementById('ruleId').value = rule.id;
+    document.getElementById('ruleName').value = rule.name || '';
+    document.getElementById('ruleDescription').value = rule.description || '';
+    document.getElementById('ruleType').value = rule.rule_type || 'pattern';
+    document.getElementById('ruleCategory').value = rule.category || '';
+    document.getElementById('ruleSeverity').value = rule.severity || 'medium';
+    document.getElementById('ruleYamlContent').value = rule.yaml_content || '';
+    document.getElementById('ruleTags').value = rule.tags || '';
+    document.getElementById('ruleEnabled').checked = rule.enabled !== false;
+    document.getElementById('modalTitle').textContent = 'Edit Rule';
+    document.getElementById('ruleModal').classList.remove('hidden');
+}
+
+// Delete rule
+async function deleteRule(ruleId) {
+    const rule = platformRules.find(r => r.id === ruleId);
+    if (!rule) return;
+    
+    if (!confirm(`Are you sure you want to delete the rule "${rule.name}"? This action cannot be undone.`)) {
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/super-admin/rules/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+                action: 'delete',
+                rule_id: ruleId
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            showToast('Rule deleted successfully', 'success');
+            loadPlatformRules();
+        } else {
+            showToast(data.error || 'Failed to delete rule', 'error');
+        }
+    } catch (error) {
+        console.error('Error deleting rule:', error);
+        showToast('An error occurred while deleting rule', 'error');
+    }
+}
+
+// Close rule modal
+function closeRuleModal() {
+    document.getElementById('ruleModal').classList.add('hidden');
+}
+
+// Save rule
+async function saveRule(e) {
+    e.preventDefault();
+    
+    const ruleId = document.getElementById('ruleId').value;
+    const name = document.getElementById('ruleName').value.trim();
+    const description = document.getElementById('ruleDescription').value.trim();
+    const ruleType = document.getElementById('ruleType').value;
+    const category = document.getElementById('ruleCategory').value.trim();
+    const severity = document.getElementById('ruleSeverity').value;
+    const yamlContent = document.getElementById('ruleYamlContent').value.trim();
+    const tags = document.getElementById('ruleTags').value.trim();
+    const enabled = document.getElementById('ruleEnabled').checked;
+    
+    if (!name) {
+        showToast('Rule name is required', 'error');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/super-admin/rules/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+                action: ruleId ? 'update' : 'create',
+                rule_id: ruleId || undefined,
+                name: name,
+                description: description,
+                rule_type: ruleType,
+                category: category,
+                severity: severity,
+                yaml_content: yamlContent,
+                tags: tags ? tags.split(',').map(t => t.trim()).filter(t => t) : [],
+                enabled: enabled
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            showToast(ruleId ? 'Rule updated successfully' : 'Rule created successfully', 'success');
+            closeRuleModal();
+            loadPlatformRules();
+        } else {
+            showToast(data.error || 'Failed to save rule', 'error');
+        }
+    } catch (error) {
+        console.error('Error saving rule:', error);
+        showToast('An error occurred while saving rule', 'error');
+    }
+}
+
+// Escape HTML
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+</script>
+{% endblock %}

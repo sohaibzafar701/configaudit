@@ -6,8 +6,10 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.auth.models import User
 from django.utils import timezone
+from datetime import timedelta
 import json
 import uuid
+import random
 
 
 class Organization(models.Model):
@@ -330,6 +332,79 @@ class UserInvitation(models.Model):
         """Generate token if not set"""
         if not self.token:
             self.token = uuid.uuid4().hex
+        super().save(*args, **kwargs)
+
+
+class PasswordResetToken(models.Model):
+    """Password reset token model for forgot password functionality"""
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='password_reset_tokens')
+    token = models.CharField(max_length=64, unique=True)
+    expires_at = models.DateTimeField()
+    used_at = models.DateTimeField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"Password reset token for {self.user.username}"
+    
+    def is_expired(self):
+        """Check if token is expired"""
+        return timezone.now() > self.expires_at
+    
+    def is_used(self):
+        """Check if token has been used"""
+        return self.used_at is not None
+    
+    def is_valid(self):
+        """Check if token is valid (not expired and not used)"""
+        return not self.is_expired() and not self.is_used()
+    
+    def save(self, *args, **kwargs):
+        """Generate token if not set"""
+        if not self.token:
+            self.token = uuid.uuid4().hex
+        if not self.expires_at:
+            self.expires_at = timezone.now() + timedelta(hours=1)
+        super().save(*args, **kwargs)
+
+
+class TwoFactorAuthCode(models.Model):
+    """Two-factor authentication code model for email-based 2FA"""
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='two_factor_codes')
+    code = models.CharField(max_length=6)
+    session_key = models.CharField(max_length=255, blank=True, null=True)
+    expires_at = models.DateTimeField()
+    used_at = models.DateTimeField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"2FA code for {self.user.username}"
+    
+    def is_expired(self):
+        """Check if code is expired"""
+        return timezone.now() > self.expires_at
+    
+    def is_used(self):
+        """Check if code has been used"""
+        return self.used_at is not None
+    
+    def is_valid(self):
+        """Check if code is valid (not expired and not used)"""
+        return not self.is_expired() and not self.is_used()
+    
+    def save(self, *args, **kwargs):
+        """Generate code if not set"""
+        if not self.code:
+            self.code = f"{random.randint(100000, 999999):06d}"
+        if not self.expires_at:
+            self.expires_at = timezone.now() + timedelta(minutes=10)
         super().save(*args, **kwargs)
 
 

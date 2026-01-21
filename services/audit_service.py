@@ -290,22 +290,55 @@ def process_audit(audit_id, config_content, device_family=None, selected_rule_id
         # Store findings - group by rule_id to create parent-child structure
         set_audit_progress(audit_id, status='storing_findings', progress_percent=95)
         
-        # Group findings by rule_id
-        findings_by_rule = {}
+        # Deduplicate findings first - remove exact duplicates based on rule_id, message, and config_path
+        seen_findings = set()
+        deduplicated_findings = []
+        for finding in findings:
+            # Create a unique key for this finding
+            finding_key = (
+                finding.get('rule_id'),
+                finding.get('message', ''),
+                finding.get('config_path', ''),
+                finding.get('severity', '')
+            )
+            if finding_key not in seen_findings:
+                seen_findings.add(finding_key)
+                deduplicated_findings.append(finding)
+        
+        findings = deduplicated_findings
+        
+        # Group findings by rule name (not rule_id) to handle duplicate rules with same name
+        # First, get rule information for all findings
+        findings_by_rule_name = {}
         for finding in findings:
             rule_id = finding.get('rule_id')
-            if rule_id not in findings_by_rule:
-                findings_by_rule[rule_id] = []
-            findings_by_rule[rule_id].append(finding)
-        
-        # Get rule information for parent findings
-        # (Rule is already imported at the top of the file)
-        
-        # Create parent-child structure for findings
-        for rule_id, rule_findings in findings_by_rule.items():
             rule = Rule.get_by_id(rule_id)
             rule_name = rule.get('name', 'Unknown Rule') if rule else 'Unknown Rule'
-            rule_remediation = rule.get('remediation_template', '') if rule else ''
+            
+            # Group by rule name only - this prevents duplicate findings when multiple rules have the same name
+            if rule_name not in findings_by_rule_name:
+                findings_by_rule_name[rule_name] = {
+                    'rule_id': rule_id,  # Use the first rule_id encountered
+                    'rule_name': rule_name,
+                    'rule_remediation': rule.get('remediation_template', '') if rule else '',
+                    'findings': []
+                }
+            findings_by_rule_name[rule_name]['findings'].append(finding)
+        
+        # Create parent-child structure for findings
+        # Track created parent findings to prevent duplicates
+        created_parent_findings = set()
+        
+        for rule_name, rule_data in findings_by_rule_name.items():
+            rule_id = rule_data['rule_id']
+            rule_remediation = rule_data['rule_remediation']
+            rule_findings = rule_data['findings']
+            
+            # Create a unique key for this rule's parent finding based on rule name only
+            parent_key = (audit_id, rule_name)
+            if parent_key in created_parent_findings:
+                # Skip if we've already created a parent for this rule name
+                continue
             
             if len(rule_findings) == 1:
                 # Single finding - create as parent (no children)
@@ -319,8 +352,24 @@ def process_audit(audit_id, config_content, device_family=None, selected_rule_id
                     remediation=finding.get('remediation', '') or rule_remediation,
                     parent_finding_id=None
                 )
+                created_parent_findings.add(parent_key)
             else:
                 # Multiple findings - create parent with children
+                # Deduplicate rule_findings to avoid duplicate children
+                seen_children = set()
+                unique_rule_findings = []
+                for finding in rule_findings:
+                    child_key = (
+                        finding.get('message', ''),
+                        finding.get('config_path', ''),
+                        finding.get('severity', '')
+                    )
+                    if child_key not in seen_children:
+                        seen_children.add(child_key)
+                        unique_rule_findings.append(finding)
+                
+                rule_findings = unique_rule_findings
+                
                 # Determine highest severity
                 severities = ['low', 'medium', 'high', 'critical']
                 highest_severity = 'low'
@@ -343,8 +392,9 @@ def process_audit(audit_id, config_content, device_family=None, selected_rule_id
                     remediation=rule_remediation,
                     parent_finding_id=None
                 )
+                created_parent_findings.add(parent_key)
                 
-                # Create child findings
+                # Create child findings (deduplicated)
                 for finding in rule_findings:
                     Finding.create(
                         audit_id=audit_id,

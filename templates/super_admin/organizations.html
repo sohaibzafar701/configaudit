@@ -109,18 +109,104 @@ function editOrg(orgId) {
     document.getElementById('modalTitle').textContent = 'Edit Organization';
 }
 
-function deleteOrg(orgId) {
-    if (!confirm('Are you sure you want to delete this organization?')) return;
-    // TODO: Implement delete
+async function deleteOrg(orgId) {
+    if (!confirm('Are you sure you want to delete this organization? This action cannot be undone.')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/api/super-admin/organizations/${orgId}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+                action: 'delete'
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            showToast('Organization deleted successfully', 'success');
+            // Reload page to show updated data
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        } else {
+            showToast(data.error || 'Failed to delete organization', 'error');
+        }
+    } catch (error) {
+        console.error('Error deleting organization:', error);
+        showToast('An error occurred while deleting the organization', 'error');
+    }
 }
 
 function closeOrgModal() {
     document.getElementById('orgModal').classList.add('hidden');
 }
 
-function saveOrg(e) {
+async function saveOrg(e) {
     e.preventDefault();
-    // TODO: Implement save
+    
+    const orgId = document.getElementById('orgId').value;
+    const name = document.getElementById('orgName').value.trim();
+    const domain = document.getElementById('orgDomain').value.trim() || null;
+    const pocEmail = document.getElementById('orgPocEmail').value.trim();
+    const status = document.getElementById('orgStatus').value;
+    
+    // Validate required fields
+    if (!name || !pocEmail) {
+        showToast('Name and POC Email are required', 'error');
+        return;
+    }
+    
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(pocEmail)) {
+        showToast('Please enter a valid email address', 'error');
+        return;
+    }
+    
+    try {
+        const url = orgId 
+            ? `/api/super-admin/organizations/${orgId}/`
+            : '/api/super-admin/organizations/';
+        
+        const action = orgId ? 'update' : 'create';
+        
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+                action: action,
+                name: name,
+                domain: domain,
+                poc_email: pocEmail,
+                status: status
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            showToast(data.message || (orgId ? 'Organization updated successfully' : 'Organization created successfully'), 'success');
+            closeOrgModal();
+            // Reload page to show updated data
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        } else {
+            showToast(data.error || 'Failed to save organization', 'error');
+        }
+    } catch (error) {
+        console.error('Error saving organization:', error);
+        showToast('An error occurred while saving the organization', 'error');
+    }
 }
 </script>
 {% endblock %}

@@ -1,0 +1,19 @@
+[Unit]
+Description=ConfigAudit Django Application
+After=network.target
+
+[Service]
+Type=simple
+User=phisimuser
+Group=phisimuser
+WorkingDirectory=/home/phisimuser/configaudit
+Environment="PATH=/home/phisimuser/configaudit/venv/bin"
+ExecStart=/home/phisimuser/configaudit/venv/bin/gunicorn \
+    --config /home/phisimuser/configaudit/gunicorn_config.py \
+    auditconfig.wsgi:application
+ExecReload=/bin/kill -s HUP $MAINPID
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

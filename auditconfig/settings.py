@@ -14,7 +14,7 @@ SECRET_KEY = 'django-insecure-ncrt-dev-key-change-in-production'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '203.175.66.63', 'pdsconfigaudit.com', 'www.pdsconfigaudit.com']
 
 # Application definition
 INSTALLED_APPS = [
@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'apps.core',
+    'apps.email_delivery',
 ]
 
 MIDDLEWARE = [
@@ -105,3 +106,80 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # File upload settings
 FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10MB
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10MB
+
+# Email configuration
+EMAIL_BACKEND = 'apps.email_delivery.backends.MXDirectBackend'
+DEFAULT_FROM_EMAIL = 'noreply@pdsconfigaudit.com'
+SERVER_EMAIL = 'noreply@pdsconfigaudit.com'
+EMAIL_MX_TIMEOUT = 30  # SMTP connection timeout in seconds
+EMAIL_MX_RETRY_ATTEMPTS = 3  # Number of MX servers to try before failing
+
+# Logging configuration
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {name} {module} {funcName} {lineno} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {asctime} {name} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR / 'logs' / 'django.log',
+            'formatter': 'verbose',
+        },
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file', 'console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'django.request': {
+            'handlers': ['file', 'console'],
+            'level': 'WARNING',  # Only show warnings and errors for requests
+            'propagate': False,
+        },
+        'django.server': {
+            'handlers': ['file', 'console'],
+            'level': 'INFO',  # Show server startup and important messages
+            'propagate': False,
+        },
+        'django.db.backends': {
+            'handlers': ['file', 'console'],
+            'level': 'ERROR',  # Suppress SQL query logs, only show errors
+            'propagate': False,
+        },
+        'django.template': {
+            'handlers': ['file', 'console'],
+            'level': 'WARNING',  # Only show template warnings and errors
+            'propagate': False,
+        },
+        'apps.email_delivery': {
+            'handlers': ['file', 'console'],
+            'level': 'INFO',  # Show important email actions
+            'propagate': False,
+        },
+        'apps.core': {
+            'handlers': ['file', 'console'],
+            'level': 'INFO',  # Show important application actions
+            'propagate': False,
+        },
+    },
+    'root': {
+        'handlers': ['file', 'console'],
+        'level': 'INFO',  # Default to INFO level
+    },
+}

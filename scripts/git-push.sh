@@ -15,6 +15,30 @@ echo -e "${BLUE}  Interactive Git Push Script${NC}"
 echo -e "${BLUE}========================================${NC}"
 echo ""
 
+# Change to git repository root
+# Find the .git directory by going up from the script's location
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$SCRIPT_DIR"
+
+# Navigate up until we find .git directory
+while [ "$REPO_ROOT" != "/" ] && [ ! -d "$REPO_ROOT/.git" ]; do
+    REPO_ROOT="$(dirname "$REPO_ROOT")"
+done
+
+if [ ! -d "$REPO_ROOT/.git" ]; then
+    echo -e "${RED}Error: Not in a git repository!${NC}"
+    exit 1
+fi
+
+# Change to repository root
+cd "$REPO_ROOT" || {
+    echo -e "${RED}Error: Failed to change to repository root: $REPO_ROOT${NC}"
+    exit 1
+}
+
+echo -e "${GREEN}Working in repository: $REPO_ROOT${NC}"
+echo ""
+
 # Step 1: Check Current Git Status
 echo -e "${YELLOW}Step 1: Checking current Git status...${NC}"
 git status
@@ -64,8 +88,11 @@ echo ""
 
 # Step 4: Add all changes
 echo -e "${YELLOW}Step 4: Staging all changes...${NC}"
-if git add .; then
+if git add -A; then
     echo -e "${GREEN}✓ Successfully staged all changes${NC}"
+    # Show what was staged
+    echo -e "${BLUE}Staged changes:${NC}"
+    git status --short
 else
     echo -e "${RED}Error: Failed to stage changes${NC}"
     exit 1
@@ -74,6 +101,17 @@ echo ""
 
 # Step 5: Commit changes
 echo -e "${YELLOW}Step 5: Committing changes...${NC}"
+
+# Verify there are staged changes
+if [ -z "$(git diff --cached --name-only)" ]; then
+    echo -e "${YELLOW}Warning: No changes are staged for commit.${NC}"
+    read -p "Do you want to continue anyway? (y/n): " continue_anyway
+    if [ "$continue_anyway" != "y" ] && [ "$continue_anyway" != "Y" ]; then
+        echo -e "${RED}Commit cancelled.${NC}"
+        exit 1
+    fi
+fi
+
 read -p "Enter commit message (or press Enter to use branch name): " commit_message
 
 if [ -z "$commit_message" ]; then
@@ -84,6 +122,7 @@ if git commit -m "$commit_message"; then
     echo -e "${GREEN}✓ Successfully committed changes with message: '${commit_message}'${NC}"
 else
     echo -e "${RED}Error: Failed to commit changes${NC}"
+    echo -e "${YELLOW}This might happen if there are no changes to commit.${NC}"
     exit 1
 fi
 echo ""

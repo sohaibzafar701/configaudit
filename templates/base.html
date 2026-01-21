@@ -41,6 +41,32 @@
                 opacity: 0;
             }
         }
+        .user-dropdown {
+            display: none;
+            position: absolute;
+            bottom: 100%;
+            left: 0;
+            right: 0;
+            background-color: #1f2937;
+            border: 1px solid #374151;
+            border-radius: 0.375rem;
+            margin-bottom: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .user-dropdown.show {
+            display: block;
+            animation: dropdownSlideIn 0.2s ease-out;
+        }
+        @keyframes dropdownSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
     {% block extra_head %}{% endblock %}
 </head>
@@ -51,63 +77,64 @@
     <div class="fixed inset-0 bg-black bg-opacity-50 z-40 sidebar-overlay hidden lg:hidden" id="sidebarOverlay"></div>
     
     <!-- Sidebar -->
-    <aside class="fixed top-0 left-0 h-full w-64 bg-gray-900 text-white z-50 transform -translate-x-full transition-transform duration-300 lg:translate-x-0" id="sidebar">
-        <div class="flex items-center justify-between p-4 border-b border-gray-800">
+    <aside class="fixed top-0 left-0 h-full w-64 bg-gray-900 text-white z-50 transform -translate-x-full transition-transform duration-300 lg:translate-x-0 flex flex-col" id="sidebar">
+        <!-- Header - Fixed at top -->
+        <div class="flex items-center justify-between p-4 border-b border-gray-800 flex-shrink-0">
             <h1 class="text-xl font-bold">NCRT</h1>
             <button class="lg:hidden text-white hover:text-gray-300" id="sidebarToggle" aria-label="Toggle sidebar">
                 <i class="fas fa-bars"></i>
             </button>
         </div>
-        {% if user.is_authenticated %}
-        <div class="p-4 border-b border-gray-800">
-            <div class="text-sm text-gray-400">Logged in as</div>
-            <div class="font-medium">{{ user.username }}</div>
-            {% if user.userprofile.organization %}
-            <div class="text-xs text-gray-500 mt-1">{{ user.userprofile.organization.name }}</div>
-            {% elif user.userprofile.is_super_admin %}
-            <div class="text-xs text-blue-400 mt-1">Super Admin</div>
-            {% endif %}
-        </div>
-        {% endif %}
-        <nav class="p-4 space-y-2">
-            <a href="{% url 'index' %}" class="flex items-center space-x-3 px-4 py-2 rounded hover:bg-gray-800 transition-colors">
-                <i class="fas fa-home w-5"></i>
-                <span>Home</span>
-            </a>
-            <a href="{% url 'audit_page' %}" class="flex items-center space-x-3 px-4 py-2 rounded hover:bg-gray-800 transition-colors">
-                <i class="fas fa-search w-5"></i>
-                <span>Audit</span>
-            </a>
-            <a href="{% url 'rules_page' %}" class="flex items-center space-x-3 px-4 py-2 rounded rounded hover:bg-gray-800 transition-colors">
-                <i class="fas fa-list-check w-5"></i>
-                <span>Rules</span>
-            </a>
-            <a href="{% url 'report_page' %}" class="flex items-center space-x-3 px-4 py-2 rounded hover:bg-gray-800 transition-colors">
-                <i class="fas fa-file-alt w-5"></i>
-                <span>Report</span>
-            </a>
-            <a href="{% url 'assets_page' %}" class="flex items-center space-x-3 px-4 py-2 rounded hover:bg-gray-800 transition-colors">
-                <i class="fas fa-server w-5"></i>
-                <span>Assets</span>
-            </a>
-            <a href="{% url 'settings_page' %}" class="flex items-center space-x-3 px-4 py-2 rounded hover:bg-gray-800 transition-colors">
-                <i class="fas fa-cog w-5"></i>
-                <span>Settings</span>
-            </a>
-            <a href="{% url 'help_page' %}" class="flex items-center space-x-3 px-4 py-2 rounded hover:bg-gray-800 transition-colors">
-                <i class="fas fa-question-circle w-5"></i>
-                <span>Help</span>
-            </a>
-            {% if user.is_authenticated %}
-                {% if user.userprofile.is_super_admin %}
-                <div class="pt-4 mt-4 border-t border-gray-800">
+        <!-- Navigation - Scrollable -->
+        <nav class="p-4 space-y-2 flex-1 overflow-y-auto">
+            {% if user.is_authenticated and user.userprofile.is_super_admin %}
+                {# Super Admin - Dashboard and Manage Rules #}
+                <div>
                     <div class="text-xs text-gray-500 uppercase mb-2">Super Admin</div>
                     <a href="{% url 'super_admin_dashboard' %}" class="flex items-center space-x-3 px-4 py-2 rounded hover:bg-gray-800 transition-colors">
                         <i class="fas fa-shield-alt w-5"></i>
-                        <span>Super Admin</span>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="{% url 'super_admin_rules' %}" class="flex items-center space-x-3 px-4 py-2 rounded hover:bg-gray-800 transition-colors">
+                        <i class="fas fa-list-check w-5"></i>
+                        <span>Manage Rules</span>
                     </a>
                 </div>
-                {% elif user.userprofile.is_org_admin %}
+            {% elif user.is_authenticated and user.userprofile.is_org_viewer %}
+                {# Organization Viewer - Only Reports #}
+                <a href="{% url 'report_page' %}" class="flex items-center space-x-3 px-4 py-2 rounded hover:bg-gray-800 transition-colors">
+                    <i class="fas fa-file-alt w-5"></i>
+                    <span>Report</span>
+                </a>
+            {% else %}
+                {# Regular users and Org Admins - Full navigation #}
+                <a href="{% url 'index' %}" class="flex items-center space-x-3 px-4 py-2 rounded hover:bg-gray-800 transition-colors">
+                    <i class="fas fa-home w-5"></i>
+                    <span>Home</span>
+                </a>
+                <a href="{% url 'audit_page' %}" class="flex items-center space-x-3 px-4 py-2 rounded hover:bg-gray-800 transition-colors">
+                    <i class="fas fa-search w-5"></i>
+                    <span>Audit</span>
+                </a>
+                <a href="{% url 'rules_page' %}" class="flex items-center space-x-3 px-4 py-2 rounded rounded hover:bg-gray-800 transition-colors">
+                    <i class="fas fa-list-check w-5"></i>
+                    <span>Rules</span>
+                </a>
+                <a href="{% url 'report_page' %}" class="flex items-center space-x-3 px-4 py-2 rounded hover:bg-gray-800 transition-colors">
+                    <i class="fas fa-file-alt w-5"></i>
+                    <span>Report</span>
+                </a>
+                <a href="{% url 'assets_page' %}" class="flex items-center space-x-3 px-4 py-2 rounded hover:bg-gray-800 transition-colors">
+                    <i class="fas fa-server w-5"></i>
+                    <span>Assets</span>
+                </a>
+                <a href="{% url 'help_page' %}" class="flex items-center space-x-3 px-4 py-2 rounded hover:bg-gray-800 transition-colors">
+                    <i class="fas fa-question-circle w-5"></i>
+                    <span>Help</span>
+                </a>
+            {% endif %}
+            {% if user.is_authenticated %}
+                {% if user.userprofile.is_org_admin %}
                 <div class="pt-4 mt-4 border-t border-gray-800">
                     <div class="text-xs text-gray-500 uppercase mb-2">Admin</div>
                     <a href="{% url 'org_admin_users' %}" class="flex items-center space-x-3 px-4 py-2 rounded hover:bg-gray-800 transition-colors">
@@ -116,14 +143,29 @@
                     </a>
                 </div>
                 {% endif %}
-                <div class="pt-4 mt-4 border-t border-gray-800">
-                    <button onclick="logout()" class="flex items-center space-x-3 px-4 py-2 rounded hover:bg-gray-800 transition-colors w-full text-left">
-                        <i class="fas fa-sign-out-alt w-5"></i>
-                        <span>Logout</span>
-                    </button>
-                </div>
             {% endif %}
         </nav>
+        <!-- User Section - Fixed at bottom -->
+        {% if user.is_authenticated %}
+        <div class="border-t border-gray-800 flex-shrink-0 relative" id="userSection">
+            <button id="userInfoButton" class="w-full p-4 hover:bg-gray-800 transition-colors text-left" aria-label="User menu">
+                <div class="text-sm text-gray-400">Logged in as</div>
+                <div class="font-medium">{{ user.username }}</div>
+                {% if user.userprofile.organization %}
+                <div class="text-xs text-gray-500 mt-1">{{ user.userprofile.organization.name }}</div>
+                {% elif user.userprofile.is_super_admin %}
+                <div class="text-xs text-blue-400 mt-1">Super Admin</div>
+                {% endif %}
+                <i class="fas fa-chevron-up absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xs transition-transform" id="userDropdownIcon"></i>
+            </button>
+            <div class="user-dropdown" id="userDropdown">
+                <button onclick="logout()" class="flex items-center space-x-3 px-4 py-2 w-full text-left hover:bg-gray-800 transition-colors">
+                    <i class="fas fa-sign-out-alt w-5"></i>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </div>
+        {% endif %}
     </aside>
     
     <!-- Main Content -->
@@ -131,7 +173,13 @@
         <nav aria-label="Breadcrumb" class="bg-white border-b border-gray-200 px-4 py-3">
             {% block breadcrumb %}
             <div class="flex items-center space-x-2 text-sm text-gray-600">
-                <a href="{% url 'index' %}" class="hover:text-gray-900">Home</a>
+                {% if user.is_authenticated and user.userprofile.is_super_admin %}
+                    <a href="{% url 'super_admin_dashboard' %}" class="hover:text-gray-900">Dashboard</a>
+                {% elif user.is_authenticated and user.userprofile.is_org_viewer %}
+                    <a href="{% url 'report_page' %}" class="hover:text-gray-900">Reports</a>
+                {% else %}
+                    <a href="{% url 'index' %}" class="hover:text-gray-900">Home</a>
+                {% endif %}
                 <span>/</span>
                 <span class="text-gray-900">{% block breadcrumb_current %}Dashboard{% endblock %}</span>
             </div>
@@ -287,6 +335,40 @@
                     link.classList.add('bg-gray-800');
                 }
             });
+            
+            // User dropdown toggle
+            const userInfoButton = document.getElementById('userInfoButton');
+            const userDropdown = document.getElementById('userDropdown');
+            const userDropdownIcon = document.getElementById('userDropdownIcon');
+            
+            if (userInfoButton && userDropdown) {
+                userInfoButton.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const isOpen = userDropdown.classList.contains('show');
+                    if (isOpen) {
+                        userDropdown.classList.remove('show');
+                        if (userDropdownIcon) {
+                            userDropdownIcon.classList.remove('rotate-180');
+                        }
+                    } else {
+                        userDropdown.classList.add('show');
+                        if (userDropdownIcon) {
+                            userDropdownIcon.classList.add('rotate-180');
+                        }
+                    }
+                });
+                
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    const userSection = document.getElementById('userSection');
+                    if (userSection && !userSection.contains(e.target)) {
+                        userDropdown.classList.remove('show');
+                        if (userDropdownIcon) {
+                            userDropdownIcon.classList.remove('rotate-180');
+                        }
+                    }
+                });
+            }
         });
         
         // Logout function

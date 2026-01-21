@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Two-Factor Authentication - NCRT</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+        .code-input {
+            width: 2.5rem;
+            height: 2.5rem;
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: 500;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            transition: all 0.2s;
+        }
+        .code-input:focus {
+            outline: none;
+            border-color: #6b7280;
+            box-shadow: 0 0 0 1px rgba(107, 114, 128, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 w-full max-w-xs fade-in">
+        <div class="text-center mb-6">
+            <h1 class="text-2xl font-semibold text-gray-800 mb-1">Two-Factor Authentication</h1>
+            <p class="text-xs text-gray-500">Enter the 6-digit code sent to your email</p>
+        </div>
+        
+        <form id="verify2FAForm" class="space-y-4">
+            <div>
+                <label for="code" class="block text-xs font-medium text-gray-700 mb-2 text-center">
+                    Verification Code
+                </label>
+                <div class="flex justify-center space-x-1.5 mb-4" id="codeInputs">
+                    <input type="text" class="code-input" maxlength="1" pattern="[0-9]" inputmode="numeric" aria-label="Digit 1">
+                    <input type="text" class="code-input" maxlength="1" pattern="[0-9]" inputmode="numeric" aria-label="Digit 2">
+                    <input type="text" class="code-input" maxlength="1" pattern="[0-9]" inputmode="numeric" aria-label="Digit 3">
+                    <input type="text" class="code-input" maxlength="1" pattern="[0-9]" inputmode="numeric" aria-label="Digit 4">
+                    <input type="text" class="code-input" maxlength="1" pattern="[0-9]" inputmode="numeric" aria-label="Digit 5">
+                    <input type="text" class="code-input" maxlength="1" pattern="[0-9]" inputmode="numeric" aria-label="Digit 6">
+                </div>
+                <input type="hidden" id="code" name="code">
+            </div>
+            
+            <div id="errorMessage" class="hidden bg-red-50 border border-red-200 text-red-700 text-xs px-3 py-2 rounded">
+                <span id="errorText"></span>
+            </div>
+            
+            <button type="submit" id="verifyButton"
+                class="w-full bg-gray-800 text-white text-sm py-2 px-4 rounded-md hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-1 font-medium transition-colors">
+                <span id="verifyButtonText">Verify Code</span>
+            </button>
+            
+            <div class="text-center">
+                <button type="button" id="resendButton" class="text-xs text-gray-600 hover:text-gray-800">
+                    Resend Code
+                </button>
+            </div>
+        </form>
+        
+        <div class="mt-5 text-center text-xs text-gray-500">
+            <p>Didn't receive the code? Check your spam folder or click "Resend Code" above.</p>
+        </div>
+    </div>
+    
+    <script>
+        const codeInputs = document.querySelectorAll('.code-input');
+        const hiddenCodeInput = document.getElementById('code');
+        
+        // Handle individual digit inputs
+        codeInputs.forEach((input, index) => {
+            input.addEventListener('input', function(e) {
+                const value = e.target.value.replace(/[^0-9]/g, '');
+                e.target.value = value;
+                
+                if (value && index < codeInputs.length - 1) {
+                    codeInputs[index + 1].focus();
+                }
+                
+                updateHiddenCode();
+            });
+            
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Backspace' && !e.target.value && index > 0) {
+                    codeInputs[index - 1].focus();
+                }
+            });
+            
+            input.addEventListener('paste', function(e) {
+                e.preventDefault();
+                const pastedData = e.clipboardData.getData('text').replace(/[^0-9]/g, '').slice(0, 6);
+                pastedData.split('').forEach((digit, i) => {
+                    if (codeInputs[index + i]) {
+                        codeInputs[index + i].value = digit;
+                    }
+                });
+                updateHiddenCode();
+                const lastFilledIndex = Math.min(index + pastedData.length - 1, codeInputs.length - 1);
+                codeInputs[lastFilledIndex].focus();
+            });
+        });
+        
+        function updateHiddenCode() {
+            const code = Array.from(codeInputs).map(input => input.value).join('');
+            hiddenCodeInput.value = code;
+        }
+        
+        document.getElementById('verify2FAForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const code = hiddenCodeInput.value;
+            const errorDiv = document.getElementById('errorMessage');
+            const errorText = document.getElementById('errorText');
+            const verifyButton = document.getElementById('verifyButton');
+            const verifyButtonText = document.getElementById('verifyButtonText');
+            
+            if (code.length !== 6) {
+                errorText.textContent = 'Please enter the complete 6-digit code.';
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+            
+            errorDiv.classList.add('hidden');
+            verifyButton.disabled = true;
+            verifyButton.classList.add('opacity-75', 'cursor-not-allowed');
+            verifyButton.innerHTML = '<span>Verifying...</span>';
+            
+            try {
+                const response = await fetch('/verify-2fa/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({ code })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.status === 'success') {
+                    window.location.href = data.redirect || '/';
+                } else {
+                    errorText.textContent = data.error || 'Invalid code. Please try again.';
+                    errorDiv.classList.remove('hidden');
+                    // Clear inputs
+                    codeInputs.forEach(input => input.value = '');
+                    codeInputs[0].focus();
+                    resetButton();
+                }
+            } catch (error) {
+                errorText.textContent = 'An error occurred. Please try again.';
+                errorDiv.classList.remove('hidden');
+                resetButton();
+            }
+            
+            function resetButton() {
+                verifyButton.disabled = false;
+                verifyButton.classList.remove('opacity-75', 'cursor-not-allowed');
+                verifyButton.innerHTML = '<span id="verifyButtonText">Verify Code</span>';
+            }
+        });
+        
+        document.getElementById('resendButton').addEventListener('click', async function() {
+            const resendButton = document.getElementById('resendButton');
+            const errorDiv = document.getElementById('errorMessage');
+            const errorText = document.getElementById('errorText');
+            
+            resendButton.disabled = true;
+            resendButton.textContent = 'Sending...';
+            
+            try {
+                const response = await fetch('/verify-2fa/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({ resend: true })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.status === 'success') {
+                    errorDiv.classList.remove('hidden');
+                    errorDiv.className = 'bg-green-50 border border-green-200 text-green-700 text-xs px-3 py-2 rounded';
+                    errorText.textContent = data.message || 'New code has been sent to your email.';
+                    setTimeout(() => {
+                        errorDiv.classList.add('hidden');
+                    }, 5000);
+                } else {
+                    errorDiv.classList.remove('hidden');
+                    errorText.textContent = data.error || 'Failed to resend code. Please try again.';
+                }
+            } catch (error) {
+                errorDiv.classList.remove('hidden');
+                errorText.textContent = 'An error occurred. Please try again.';
+            } finally {
+                resendButton.disabled = false;
+                resendButton.textContent = 'Resend Code';
+            }
+        });
+        
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        
+        // Auto-focus first input
+        document.addEventListener('DOMContentLoaded', function() {
+            codeInputs[0].focus();
+        });
+    </script>
+</body>
+</html>

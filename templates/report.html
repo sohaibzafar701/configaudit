@@ -69,10 +69,19 @@
 <script>
     // Simplified report view - full report.js should be inlined here
     async function apiRequest(url, method = 'GET', data = null) {
-        const options = { method, headers: { 'Content-Type': 'application/json' } };
+        const options = { method, headers: { 'Content-Type': 'application/json' }, credentials: 'include' };
         if (data && method !== 'GET') options.body = JSON.stringify(data);
         try {
             const response = await fetch(url, options);
+            
+            // Check if response is JSON
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                const text = await response.text();
+                console.error('Non-JSON response:', text.substring(0, 200));
+                return { ok: false, error: 'Server returned non-JSON response', status: response.status };
+            }
+            
             const result = await response.json();
             return { ok: response.ok, data: result, status: response.status };
         } catch (error) {
@@ -92,8 +101,11 @@
     });
     
     let selectedAudits = new Set();
+    let currentPage = 1;
+    const pageSize = 10;
     
-    async function loadAuditList() {
+    async function loadAuditList(page = 1) {
+        currentPage = page;
         const searchQuery = document.getElementById('searchInput')?.value || '';
         const statusFilter = document.getElementById('statusFilter')?.value || '';
         const dateFilter = document.getElementById('dateFilter')?.value || '';
@@ -101,12 +113,26 @@
         // Build query parameters
         const params = new URLSearchParams();
         params.append('history', 'true');
+        params.append('page', page.toString());
+        params.append('page_size', pageSize.toString());
         if (searchQuery) params.append('search', searchQuery);
         if (statusFilter) params.append('status', statusFilter);
         if (dateFilter) params.append('date_range', dateFilter);
         
         const result = await apiRequest(`/api/audits?${params.toString()}`);
         const container = document.getElementById('reportContent');
+        
+        if (!result.ok) {
+            container.innerHTML = `
+                <div class="text-center py-12">
+                    <i class="fas fa-exclamation-triangle text-4xl text-red-500 mb-4"></i>
+                    <p class="text-red-600 text-lg font-medium">Error loading audits</p>
+                    <p class="text-gray-500 text-sm mt-2">${result.error || result.data?.error || 'An error occurred while loading audits'}</p>
+                </div>
+            `;
+            document.getElementById('bulkActions').classList.add('hidden');
+            return;
+        }
         
         if (result.ok && result.data) {
             const audits = result.data.audits || [];
@@ -195,6 +221,12 @@
                 `;
             }).join('');
             
+            // Add pagination controls
+            if (pagination.total_pages > 1) {
+                htmlContent += renderPagination(pagination);
+            }
+            
+            container.innerHTML = htmlContent;
             updateBulkActions();
         } else {
             container.innerHTML = `
@@ -275,7 +307,7 @@
             }
             
             selectedAudits.clear();
-            loadAuditList();
+            loadAuditList(1); // Reset to page 1 after bulk deletion
         });
     }
     
@@ -302,16 +334,16 @@
                 let searchTimeout;
                 searchInput.addEventListener('input', function() {
                     clearTimeout(searchTimeout);
-                    searchTimeout = setTimeout(loadAuditList, 300);
+                    searchTimeout = setTimeout(() => loadAuditList(1), 300); // Reset to page 1 on search
                 });
             }
             
             if (statusFilter) {
-                statusFilter.addEventListener('change', loadAuditList);
+                statusFilter.addEventListener('change', () => loadAuditList(1)); // Reset to page 1 on filter change
             }
             
             if (dateFilter) {
-                dateFilter.addEventListener('change', loadAuditList);
+                dateFilter.addEventListener('change', () => loadAuditList(1)); // Reset to page 1 on filter change
             }
         }
     });

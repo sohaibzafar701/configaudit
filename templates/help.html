@@ -4,23 +4,863 @@
 
 {% block breadcrumb_current %}Help{% endblock %}
 
+{% block extra_head %}
+<style>
+    .help-section {
+        scroll-margin-top: 80px;
+    }
+    .collapsible {
+        transition: all 0.3s ease;
+    }
+    .collapsible-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+    }
+    .collapsible-content.open {
+        max-height: 2000px;
+    }
+    .step-number {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        flex-shrink: 0;
+    }
+    .nav-link {
+        transition: all 0.2s ease;
+    }
+    .nav-link:hover {
+        transform: translateX(4px);
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<section class="bg-white rounded-lg shadow p-6">
-    <h2 class="text-2xl font-bold mb-4">Help & Documentation</h2>
-    <div class="prose max-w-none">
-        <h3>Getting Started</h3>
-        <p>NCRT (Network Configuration Rule Tester) helps you audit network device configurations for security vulnerabilities and compliance.</p>
-        
-        <h3>Features</h3>
-        <ul>
-            <li>Upload configuration files for analysis</li>
-            <li>Run security rules against configurations</li>
-            <li>View detailed reports with findings</li>
-            <li>Track assets and audit history</li>
-        </ul>
-        
-        <h3>Support</h3>
-        <p>For more information, please refer to the application documentation.</p>
+<!-- Hero Section -->
+<section class="bg-gradient-to-r from-blue-600 to-blue-800 text-white rounded-lg shadow-lg p-8 mb-8">
+    <div class="max-w-4xl mx-auto text-center">
+        <h1 class="text-4xl font-bold mb-4">
+            <i class="fas fa-question-circle mr-3"></i>Welcome to NCRT Help Center
+        </h1>
+        <p class="text-xl mb-6 text-blue-100">
+            Network Configuration Rule Tester - Your comprehensive guide to security auditing
+        </p>
+        <div class="flex flex-wrap justify-center gap-4 text-sm">
+            <a href="#getting-started" class="bg-white text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-50 transition-colors">
+                <i class="fas fa-rocket mr-2"></i>Quick Start
+            </a>
+            <a href="#tutorials" class="bg-white text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-50 transition-colors">
+                <i class="fas fa-book mr-2"></i>Tutorials
+            </a>
+            <a href="#understanding-results" class="bg-white text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-50 transition-colors">
+                <i class="fas fa-chart-line mr-2"></i>Understanding Results
+            </a>
+            <a href="#faq" class="bg-white text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-50 transition-colors">
+                <i class="fas fa-question mr-2"></i>FAQ
+            </a>
+        </div>
     </div>
 </section>
+
+<div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+    <!-- Navigation Sidebar -->
+    <aside class="lg:col-span-1">
+        <div class="bg-white rounded-lg shadow p-4 sticky top-4">
+            <h3 class="font-bold text-lg mb-4 text-gray-800">
+                <i class="fas fa-list mr-2"></i>Navigation
+            </h3>
+            <nav class="space-y-2">
+                <a href="#introduction" class="block nav-link text-gray-700 hover:text-blue-600 py-2 px-3 rounded hover:bg-blue-50">
+                    <i class="fas fa-info-circle mr-2"></i>Introduction
+                </a>
+                <a href="#getting-started" class="block nav-link text-gray-700 hover:text-blue-600 py-2 px-3 rounded hover:bg-blue-50">
+                    <i class="fas fa-rocket mr-2"></i>Getting Started
+                </a>
+                <a href="#tutorials" class="block nav-link text-gray-700 hover:text-blue-600 py-2 px-3 rounded hover:bg-blue-50">
+                    <i class="fas fa-book mr-2"></i>Tutorials
+                </a>
+                <a href="#features" class="block nav-link text-gray-700 hover:text-blue-600 py-2 px-3 rounded hover:bg-blue-50">
+                    <i class="fas fa-star mr-2"></i>Features
+                </a>
+                <a href="#understanding-results" class="block nav-link text-gray-700 hover:text-blue-600 py-2 px-3 rounded hover:bg-blue-50">
+                    <i class="fas fa-chart-line mr-2"></i>Understanding Results
+                </a>
+                <a href="#faq" class="block nav-link text-gray-700 hover:text-blue-600 py-2 px-3 rounded hover:bg-blue-50">
+                    <i class="fas fa-question mr-2"></i>FAQ
+                </a>
+            </nav>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="lg:col-span-3 space-y-6">
+        <!-- Introduction Section -->
+        <section id="introduction" class="help-section bg-white rounded-lg shadow p-6">
+            <h2 class="text-3xl font-bold mb-4 text-gray-800">
+                <i class="fas fa-info-circle text-blue-600 mr-3"></i>What is NCRT?
+            </h2>
+            <div class="prose max-w-none text-gray-700">
+                <p class="text-lg mb-4">
+                    <strong>NCRT (Network Configuration Rule Tester)</strong> is a powerful security auditing tool designed to analyze network device configurations and identify security vulnerabilities and compliance issues.
+                </p>
+                <div class="bg-blue-50 border-l-4 border-blue-600 p-4 mb-4">
+                    <p class="mb-2"><strong>Key Capabilities:</strong></p>
+                    <ul class="list-disc list-inside space-y-1">
+                        <li>Analyze router, switch, and firewall configurations</li>
+                        <li>Identify security vulnerabilities and misconfigurations</li>
+                        <li>Check compliance with security frameworks</li>
+                        <li>Track devices and audit history</li>
+                        <li>Generate detailed reports with actionable findings</li>
+                    </ul>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h3 class="font-semibold mb-2 text-gray-800">
+                            <i class="fas fa-network-wired text-green-600 mr-2"></i>Supported Vendors
+                        </h3>
+                        <ul class="list-disc list-inside text-gray-700">
+                            <li>Cisco (IOS, IOS-XE, NX-OS)</li>
+                            <li>Juniper (JunOS)</li>
+                            <li>Extensible architecture for more vendors</li>
+                        </ul>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h3 class="font-semibold mb-2 text-gray-800">
+                            <i class="fas fa-shield-alt text-red-600 mr-2"></i>Security Focus
+                        </h3>
+                        <ul class="list-disc list-inside text-gray-700">
+                            <li>Authentication & Authorization</li>
+                            <li>Encryption & Cryptography</li>
+                            <li>Access Control</li>
+                            <li>Network Services</li>
+                            <li>Compliance Frameworks</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Getting Started Section -->
+        <section id="getting-started" class="help-section bg-white rounded-lg shadow p-6">
+            <h2 class="text-3xl font-bold mb-6 text-gray-800">
+                <i class="fas fa-rocket text-green-600 mr-3"></i>Getting Started
+            </h2>
+            <div class="space-y-6">
+                <!-- Step 1 -->
+                <div class="flex gap-4">
+                    <div class="step-number bg-blue-600 text-white">1</div>
+                    <div class="flex-1">
+                        <h3 class="text-xl font-semibold mb-2 text-gray-800">Upload Your Configuration</h3>
+                        <p class="text-gray-700 mb-3">
+                            Navigate to the <strong>Audit</strong> page from the sidebar. You can either:
+                        </p>
+                        <ul class="list-disc list-inside text-gray-700 space-y-1 ml-4">
+                            <li>Drag and drop your configuration file (.txt, .cfg, .conf)</li>
+                            <li>Click to browse and select a file from your computer</li>
+                            <li>Paste configuration content directly (if supported)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="flex gap-4">
+                    <div class="step-number bg-green-600 text-white">2</div>
+                    <div class="flex-1">
+                        <h3 class="text-xl font-semibold mb-2 text-gray-800">Enter Device Information</h3>
+                        <p class="text-gray-700 mb-3">
+                            Provide the following information:
+                        </p>
+                        <ul class="list-disc list-inside text-gray-700 space-y-1 ml-4">
+                            <li><strong>Device Identifier</strong> (required): IP address, hostname, or device name</li>
+                            <li><strong>Device Make</strong> (optional): e.g., Cisco, Juniper</li>
+                            <li><strong>Device Model</strong> (optional): e.g., Catalyst 9300</li>
+                            <li><strong>Device Type</strong> (optional): Router, Switch, or Firewall</li>
+                        </ul>
+                        <p class="text-sm text-gray-600 mt-2">
+                            <i class="fas fa-lightbulb text-yellow-500 mr-1"></i>
+                            <strong>Tip:</strong> The system will attempt to auto-detect device information from the configuration if not provided.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="flex gap-4">
+                    <div class="step-number bg-yellow-600 text-white">3</div>
+                    <div class="flex-1">
+                        <h3 class="text-xl font-semibold mb-2 text-gray-800">Select Rule Tags</h3>
+                        <p class="text-gray-700 mb-3">
+                            Choose which security rules to apply by selecting relevant tags:
+                        </p>
+                        <ul class="list-disc list-inside text-gray-700 space-y-1 ml-4">
+                            <li><strong>Vendor tags</strong>: cisco, juniper (vendor-specific rules)</li>
+                            <li><strong>Category tags</strong>: authentication, encryption, access-control</li>
+                            <li><strong>Generic tags</strong>: generic, all (applies to all devices)</li>
+                        </ul>
+                        <p class="text-sm text-gray-600 mt-2">
+                            <i class="fas fa-lightbulb text-yellow-500 mr-1"></i>
+                            <strong>Tip:</strong> Select multiple tags to run a comprehensive audit. The system will only run rules that match your device type.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="flex gap-4">
+                    <div class="step-number bg-red-600 text-white">4</div>
+                    <div class="flex-1">
+                        <h3 class="text-xl font-semibold mb-2 text-gray-800">Start the Audit</h3>
+                        <p class="text-gray-700 mb-3">
+                            Click the <strong>"Start Audit"</strong> button to begin the analysis. The system will:
+                        </p>
+                        <ul class="list-disc list-inside text-gray-700 space-y-1 ml-4">
+                            <li>Parse your configuration file</li>
+                            <li>Extract device metadata (hostname, model, firmware, etc.)</li>
+                            <li>Run selected security rules against the configuration</li>
+                            <li>Generate findings with severity levels and recommendations</li>
+                        </ul>
+                        <p class="text-sm text-gray-600 mt-2">
+                            <i class="fas fa-clock text-blue-500 mr-1"></i>
+                            <strong>Note:</strong> Audit processing happens in the background. You can monitor progress in real-time.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Step 5 -->
+                <div class="flex gap-4">
+                    <div class="step-number bg-purple-600 text-white">5</div>
+                    <div class="flex-1">
+                        <h3 class="text-xl font-semibold mb-2 text-gray-800">Review Results</h3>
+                        <p class="text-gray-700 mb-3">
+                            Once the audit completes, navigate to the <strong>Report</strong> page to:
+                        </p>
+                        <ul class="list-disc list-inside text-gray-700 space-y-1 ml-4">
+                            <li>View detailed findings organized by severity and category</li>
+                            <li>Filter and search through results</li>
+                            <li>Export reports in multiple formats (PDF, CSV, HTML, JSON)</li>
+                            <li>Review compliance scores and statistics</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tutorials Section -->
+        <section id="tutorials" class="help-section bg-white rounded-lg shadow p-6">
+            <h2 class="text-3xl font-bold mb-6 text-gray-800">
+                <i class="fas fa-book text-purple-600 mr-3"></i>Detailed Tutorials
+            </h2>
+
+            <!-- Audit Page Tutorial -->
+            <div class="mb-6 border-l-4 border-blue-600 pl-4">
+                <h3 class="text-2xl font-semibold mb-3 text-gray-800">
+                    <i class="fas fa-search text-blue-600 mr-2"></i>Audit Page
+                </h3>
+                <p class="text-gray-700 mb-4">
+                    The Audit page is where you start new security audits of your network device configurations.
+                </p>
+                
+                <button onclick="toggleCollapse('audit-details')" class="flex items-center justify-between w-full bg-blue-50 hover:bg-blue-100 p-3 rounded-lg transition-colors mb-3">
+                    <span class="font-semibold text-gray-800">
+                        <i class="fas fa-chevron-down mr-2 transform transition-transform" id="audit-details-icon"></i>
+                        View Detailed Instructions
+                    </span>
+                </button>
+                
+                <div id="audit-details" class="collapsible-content">
+                    <div class="bg-gray-50 p-4 rounded-lg space-y-4">
+                        <div>
+                            <h4 class="font-semibold mb-2 text-gray-800">Uploading Configurations</h4>
+                            <ul class="list-disc list-inside text-gray-700 space-y-1">
+                                <li>Supported file formats: .txt, .cfg, .conf</li>
+                                <li>Maximum file size: 10MB (configurations are typically much smaller)</li>
+                                <li>You can upload the raw configuration output from your device</li>
+                                <li>The system supports both full configurations and partial snippets</li>
+                            </ul>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-semibold mb-2 text-gray-800">Device Identifier</h4>
+                            <p class="text-gray-700 mb-2">
+                                The device identifier is used to track and organize your audits. Use a unique identifier such as:
+                            </p>
+                            <ul class="list-disc list-inside text-gray-700 space-y-1">
+                                <li>IP address (e.g., 192.168.1.1)</li>
+                                <li>Hostname (e.g., router-01.company.com)</li>
+                                <li>Device name (e.g., Core-Switch-01)</li>
+                            </ul>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-semibold mb-2 text-gray-800">Rule Tag Selection</h4>
+                            <p class="text-gray-700 mb-2">
+                                Rule tags help you focus the audit on specific areas:
+                            </p>
+                            <ul class="list-disc list-inside text-gray-700 space-y-1">
+                                <li><strong>Vendor-specific tags</strong>: Select tags matching your device vendor for vendor-specific checks</li>
+                                <li><strong>Category tags</strong>: Choose security categories you want to audit (authentication, encryption, etc.)</li>
+                                <li><strong>Generic tags</strong>: Apply to all device types for general security checks</li>
+                            </ul>
+                            <p class="text-sm text-gray-600 mt-2">
+                                <i class="fas fa-info-circle text-blue-500 mr-1"></i>
+                                Only enabled rules matching your selected tags and device type will be executed.
+                            </p>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-semibold mb-2 text-gray-800">Monitoring Progress</h4>
+                            <p class="text-gray-700 mb-2">
+                                After starting an audit, you'll see a progress section showing:
+                            </p>
+                            <ul class="list-disc list-inside text-gray-700 space-y-1">
+                                <li>Overall progress percentage</li>
+                                <li>Current rule being executed</li>
+                                <li>Number of rules completed</li>
+                                <li>Detailed execution information for each rule</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Report Page Tutorial -->
+            <div class="mb-6 border-l-4 border-green-600 pl-4">
+                <h3 class="text-2xl font-semibold mb-3 text-gray-800">
+                    <i class="fas fa-file-alt text-green-600 mr-2"></i>Report Page
+                </h3>
+                <p class="text-gray-700 mb-4">
+                    The Report page displays all your audit results with powerful filtering and export capabilities.
+                </p>
+                
+                <button onclick="toggleCollapse('report-details')" class="flex items-center justify-between w-full bg-green-50 hover:bg-green-100 p-3 rounded-lg transition-colors mb-3">
+                    <span class="font-semibold text-gray-800">
+                        <i class="fas fa-chevron-down mr-2 transform transition-transform" id="report-details-icon"></i>
+                        View Detailed Instructions
+                    </span>
+                </button>
+                
+                <div id="report-details" class="collapsible-content">
+                    <div class="bg-gray-50 p-4 rounded-lg space-y-4">
+                        <div>
+                            <h4 class="font-semibold mb-2 text-gray-800">Selecting an Audit</h4>
+                            <p class="text-gray-700 mb-2">
+                                Use the audit dropdown at the top to select which audit results you want to view. The list shows:
+                            </p>
+                            <ul class="list-disc list-inside text-gray-700 space-y-1">
+                                <li>Device identifier and hostname</li>
+                                <li>Audit date and time</li>
+                                <li>Status (Completed, Failed, Processing)</li>
+                                <li>Total findings count</li>
+                            </ul>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-semibold mb-2 text-gray-800">Filtering Results</h4>
+                            <p class="text-gray-700 mb-2">
+                                Use the filter options to narrow down findings:
+                            </p>
+                            <ul class="list-disc list-inside text-gray-700 space-y-1">
+                                <li><strong>Severity</strong>: Filter by Critical, High, Medium, Low, or Info</li>
+                                <li><strong>Category</strong>: Filter by security category (authentication, encryption, etc.)</li>
+                                <li><strong>Search</strong>: Search for specific text in findings</li>
+                                <li><strong>Status Filter</strong>: Show only completed, failed, or processing audits</li>
+                                <li><strong>Date Range</strong>: Filter audits by creation date</li>
+                            </ul>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-semibold mb-2 text-gray-800">Viewing Findings</h4>
+                            <p class="text-gray-700 mb-2">
+                                Findings are displayed with:
+                            </p>
+                            <ul class="list-disc list-inside text-gray-700 space-y-1">
+                                <li>Severity badges (color-coded)</li>
+                                <li>Rule name and description</li>
+                                <li>Detailed finding messages</li>
+                                <li>Configuration context (where the issue was found)</li>
+                                <li>Recommendations for remediation</li>
+                            </ul>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-semibold mb-2 text-gray-800">Exporting Reports</h4>
+                            <p class="text-gray-700 mb-2">
+                                Export your audit results in multiple formats:
+                            </p>
+                            <ul class="list-disc list-inside text-gray-700 space-y-1">
+                                <li><strong>PDF</strong>: Professional formatted report for sharing</li>
+                                <li><strong>CSV</strong>: Spreadsheet format for data analysis</li>
+                                <li><strong>HTML</strong>: Web-friendly format</li>
+                                <li><strong>JSON</strong>: Machine-readable format for integration</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rules Page Tutorial -->
+            <div class="mb-6 border-l-4 border-yellow-600 pl-4">
+                <h3 class="text-2xl font-semibold mb-3 text-gray-800">
+                    <i class="fas fa-list-check text-yellow-600 mr-2"></i>Rules Page
+                </h3>
+                <p class="text-gray-700 mb-4">
+                    The Rules page allows you to view and manage the security rules used in audits.
+                </p>
+                
+                <button onclick="toggleCollapse('rules-details')" class="flex items-center justify-between w-full bg-yellow-50 hover:bg-yellow-100 p-3 rounded-lg transition-colors mb-3">
+                    <span class="font-semibold text-gray-800">
+                        <i class="fas fa-chevron-down mr-2 transform transition-transform" id="rules-details-icon"></i>
+                        View Detailed Instructions
+                    </span>
+                </button>
+                
+                <div id="rules-details" class="collapsible-content">
+                    <div class="bg-gray-50 p-4 rounded-lg space-y-4">
+                        <div>
+                            <h4 class="font-semibold mb-2 text-gray-800">Viewing Rules</h4>
+                            <p class="text-gray-700 mb-2">
+                                The Rules page displays all available security rules with:
+                            </p>
+                            <ul class="list-disc list-inside text-gray-700 space-y-1">
+                                <li>Rule name and description</li>
+                                <li>Severity level (Critical, High, Medium, Low, Info)</li>
+                                <li>Category (authentication, encryption, etc.)</li>
+                                <li>Rule type (pattern, python, hybrid)</li>
+                                <li>Applicable tags (vendor, category)</li>
+                                <li>Enabled/disabled status</li>
+                            </ul>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-semibold mb-2 text-gray-800">Filtering Rules</h4>
+                            <p class="text-gray-700 mb-2">
+                                Use the filter options to find specific rules:
+                            </p>
+                            <ul class="list-disc list-inside text-gray-700 space-y-1">
+                                <li><strong>Vendor</strong>: Filter by device vendor (Cisco, Juniper, etc.)</li>
+                                <li><strong>Category</strong>: Filter by security category</li>
+                                <li><strong>Severity</strong>: Filter by severity level</li>
+                                <li><strong>Type</strong>: Filter by rule type</li>
+                                <li><strong>Search</strong>: Search by rule name or description</li>
+                            </ul>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-semibold mb-2 text-gray-800">Rule Details</h4>
+                            <p class="text-gray-700 mb-2">
+                                Click on a rule to view detailed information including:
+                            </p>
+                            <ul class="list-disc list-inside text-gray-700 space-y-1">
+                                <li>Full rule description</li>
+                                <li>YAML rule definition</li>
+                                <li>Compliance framework mappings</li>
+                                <li>Rule execution history</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Assets Page Tutorial -->
+            <div class="mb-6 border-l-4 border-purple-600 pl-4">
+                <h3 class="text-2xl font-semibold mb-3 text-gray-800">
+                    <i class="fas fa-server text-purple-600 mr-2"></i>Assets Page
+                </h3>
+                <p class="text-gray-700 mb-4">
+                    The Assets page helps you track and manage all your network devices and their audit history.
+                </p>
+                
+                <button onclick="toggleCollapse('assets-details')" class="flex items-center justify-between w-full bg-purple-50 hover:bg-purple-100 p-3 rounded-lg transition-colors mb-3">
+                    <span class="font-semibold text-gray-800">
+                        <i class="fas fa-chevron-down mr-2 transform transition-transform" id="assets-details-icon"></i>
+                        View Detailed Instructions
+                    </span>
+                </button>
+                
+                <div id="assets-details" class="collapsible-content">
+                    <div class="bg-gray-50 p-4 rounded-lg space-y-4">
+                        <div>
+                            <h4 class="font-semibold mb-2 text-gray-800">Asset Overview</h4>
+                            <p class="text-gray-700 mb-2">
+                                Each asset (device) shows:
+                            </p>
+                            <ul class="list-disc list-inside text-gray-700 space-y-1">
+                                <li>Device identifier and hostname</li>
+                                <li>Device make, model, and type</li>
+                                <li>Last audit date and status</li>
+                                <li>Total number of audits performed</li>
+                                <li>Latest findings count</li>
+                            </ul>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-semibold mb-2 text-gray-800">Audit History</h4>
+                            <p class="text-gray-700 mb-2">
+                                Click on a device to view its complete audit history:
+                            </p>
+                            <ul class="list-disc list-inside text-gray-700 space-y-1">
+                                <li>All audits performed on the device</li>
+                                <li>Audit dates and statuses</li>
+                                <li>Finding counts per audit</li>
+                                <li>Links to detailed reports</li>
+                            </ul>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-semibold mb-2 text-gray-800">Search and Filter</h4>
+                            <p class="text-gray-700 mb-2">
+                                Use the search and filter options to:
+                            </p>
+                            <ul class="list-disc list-inside text-gray-700 space-y-1">
+                                <li>Search by device identifier, hostname, model, or make</li>
+                                <li>Filter by last audit date (last 7/30 days, never audited)</li>
+                                <li>Quickly find devices that need attention</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section id="features" class="help-section bg-white rounded-lg shadow p-6">
+            <h2 class="text-3xl font-bold mb-6 text-gray-800">
+                <i class="fas fa-star text-yellow-500 mr-3"></i>Key Features
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-blue-50 p-5 rounded-lg border-l-4 border-blue-600">
+                    <h3 class="text-xl font-semibold mb-2 text-gray-800">
+                        <i class="fas fa-shield-alt text-blue-600 mr-2"></i>Multi-Vendor Support
+                    </h3>
+                    <p class="text-gray-700">
+                        Analyze configurations from multiple network device vendors including Cisco, Juniper, and more. The extensible architecture allows for easy addition of new vendor parsers.
+                    </p>
+                </div>
+                
+                <div class="bg-green-50 p-5 rounded-lg border-l-4 border-green-600">
+                    <h3 class="text-xl font-semibold mb-2 text-gray-800">
+                        <i class="fas fa-cogs text-green-600 mr-2"></i>Flexible Rule System
+                    </h3>
+                    <p class="text-gray-700">
+                        Support for multiple rule types: pattern-based rules, Python scripts, and hybrid rules. Rules can be tagged by vendor, category, and severity for easy organization.
+                    </p>
+                </div>
+                
+                <div class="bg-yellow-50 p-5 rounded-lg border-l-4 border-yellow-600">
+                    <h3 class="text-xl font-semibold mb-2 text-gray-800">
+                        <i class="fas fa-chart-bar text-yellow-600 mr-2"></i>Advanced Risk Scoring
+                    </h3>
+                    <p class="text-gray-700">
+                        Findings are scored using multiple weight factors including severity, category, and compliance impact. Get a comprehensive risk assessment of your network security posture.
+                    </p>
+                </div>
+                
+                <div class="bg-purple-50 p-5 rounded-lg border-l-4 border-purple-600">
+                    <h3 class="text-xl font-semibold mb-2 text-gray-800">
+                        <i class="fas fa-check-double text-purple-600 mr-2"></i>Compliance Tracking
+                    </h3>
+                    <p class="text-gray-700">
+                        Track compliance with security frameworks and requirements. View compliance scores and identify gaps in your security configuration.
+                    </p>
+                </div>
+                
+                <div class="bg-red-50 p-5 rounded-lg border-l-4 border-red-600">
+                    <h3 class="text-xl font-semibold mb-2 text-gray-800">
+                        <i class="fas fa-file-export text-red-600 mr-2"></i>Multiple Export Formats
+                    </h3>
+                    <p class="text-gray-700">
+                        Export audit reports in PDF, CSV, HTML, and JSON formats. Share results with stakeholders or integrate with other security tools.
+                    </p>
+                </div>
+                
+                <div class="bg-indigo-50 p-5 rounded-lg border-l-4 border-indigo-600">
+                    <h3 class="text-xl font-semibold mb-2 text-gray-800">
+                        <i class="fas fa-history text-indigo-600 mr-2"></i>Audit History & Tracking
+                    </h3>
+                    <p class="text-gray-700">
+                        Maintain a complete history of all audits performed. Track changes over time, compare configurations, and monitor security improvements.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Understanding Results Section -->
+        <section id="understanding-results" class="help-section bg-white rounded-lg shadow p-6">
+            <h2 class="text-3xl font-bold mb-6 text-gray-800">
+                <i class="fas fa-chart-line text-indigo-600 mr-3"></i>Understanding Audit Results
+            </h2>
+            
+            <!-- Severity Levels -->
+            <div class="mb-6">
+                <h3 class="text-2xl font-semibold mb-4 text-gray-800">Severity Levels</h3>
+                <div class="space-y-3">
+                    <div class="flex items-start gap-4 p-4 bg-red-50 border-l-4 border-red-600 rounded-lg">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-exclamation-circle text-red-600 text-2xl"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-red-800 mb-1">Critical</h4>
+                            <p class="text-gray-700">
+                                Immediate security risks that require urgent attention. These findings indicate severe vulnerabilities that could lead to unauthorized access or data breaches.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start gap-4 p-4 bg-orange-50 border-l-4 border-orange-600 rounded-lg">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-exclamation-triangle text-orange-600 text-2xl"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-orange-800 mb-1">High</h4>
+                            <p class="text-gray-700">
+                                Significant security issues that should be addressed promptly. These findings represent substantial risks to network security.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start gap-4 p-4 bg-yellow-50 border-l-4 border-yellow-600 rounded-lg">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-exclamation text-yellow-600 text-2xl"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-yellow-800 mb-1">Medium</h4>
+                            <p class="text-gray-700">
+                                Moderate security concerns that should be reviewed and addressed. These findings indicate potential security weaknesses.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start gap-4 p-4 bg-blue-50 border-l-4 border-blue-600 rounded-lg">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-info-circle text-blue-600 text-2xl"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-blue-800 mb-1">Low</h4>
+                            <p class="text-gray-700">
+                                Minor security observations or best practice recommendations. These findings are informational but worth reviewing.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start gap-4 p-4 bg-gray-50 border-l-4 border-gray-600 rounded-lg">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-info text-gray-600 text-2xl"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-gray-800 mb-1">Info</h4>
+                            <p class="text-gray-700">
+                                Informational findings that provide context or additional information about the configuration. No immediate action required.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Finding Structure -->
+            <div class="mb-6">
+                <h3 class="text-2xl font-semibold mb-4 text-gray-800">Finding Structure</h3>
+                <div class="bg-gray-50 p-5 rounded-lg">
+                    <p class="text-gray-700 mb-4">
+                        Findings are organized in a parent-child structure:
+                    </p>
+                    <ul class="list-disc list-inside text-gray-700 space-y-2">
+                        <li><strong>Parent Findings</strong>: Represent the overall rule result. The parent severity is set to the highest severity among its children.</li>
+                        <li><strong>Child Findings</strong>: Represent specific instances where the rule found issues. Multiple child findings can be grouped under a single parent.</li>
+                    </ul>
+                    <p class="text-sm text-gray-600 mt-4">
+                        <i class="fas fa-lightbulb text-yellow-500 mr-1"></i>
+                        <strong>Tip:</strong> When a rule finds multiple issues, they're grouped together under one parent finding for easier review.
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Compliance Scores -->
+            <div class="mb-6">
+                <h3 class="text-2xl font-semibold mb-4 text-gray-800">Compliance Scores</h3>
+                <div class="bg-gray-50 p-5 rounded-lg">
+                    <p class="text-gray-700 mb-4">
+                        Compliance scores provide an overall assessment of how well your configuration aligns with security frameworks:
+                    </p>
+                    <ul class="list-disc list-inside text-gray-700 space-y-2">
+                        <li>Scores are calculated based on the findings and their severity</li>
+                        <li>Higher scores indicate better compliance</li>
+                        <li>Scores are broken down by framework and requirement level</li>
+                        <li>Use scores to track improvements over time</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Acting on Findings -->
+            <div>
+                <h3 class="text-2xl font-semibold mb-4 text-gray-800">How to Act on Findings</h3>
+                <div class="bg-blue-50 border-l-4 border-blue-600 p-5 rounded-lg">
+                    <ol class="list-decimal list-inside text-gray-700 space-y-3">
+                        <li><strong>Prioritize by Severity</strong>: Start with Critical and High severity findings first.</li>
+                        <li><strong>Review Recommendations</strong>: Each finding includes recommendations for remediation.</li>
+                        <li><strong>Check Configuration Context</strong>: Review the specific configuration lines where issues were found.</li>
+                        <li><strong>Make Changes</strong>: Update your device configurations based on the findings.</li>
+                        <li><strong>Re-audit</strong>: Run a new audit after making changes to verify improvements.</li>
+                        <li><strong>Track Progress</strong>: Use the Assets page to track audit history and monitor improvements over time.</li>
+                    </ol>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ Section -->
+        <section id="faq" class="help-section bg-white rounded-lg shadow p-6">
+            <h2 class="text-3xl font-bold mb-6 text-gray-800">
+                <i class="fas fa-question text-blue-600 mr-3"></i>Frequently Asked Questions
+            </h2>
+            
+            <div class="space-y-4">
+                <div class="border border-gray-200 rounded-lg">
+                    <button onclick="toggleCollapse('faq-1')" class="w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex items-center justify-between transition-colors">
+                        <span class="font-semibold text-gray-800">
+                            What file formats are supported for configuration uploads?
+                        </span>
+                        <i class="fas fa-chevron-down transform transition-transform" id="faq-1-icon"></i>
+                    </button>
+                    <div id="faq-1" class="collapsible-content">
+                        <div class="p-4 text-gray-700">
+                            NCRT supports common configuration file formats including .txt, .cfg, and .conf. You can upload the raw configuration output directly from your network device. The system will automatically detect the device type and vendor.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="border border-gray-200 rounded-lg">
+                    <button onclick="toggleCollapse('faq-2')" class="w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex items-center justify-between transition-colors">
+                        <span class="font-semibold text-gray-800">
+                            How long does an audit take to complete?
+                        </span>
+                        <i class="fas fa-chevron-down transform transition-transform" id="faq-2-icon"></i>
+                    </button>
+                    <div id="faq-2" class="collapsible-content">
+                        <div class="p-4 text-gray-700">
+                            Audit duration depends on the size of your configuration file and the number of rules selected. Most audits complete within a few minutes. You can monitor progress in real-time on the Audit page. Large configurations or many rules may take longer.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="border border-gray-200 rounded-lg">
+                    <button onclick="toggleCollapse('faq-3')" class="w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex items-center justify-between transition-colors">
+                        <span class="font-semibold text-gray-800">
+                            Can I customize which rules are applied to my audits?
+                        </span>
+                        <i class="fas fa-chevron-down transform transition-transform" id="faq-3-icon"></i>
+                    </button>
+                    <div id="faq-3" class="collapsible-content">
+                        <div class="p-4 text-gray-700">
+                            Yes! When starting an audit, you can select specific rule tags to control which rules are executed. You can choose vendor tags (cisco, juniper), category tags (authentication, encryption), or generic tags. Only enabled rules matching your selections will run.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="border border-gray-200 rounded-lg">
+                    <button onclick="toggleCollapse('faq-4')" class="w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex items-center justify-between transition-colors">
+                        <span class="font-semibold text-gray-800">
+                            What should I do if an audit fails?
+                        </span>
+                        <i class="fas fa-chevron-down transform transition-transform" id="faq-4-icon"></i>
+                    </button>
+                    <div id="faq-4" class="collapsible-content">
+                        <div class="p-4 text-gray-700">
+                            If an audit fails, check the audit status and error messages. Common causes include invalid configuration format, parsing errors, or system issues. Try re-uploading the configuration file, ensuring it's in the correct format. If problems persist, check that your configuration file is complete and not corrupted.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="border border-gray-200 rounded-lg">
+                    <button onclick="toggleCollapse('faq-5')" class="w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex items-center justify-between transition-colors">
+                        <span class="font-semibold text-gray-800">
+                            How do I export audit reports?
+                        </span>
+                        <i class="fas fa-chevron-down transform transition-transform" id="faq-5-icon"></i>
+                    </button>
+                    <div id="faq-5" class="collapsible-content">
+                        <div class="p-4 text-gray-700">
+                            On the Report page, select the audit you want to export, then use the export buttons to download the report in your preferred format (PDF, CSV, HTML, or JSON). The export includes all findings, statistics, and compliance scores.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="border border-gray-200 rounded-lg">
+                    <button onclick="toggleCollapse('faq-6')" class="w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex items-center justify-between transition-colors">
+                        <span class="font-semibold text-gray-800">
+                            Can I compare audits over time?
+                        </span>
+                        <i class="fas fa-chevron-down transform transition-transform" id="faq-6-icon"></i>
+                    </button>
+                    <div id="faq-6" class="collapsible-content">
+                        <div class="p-4 text-gray-700">
+                            Yes! Use the Assets page to view the audit history for any device. You can see all audits performed on a device, compare finding counts, and track improvements over time. This helps you monitor the effectiveness of security remediation efforts.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="border border-gray-200 rounded-lg">
+                    <button onclick="toggleCollapse('faq-7')" class="w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex items-center justify-between transition-colors">
+                        <span class="font-semibold text-gray-800">
+                            What is the difference between rule types (pattern, python, hybrid)?
+                        </span>
+                        <i class="fas fa-chevron-down transform transition-transform" id="faq-7-icon"></i>
+                    </button>
+                    <div id="faq-7" class="collapsible-content">
+                        <div class="p-4 text-gray-700">
+                            <ul class="list-disc list-inside space-y-2">
+                                <li><strong>Pattern rules</strong>: Use pattern matching to find specific configuration patterns. Fast and efficient for simple checks.</li>
+                                <li><strong>Python rules</strong>: Execute Python scripts for complex logic and analysis. More powerful but may take longer to execute.</li>
+                                <li><strong>Hybrid rules</strong>: Combine pattern matching with Python logic for flexible and efficient rule execution.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="border border-gray-200 rounded-lg">
+                    <button onclick="toggleCollapse('faq-8')" class="w-full text-left p-4 bg-gray-50 hover:bg-gray-100 flex items-center justify-between transition-colors">
+                        <span class="font-semibold text-gray-800">
+                            How do I track which devices need attention?
+                        </span>
+                        <i class="fas fa-chevron-down transform transition-transform" id="faq-8-icon"></i>
+                    </button>
+                    <div id="faq-8" class="collapsible-content">
+                        <div class="p-4 text-gray-700">
+                            Use the Assets page to see all your devices and their latest audit status. Filter by "Never audited" to find devices that haven't been audited yet. Sort by finding count to identify devices with the most security issues. The Assets page provides a comprehensive overview of your network security posture.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+<script>
+function toggleCollapse(id) {
+    const content = document.getElementById(id);
+    const icon = document.getElementById(id + '-icon');
+    
+    if (content.classList.contains('open')) {
+        content.classList.remove('open');
+        if (icon) icon.style.transform = 'rotate(0deg)';
+    } else {
+        content.classList.add('open');
+        if (icon) icon.style.transform = 'rotate(180deg)';
+    }
+}
+
+// Smooth scrolling for anchor links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+    });
+});
+</script>
 {% endblock %}

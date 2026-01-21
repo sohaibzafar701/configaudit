@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Two-Factor Authentication Code</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 30px;
+            margin: 20px 0;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: #2c3e50;
+            margin: 0;
+        }
+        .content {
+            background-color: #ffffff;
+            padding: 25px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .code-box {
+            background-color: #3498db;
+            color: #ffffff;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 32px;
+            font-weight: bold;
+            letter-spacing: 5px;
+            margin: 30px 0;
+            font-family: 'Courier New', monospace;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #7f8c8d;
+            font-size: 12px;
+        }
+        .info-box {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .info-box p {
+            margin: 5px 0;
+        }
+        .warning-box {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Two-Factor Authentication</h1>
+        </div>
+        
+        <div class="content">
+            <p>Hello,</p>
+            
+            <p>You are attempting to log in to your NCRT account. Please use the following verification code to complete your login:</p>
+            
+            <div class="code-box">
+                {{ code }}
+            </div>
+            
+            <div class="warning-box">
+                <p><strong>Security Notice:</strong></p>
+                <p>This code will expire in 10 minutes.</p>
+                <p>If you did not attempt to log in, please ignore this email and consider changing your password.</p>
+            </div>
+            
+            <div class="info-box">
+                <p><strong>Username:</strong> {{ user.username }}</p>
+                <p><strong>Time:</strong> {{ created_at|date:"F d, Y g:i A" }}</p>
+            </div>
+            
+            <p>Enter this code on the verification page to complete your login.</p>
+        </div>
+        
+        <div class="footer">
+            <p>This is an automated message from ConfigAudit. Please do not reply to this email.</p>
+            <p>&copy; {{ "now"|date:"Y" }} ConfigAudit. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

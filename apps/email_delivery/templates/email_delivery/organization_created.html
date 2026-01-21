@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organization Created - {{ organization.name }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 30px;
+            margin: 20px 0;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: #2c3e50;
+            margin: 0;
+        }
+        .content {
+            background-color: #ffffff;
+            padding: 25px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: #27ae60;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        .button:hover {
+            background-color: #229954;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #7f8c8d;
+            font-size: 12px;
+        }
+        .info-box {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .info-box p {
+            margin: 5px 0;
+        }
+        .highlight {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Organization Created</h1>
+        </div>
+        
+        <div class="content">
+            <p>Hello,</p>
+            
+            <p>A new organization has been created on the ConfigAudit platform with you as the Point of Contact (POC).</p>
+            
+            <div class="info-box">
+                <p><strong>Organization Name:</strong> {{ organization.name }}</p>
+                {% if organization.domain %}
+                <p><strong>Domain:</strong> {{ organization.domain }}</p>
+                {% endif %}
+                <p><strong>Status:</strong> {{ organization.status }}</p>
+                <p><strong>Created:</strong> {{ created_at|date:"F d, Y g:i A" }}</p>
+            </div>
+            
+            <div class="highlight">
+                <p><strong>Next Steps:</strong></p>
+                <p>Click the button below to create your organization admin account. You will be able to set your password and start managing your organization.</p>
+                <div style="text-align: center; margin: 20px 0;">
+                    <a href="{{ signup_url }}" class="button">Create Your Account</a>
+                </div>
+                <p style="margin-top: 15px; font-size: 12px; color: #666;">Or copy and paste this link into your browser:<br>{{ signup_url }}</p>
+            </div>
+            
+            <p>As the Point of Contact for this organization, you will be responsible for:</p>
+            <ul>
+                <li>Managing organization settings and users</li>
+                <li>Overseeing security audits and compliance</li>
+                <li>Receiving important notifications and updates</li>
+            </ul>
+            
+            <p>If you have any questions or need assistance, please contact the platform administrator.</p>
+        </div>
+        
+        <div class="footer">
+            <p>This is an automated message from ConfigAudit. Please do not reply to this email.</p>
+            <p>&copy; {{ "now"|date:"Y" }} ConfigAudit. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

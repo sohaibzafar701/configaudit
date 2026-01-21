@@ -55,7 +55,7 @@ def execute_pattern_rule(rule, parsed_config):
         
         # Determine if this is a negative check (should NOT exist)
         rule_name = rule.get('name', '').lower()
-        is_negative_check = 'disabled' in rule_name or 'no ' in rule_name
+        is_negative_check = 'disabled' in rule_name or 'no ' in rule_name.lower()
         
         # For "Required" rules, check for negative patterns (e.g., "no aaa new-model")
         # If rule name contains "Required", also check for "no <pattern>"
@@ -84,7 +84,7 @@ def execute_pattern_rule(rule, parsed_config):
                     context_text = '\n'.join(context_lines)
                     
                     finding = {
-                        'rule_id': rule.get('id'),
+                        'rule_id': rule['id'],
                         'severity': severity,
                         'message': message or f"Security issue: {rule.get('name')} - feature is disabled",
                         'config_path': f"Line {line_start}: {matched_text[:100]}",
@@ -119,7 +119,7 @@ def execute_pattern_rule(rule, parsed_config):
                 context_text = '\n'.join(context_lines)
                 
                 finding = {
-                    'rule_id': rule.get('id'),
+                    'rule_id': rule['id'],
                     'severity': severity,
                     'message': message or f"Security issue: {rule.get('name')} - pattern found when it should be disabled",
                     'config_path': f"Line {line_start}: {matched_text[:100]}",
@@ -145,7 +145,7 @@ def execute_pattern_rule(rule, parsed_config):
                     context_text = '\n'.join(context_lines)
                     
                     finding = {
-                        'rule_id': rule.get('id'),
+                        'rule_id': rule['id'],
                         'severity': 'info',  # Lower severity for informational findings
                         'message': message or f"Pattern matched: {matched_text[:50]}",
                         'config_path': f"Line {line_start}: {matched_text[:100]}",
@@ -157,23 +157,17 @@ def execute_pattern_rule(rule, parsed_config):
                     findings.append(finding)
             else:
                 # Pattern not found - might be a missing required feature
-                # Check if rule name indicates this is a required/configured feature
-                if ('required' in rule_name or 'enabled' in rule_name or 
-                    'configured' in rule_name or 'configure' in rule_name or
-                    'should be' in rule_name or 'must be' in rule_name):
+                if 'required' in rule_name or 'enabled' in rule_name or 'configured' in rule_name:
                     # Get remediation from rule
                     remediation = rule.get('remediation_template', '')
                     if not remediation and rule.get('name'):
                         remediation = f"Configure the recommended feature: {rule.get('name')}"
                     
-                    # Use rule severity if available, otherwise use medium for missing required features
-                    finding_severity = severity if severity != 'info' else 'medium'
-                    
                     finding = {
-                        'rule_id': rule.get('id'),
-                        'severity': finding_severity,
-                        'message': message or f"Missing required configuration: {rule.get('name')} - pattern not found",
-                        'config_path': 'Configuration missing',
+                        'rule_id': rule['id'],
+                        'severity': 'low',  # Lower severity for missing optional features
+                        'message': message or f"Recommendation: {rule.get('name')} - pattern not found",
+                        'config_path': None,
                         'remediation': remediation
                     }
                     findings.append(finding)
@@ -192,7 +186,7 @@ def execute_python_rule(rule, parsed_config):
     # Add rule_id and remediation to each finding
     remediation = rule.get('remediation_template', '')
     for finding in findings:
-        finding['rule_id'] = rule.get('id')
+        finding['rule_id'] = rule['id']
         if 'remediation' not in finding or not finding.get('remediation'):
             finding['remediation'] = remediation
     return findings

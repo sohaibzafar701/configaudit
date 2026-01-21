@@ -104,7 +104,8 @@
             method: method,
             headers: {
                 'Content-Type': 'application/json',
-            }
+            },
+            credentials: 'include'
         };
         
         if (data && method !== 'GET') {
@@ -132,14 +133,9 @@
     
     // Home page JavaScript - Statistics and Recent Activity
     document.addEventListener('DOMContentLoaded', function() {
+        // Load statistics and recent activity only once on page load
         loadStatistics();
         loadRecentActivity();
-        
-        // Poll for updates
-        setInterval(() => {
-            loadStatistics();
-            loadRecentActivity();
-        }, 5000);
     });
     
     async function loadStatistics() {
@@ -172,7 +168,7 @@
             const url = typeof addTimezoneParams === 'function' ? addTimezoneParams('/api/stats') : '/api/stats';
             const result = await apiRequest(url);
             if (result.ok && result.data && result.data.recent_audits) {
-                const recentAudits = result.data.recent_audits;
+                const recentAudits = result.data.recent_audits.slice(0, 3); // Limit to 3 most recent
                 
                 if (recentAudits.length === 0) {
                     recentActivityList.innerHTML = '<p class="text-gray-500">No recent audits</p>';

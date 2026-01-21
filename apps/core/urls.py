@@ -9,6 +9,10 @@ urlpatterns = [
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
     path('register/', views.register_view, name='register'),
+    path('poc-signup/', views.poc_signup_view, name='poc_signup'),
+    path('forgot-password/', views.forgot_password_view, name='forgot_password'),
+    path('reset-password/', views.reset_password_view, name='reset_password'),
+    path('verify-2fa/', views.verify_2fa_view, name='verify_2fa'),
     
     # Frontend pages
     path('', views.index, name='index'),
@@ -18,7 +22,6 @@ urlpatterns = [
     path('report-detail/', views.report_detail_page, name='report_detail_page'),
     path('assets/', views.assets_page, name='assets_page'),
     path('assets/<str:device_identifier>/audits', views.device_audits_page, name='device_audits_page'),
-    path('settings/', views.settings_page, name='settings_page'),
     path('analysis/', views.analysis_page, name='analysis_page'),
     path('help/', views.help_page, name='help_page'),
     
@@ -40,10 +43,18 @@ urlpatterns = [
     # Super Admin routes
     path('super-admin/', views.super_admin_dashboard, name='super_admin_dashboard'),
     path('super-admin/organizations/', views.super_admin_organizations, name='super_admin_organizations'),
+    path('super-admin/rules/', views.super_admin_rules, name='super_admin_rules'),
     path('api/super-admin/organizations/', views.super_admin_organization_api, name='super_admin_organizations_api'),
     path('api/super-admin/organizations/<int:org_id>/', views.super_admin_organization_api, name='super_admin_organization_detail_api'),
+    path('api/super-admin/rules/', views.super_admin_rules_api, name='super_admin_rules_api'),
+    path('api/super-admin/rules/assign/', views.super_admin_assign_rules, name='super_admin_assign_rules'),
+    path('api/super-admin/rules/unassign/', views.super_admin_unassign_rules, name='super_admin_unassign_rules'),
+    path('api/super-admin/rules/reset/', views.super_admin_reset_rules, name='super_admin_reset_rules'),
     
     # Organization Admin routes
     path('org-admin/users/', views.org_admin_users, name='org_admin_users'),
     path('api/org-admin/invite-user/', views.org_admin_invite_user, name='org_admin_invite_user'),
+    path('api/org-admin/invite-user/<int:invitation_id>/resend/', views.org_admin_resend_invite, name='org_admin_resend_invite'),
+    path('api/org-admin/invite-user/<int:invitation_id>/cancel/', views.org_admin_cancel_invite, name='org_admin_cancel_invite'),
+    path('api/org-admin/users/<int:user_id>/', views.org_admin_user_api, name='org_admin_user_api'),
 ]

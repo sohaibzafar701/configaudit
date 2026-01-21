@@ -117,7 +117,10 @@
                 const data = await response.json();
                 
                 if (response.ok && data.status === 'success') {
-                    window.location.href = data.redirect || '/';
+                    if (data.message) {
+                        alert(data.message);
+                    }
+                    window.location.href = data.redirect || '/login/';
                 } else {
                     errorDiv.textContent = data.error || 'Registration failed. Please try again.';
                     errorDiv.classList.remove('hidden');
