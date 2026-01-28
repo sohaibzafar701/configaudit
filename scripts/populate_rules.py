@@ -52,6 +52,8 @@ def get_all_rules():
     all_rules.extend(get_arista_rules())
     all_rules.extend(get_paloalto_rules())
     all_rules.extend(get_fortinet_rules())
+    all_rules.extend(get_huawei_rules())
+    all_rules.extend(get_sophos_rules())
     all_rules.extend(get_checkpoint_rules())
     all_rules.extend(get_generic_rules())
     
@@ -2958,6 +2960,153 @@ def get_fortinet_rules():
             'yaml_content': "pattern: 'config\\s+webfilter\\s+profile'\nmessage: 'Web filtering should be configured'\n",
             'tags': ['fortinet', 'firewall', 'nist'],
             'remediation_template': 'Configure web filter profiles',
+            'compliance_frameworks': 'NIST'
+        },
+    ])
+    
+    return rules
+
+def get_huawei_rules():
+    """Huawei VRP router/switch security rules"""
+    rules = []
+    
+    # Authentication
+    rules.extend([
+        {
+            'name': 'Huawei - Configure Local User',
+            'description': 'Local user accounts should be configured securely',
+            'rule_type': 'pattern',
+            'category': 'Authentication',
+            'severity': 'high',
+            'yaml_content': "pattern: 'local-user\\s+\\S+'\nmessage: 'Local user should be configured'\n",
+            'tags': ['huawei', 'router', 'switch', 'cis', 'nist'],
+            'remediation_template': 'Configure: local-user <username> password cipher <password>',
+            'compliance_frameworks': 'CIS,NIST'
+        },
+        {
+            'name': 'Huawei - Configure AAA',
+            'description': 'AAA authentication should be configured',
+            'rule_type': 'pattern',
+            'category': 'Authentication',
+            'severity': 'high',
+            'yaml_content': "pattern: 'aaa\\s+'\nmessage: 'AAA authentication should be configured'\n",
+            'tags': ['huawei', 'router', 'switch', 'nist'],
+            'remediation_template': 'Configure AAA authentication: aaa authentication-scheme <scheme-name>',
+            'compliance_frameworks': 'NIST'
+        },
+        {
+            'name': 'Huawei - Configure RADIUS Authentication',
+            'description': 'RADIUS authentication should be configured for remote access',
+            'rule_type': 'pattern',
+            'category': 'Authentication',
+            'severity': 'medium',
+            'yaml_content': "pattern: 'radius-server\\s+'\nmessage: 'RADIUS authentication should be configured'\n",
+            'tags': ['huawei', 'router', 'switch', 'nist'],
+            'remediation_template': 'Configure RADIUS server: radius-server template <template-name>',
+            'compliance_frameworks': 'NIST'
+        },
+    ])
+    
+    # Access Control
+    rules.extend([
+        {
+            'name': 'Huawei - Configure ACL',
+            'description': 'Access Control Lists should be configured',
+            'rule_type': 'pattern',
+            'category': 'Access Control',
+            'severity': 'critical',
+            'yaml_content': "pattern: 'acl\\s+number\\s+\\d+'\nmessage: 'ACL should be configured'\n",
+            'tags': ['huawei', 'router', 'switch', 'cis', 'nist', 'pci-dss'],
+            'remediation_template': 'Configure ACL: acl number <number>, rule <rule-id> permit/deny',
+            'compliance_frameworks': 'CIS,NIST,PCI-DSS'
+        },
+        {
+            'name': 'Huawei - Configure Interface ACL',
+            'description': 'ACL should be applied to interfaces',
+            'rule_type': 'pattern',
+            'category': 'Access Control',
+            'severity': 'high',
+            'yaml_content': "pattern: 'traffic-filter\\s+.*\\s+acl\\s+'\nmessage: 'ACL should be applied to interfaces'\n",
+            'tags': ['huawei', 'router', 'switch', 'cis', 'nist'],
+            'remediation_template': 'Apply ACL to interface: interface <interface-name>, traffic-filter inbound acl <number>',
+            'compliance_frameworks': 'CIS,NIST'
+        },
+    ])
+    
+    # Encryption
+    rules.extend([
+        {
+            'name': 'Huawei - Configure SSH Server',
+            'description': 'SSH server should be enabled',
+            'rule_type': 'pattern',
+            'category': 'Encryption',
+            'severity': 'high',
+            'yaml_content': "pattern: 'ssh\\s+server\\s+enable'\nmessage: 'SSH server should be enabled'\n",
+            'tags': ['huawei', 'router', 'switch', 'cis', 'nist'],
+            'remediation_template': 'Enable SSH: ssh server enable',
+            'compliance_frameworks': 'CIS,NIST'
+        },
+        {
+            'name': 'Huawei - Configure HTTPS Server',
+            'description': 'HTTPS server should be enabled for secure management',
+            'rule_type': 'pattern',
+            'category': 'Encryption',
+            'severity': 'medium',
+            'yaml_content': "pattern: 'http\\s+secure-server\\s+enable'\nmessage: 'HTTPS server should be enabled'\n",
+            'tags': ['huawei', 'router', 'switch', 'nist'],
+            'remediation_template': 'Enable HTTPS: http secure-server enable',
+            'compliance_frameworks': 'NIST'
+        },
+        {
+            'name': 'Huawei - Configure IPsec VPN',
+            'description': 'IPsec VPN should be configured securely',
+            'rule_type': 'pattern',
+            'category': 'VPN Configuration',
+            'severity': 'high',
+            'yaml_content': "pattern: 'ipsec\\s+'\nmessage: 'IPsec VPN should be configured'\n",
+            'tags': ['huawei', 'router', 'nist'],
+            'remediation_template': 'Configure IPsec: ipsec proposal <proposal-name>, esp authentication-algorithm sha2-256',
+            'compliance_frameworks': 'NIST'
+        },
+    ])
+    
+    # Logging
+    rules.extend([
+        {
+            'name': 'Huawei - Configure Logging',
+            'description': 'System logging should be configured',
+            'rule_type': 'pattern',
+            'category': 'Logging',
+            'severity': 'high',
+            'yaml_content': "pattern: 'info-center\\s+enable'\nmessage: 'System logging should be enabled'\n",
+            'tags': ['huawei', 'router', 'switch', 'cis', 'nist'],
+            'remediation_template': 'Enable logging: info-center enable',
+            'compliance_frameworks': 'CIS,NIST'
+        },
+        {
+            'name': 'Huawei - Configure Syslog Server',
+            'description': 'Syslog server should be configured',
+            'rule_type': 'pattern',
+            'category': 'Logging',
+            'severity': 'high',
+            'yaml_content': "pattern: 'info-center\\s+loghost\\s+'\nmessage: 'Syslog server should be configured'\n",
+            'tags': ['huawei', 'router', 'switch', 'cis', 'nist'],
+            'remediation_template': 'Configure syslog: info-center loghost <ip-address>',
+            'compliance_frameworks': 'CIS,NIST'
+        },
+    ])
+    
+    # SNMP Security
+    rules.extend([
+        {
+            'name': 'Huawei - Configure SNMP Community',
+            'description': 'SNMP community strings should be configured securely',
+            'rule_type': 'pattern',
+            'category': 'SNMP',
+            'severity': 'medium',
+            'yaml_content': "pattern: 'snmp-agent\\s+community\\s+'\nmessage: 'SNMP community should be configured'\n",
+            'tags': ['huawei', 'router', 'switch', 'nist'],
+            'remediation_template': 'Configure SNMP: snmp-agent community read <community-name> acl <acl-number>',
             'compliance_frameworks': 'NIST'
         },
     ])

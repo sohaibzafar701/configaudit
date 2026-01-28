@@ -30,6 +30,20 @@ def extract_metadata(config_text, device_family=None):
         if hostname_match:
             metadata['hostname'] = hostname_match.group(1)
     
+    # Huawei: sysname <name>
+    if not metadata['hostname']:
+        hostname_match = re.search(r'^sysname\s+(\S+)', config_text, re.MULTILINE | re.IGNORECASE)
+        if hostname_match:
+            metadata['hostname'] = hostname_match.group(1)
+    
+    # Sophos: hostname: <name> or hostname <name>
+    if not metadata['hostname']:
+        hostname_match = re.search(r'hostname:\s+(\S+)', config_text, re.IGNORECASE)
+        if not hostname_match:
+            hostname_match = re.search(r'hostname\s+(\S+)', config_text, re.IGNORECASE)
+        if hostname_match:
+            metadata['hostname'] = hostname_match.group(1)
+    
     # Arista: hostname <name>
     if not metadata['hostname']:
         hostname_match = re.search(r'hostname\s+(\S+)', config_text, re.IGNORECASE)
@@ -120,6 +134,26 @@ def extract_metadata(config_text, device_family=None):
         if version_match:
             metadata['firmware'] = version_match.group(1)
     
+    # Huawei: VRP version from display version output
+    if not metadata['firmware']:
+        version_match = re.search(r'VRP\s+\(R\)\s+software,\s+Version\s+(\S+)', config_text, re.IGNORECASE)
+        if version_match:
+            metadata['firmware'] = version_match.group(1)
+        elif not metadata['firmware']:
+            version_match = re.search(r'VRP\s+version\s+(\S+)', config_text, re.IGNORECASE)
+            if version_match:
+                metadata['firmware'] = version_match.group(1)
+    
+    # Sophos: UTM/XG version
+    if not metadata['firmware']:
+        version_match = re.search(r'utm\s+version\s+(\S+)', config_text, re.IGNORECASE)
+        if not version_match:
+            version_match = re.search(r'version:\s+(\S+)', config_text, re.IGNORECASE)
+        if not version_match:
+            version_match = re.search(r'xgsystem\s+(\S+)', config_text, re.IGNORECASE)
+        if version_match:
+            metadata['firmware'] = version_match.group(1)
+    
     # Extract location (if present in config comments or snmp location)
     location_match = re.search(r'snmp-server\s+location\s+(.+?)(?:\n|$)', config_text, re.IGNORECASE)
     if location_match:
@@ -150,6 +184,12 @@ def extract_metadata(config_text, device_family=None):
     # Check Point patterns
     elif re.search(r'check\s+point|gaia|set\s+hostname', config_text, re.IGNORECASE):
         metadata['make'] = 'Check Point'
+    # Huawei patterns
+    elif re.search(r'^sysname\s+|huawei|vrp\s+version|display\s+version', config_text, re.MULTILINE | re.IGNORECASE):
+        metadata['make'] = 'Huawei'
+    # Sophos patterns
+    elif re.search(r'sophos|utm\s+version|xgsystem|interfaces:\s*ethernet', config_text, re.IGNORECASE):
+        metadata['make'] = 'Sophos'
     
     # Detect device type (best effort)
     # Firewall indicators

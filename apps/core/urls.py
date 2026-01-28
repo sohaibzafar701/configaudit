@@ -22,6 +22,7 @@ urlpatterns = [
     path('report-detail/', views.report_detail_page, name='report_detail_page'),
     path('assets/', views.assets_page, name='assets_page'),
     path('assets/<str:device_identifier>/audits', views.device_audits_page, name='device_audits_page'),
+    path('baselines/', views.baselines_page, name='baselines_page'),
     path('analysis/', views.analysis_page, name='analysis_page'),
     path('help/', views.help_page, name='help_page'),
     
@@ -57,4 +58,12 @@ urlpatterns = [
     path('api/org-admin/invite-user/<int:invitation_id>/resend/', views.org_admin_resend_invite, name='org_admin_resend_invite'),
     path('api/org-admin/invite-user/<int:invitation_id>/cancel/', views.org_admin_cancel_invite, name='org_admin_cancel_invite'),
     path('api/org-admin/users/<int:user_id>/', views.org_admin_user_api, name='org_admin_user_api'),
+    
+    # Baseline API endpoints
+    path('api/baselines/<int:baseline_id>/copy', views.baseline_copy_api, name='baseline_copy_api'),
+    path('api/baselines/<int:baseline_id>/compare', views.baseline_compare_api, name='baseline_compare_api'),
+    path('api/baselines/<int:baseline_id>/document', views.baseline_document_api, name='baseline_document_api'),
+    path('api/baselines/<int:baseline_id>/template', views.baseline_template_api, name='baseline_template_api'),
+    path('api/baselines/<int:baseline_id>', views.baselines_api, name='baselines_detail_api'),
+    path('api/baselines', views.baselines_api, name='baselines_api'),
 ]

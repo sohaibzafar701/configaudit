@@ -13,8 +13,9 @@ from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from django.conf import settings
 from django.db import connection
+from django.db.models import Q
 
-from .models import Organization, UserProfile, Rule, Audit, Finding, UserInvitation, AuditLog, PasswordResetToken, TwoFactorAuthCode
+from .models import Organization, UserProfile, Rule, Audit, Finding, UserInvitation, AuditLog, PasswordResetToken, TwoFactorAuthCode, BaselineConfiguration
 from .decorators import require_authenticated, require_super_admin, require_org_admin, require_org_user, require_org_viewer
 from .utils import log_audit_action, get_client_ip
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
@@ -30,6 +31,8 @@ from services.report_generator import (
 from services.timezone_utils import format_datetime_from_iso, format_datetime_now, parse_datetime_format
 from services.metadata_extractor import extract_metadata
 from services.config_diff import compare_configs
+from services.baseline_generator import generate_baseline_document, get_baseline_rules, generate_baseline_template, export_baseline_document
+from services.baseline_comparison import compare_audit_to_baseline, get_baseline_compliance, generate_comparison_report
 
 
 # Helper function to get organization-relative audit number
@@ -674,6 +677,12 @@ def report_detail_page(request):
 def assets_page(request):
     """Assets page"""
     return render(request, 'assets.html')
+
+
+@require_authenticated
+def baselines_page(request):
+    """Baseline configurations page"""
+    return render(request, 'baselines.html')
 
 
 @require_authenticated
@@ -2312,6 +2321,9 @@ def super_admin_organization_api(request, org_id=None):
                     status=status
                 )
                 
+                # Signal will automatically copy platform rules via post_save signal
+                # No manual trigger needed - the signal handler handles this
+                
                 # Log creation
                 ip_address = get_client_ip(request)
                 log_audit_action(request.user, 'create', 'organization', org.id, 
@@ -2321,9 +2333,13 @@ def super_admin_organization_api(request, org_id=None):
                 from apps.email_delivery.utils import send_organization_created_email
                 email_sent = send_organization_created_email(org, request)
                 
+                # Get rule count for response (rules are copied by signal)
+                rule_count = Rule.objects.filter(organization=org).count()
+                
                 response_data = {
                     'id': org.id,
                     'status': 'created',
+                    'rules_copied': rule_count,
                 }
                 
                 if email_sent:
@@ -2366,14 +2382,47 @@ def super_admin_organization_api(request, org_id=None):
                     org = Organization.objects.get(id=org_id)
                     org_name = org.name
                     org_id_val = org.id
+
+                    # Delete all users that belong to this organization
+                    # We exclude global Django superusers for safety
+                    from django.contrib.auth.models import User
+                    org_users_qs = User.objects.filter(userprofile__organization=org).exclude(is_superuser=True)
+                    deleted_users_count = org_users_qs.count()
+                    org_users_qs.delete()
+
+                    # Delete all audit logs tied to this organization
+                    audit_logs_deleted = AuditLog.objects.filter(organization=org).delete()[0]
+
+                    # Deleting the organization will cascade-delete:
+                    # - UserProfile (via organization FK)
+                    # - Rules, Audits, Invitations (via organization FK)
+                    # - Findings (via Audit FK)
                     org.delete()
                     
-                    # Log deletion
+                    # Log deletion with basic stats
                     ip_address = get_client_ip(request)
-                    log_audit_action(request.user, 'delete', 'organization', org_id_val, 
-                                   f'Deleted organization: {org_name}', ip_address, None)
+                    log_audit_action(
+                        request.user,
+                        'delete',
+                        'organization',
+                        org_id_val,
+                        (
+                            f"Deleted organization: {org_name} | "
+                            f"Users deleted: {deleted_users_count} | "
+                            f"Audit logs deleted: {audit_logs_deleted}"
+                        ),
+                        ip_address,
+                        None
+                    )
                     
-                    return JsonResponse({'status': 'deleted'}, status=200)
+                    return JsonResponse(
+                        {
+                            'status': 'deleted',
+                            'users_deleted': deleted_users_count,
+                            'audit_logs_deleted': audit_logs_deleted,
+                        },
+                        status=200,
+                    )
                 except Organization.DoesNotExist:
                     return JsonResponse({'error': 'Organization not found'}, status=404)
             
@@ -2680,24 +2729,39 @@ def super_admin_reset_rules(request):
         
         # Copy all platform rules to organization
         assigned_count = 0
+        error_count = 0
+        errors = []
+        import logging
+        logger = logging.getLogger(__name__)
+        
         for rule in platform_rules:
             try:
                 rule.copy_to_organization(organization)
                 assigned_count += 1
             except Exception as e:
-                # Log error but continue
-                pass
+                error_count += 1
+                error_msg = f"Error copying rule '{rule.name}' (ID: {rule.id}) to organization '{organization.name}' (ID: {organization.id}): {str(e)}"
+                errors.append(error_msg)
+                logger.error(error_msg, exc_info=True)
         
         # Log reset
         ip_address = get_client_ip(request)
         log_audit_action(request.user, 'reset', 'rule', None, 
-                       f'Reset all rules for organization {organization.name} ({assigned_count} rules)', ip_address, None)
+                       f'Reset all rules for organization {organization.name} ({assigned_count} rules copied, {error_count} errors)', ip_address, None)
         
-        return JsonResponse({
+        response_data = {
             'status': 'reset',
             'deleted_count': deleted_count,
             'assigned_count': assigned_count,
-        }, status=200)
+            'error_count': error_count,
+        }
+        
+        if errors:
+            response_data['errors'] = errors[:10]  # Limit to first 10 errors
+            if len(errors) > 10:
+                response_data['error_message'] = f'{len(errors)} errors occurred (showing first 10)'
+        
+        return JsonResponse(response_data, status=200)
     except Organization.DoesNotExist:
         return JsonResponse({'error': 'Organization not found'}, status=404)
 
@@ -2990,3 +3054,372 @@ def org_admin_user_api(request, user_id):
         return JsonResponse({'error': 'User not found'}, status=404)
     except UserProfile.DoesNotExist:
         return JsonResponse({'error': 'User profile not found'}, status=404)
+
+
+@csrf_exempt
+@require_http_methods(["GET", "POST"])
+@require_authenticated
+def baselines_api(request, baseline_id=None):
+    """Handle baseline API requests"""
+    from django.forms.models import model_to_dict
+    
+    if request.method == 'GET':
+        # Get specific baseline
+        if baseline_id:
+            try:
+                # Super admin can only access platform baselines
+                if hasattr(request, 'user_role') and request.user_role == 'super_admin':
+                    baseline = BaselineConfiguration.objects.get(id=baseline_id, organization__isnull=True)
+                else:
+                    # Regular users can access platform baselines OR their org baselines
+                    if hasattr(request, 'organization') and request.organization:
+                        baseline = BaselineConfiguration.objects.get(
+                            Q(id=baseline_id) & (Q(organization__isnull=True) | Q(organization=request.organization))
+                        )
+                    else:
+                        return JsonResponse({'error': 'Baseline not found'}, status=404)
+                
+                baseline_dict = model_to_dict(baseline)
+                baseline_dict['rule_count'] = baseline.get_rule_count()
+                baseline_dict['frameworks_list'] = baseline.get_frameworks_list()
+                baseline_dict['is_platform'] = baseline.is_platform_baseline()
+                if baseline.organization:
+                    baseline_dict['organization_name'] = baseline.organization.name
+                return JsonResponse(baseline_dict, status=200)
+            except BaselineConfiguration.DoesNotExist:
+                return JsonResponse({'error': 'Baseline not found'}, status=404)
+        
+        # Get all baselines
+        # Super admin sees only platform baselines
+        if hasattr(request, 'user_role') and request.user_role == 'super_admin':
+            baselines = BaselineConfiguration.objects.filter(organization__isnull=True)
+        else:
+            # Regular users see platform baselines + their org baselines
+            if hasattr(request, 'organization') and request.organization:
+                baselines = BaselineConfiguration.objects.filter(
+                    Q(organization__isnull=True) | Q(organization=request.organization)
+                )
+            else:
+                baselines = BaselineConfiguration.objects.none()
+        
+        # Apply filters
+        vendor = request.GET.get('vendor')
+        device_type = request.GET.get('device_type')
+        framework = request.GET.get('framework')
+        
+        if vendor:
+            baselines = baselines.filter(vendor=vendor)
+        if device_type:
+            baselines = baselines.filter(device_type=device_type)
+        if framework:
+            baselines = baselines.filter(compliance_frameworks__icontains=framework)
+        
+        baselines_list = []
+        for baseline in baselines.order_by('name'):
+            baseline_dict = model_to_dict(baseline)
+            baseline_dict['rule_count'] = baseline.get_rule_count()
+            baseline_dict['frameworks_list'] = baseline.get_frameworks_list()
+            baseline_dict['is_platform'] = baseline.is_platform_baseline()
+            if baseline.organization:
+                baseline_dict['organization_name'] = baseline.organization.name
+            baselines_list.append(baseline_dict)
+        
+        return JsonResponse({'baselines': baselines_list, 'count': len(baselines_list)}, status=200)
+    
+    elif request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            action = data.get('action', 'create')
+            
+            if action == 'create':
+                # Create new baseline
+                if hasattr(request, 'user_role') and request.user_role == 'super_admin':
+                    return JsonResponse({'error': 'Super Admin cannot create organization baselines'}, status=403)
+                
+                if not hasattr(request, 'organization') or not request.organization:
+                    return JsonResponse({'error': 'No organization found'}, status=403)
+                
+                name = data.get('name')
+                if not name:
+                    return JsonResponse({'error': 'Name is required'}, status=400)
+                
+                baseline = BaselineConfiguration.objects.create(
+                    name=name,
+                    description=data.get('description', ''),
+                    vendor=data.get('vendor'),
+                    device_type=data.get('device_type'),
+                    compliance_frameworks=data.get('compliance_frameworks', ''),
+                    rule_ids=data.get('rule_ids', []),
+                    template_config=data.get('template_config', ''),
+                    organization=request.organization
+                )
+                
+                # Log action
+                ip_address = get_client_ip(request)
+                log_audit_action(request.user, 'create', 'baseline', baseline.id,
+                               f'Created baseline {baseline.name}', ip_address, request.organization)
+                
+                baseline_dict = model_to_dict(baseline)
+                baseline_dict['rule_count'] = baseline.get_rule_count()
+                baseline_dict['frameworks_list'] = baseline.get_frameworks_list()
+                return JsonResponse(baseline_dict, status=201)
+            
+            elif action == 'update':
+                # Update baseline
+                if not baseline_id:
+                    return JsonResponse({'error': 'baseline_id required'}, status=400)
+                
+                try:
+                    if hasattr(request, 'user_role') and request.user_role == 'super_admin':
+                        baseline = BaselineConfiguration.objects.get(id=baseline_id, organization__isnull=True)
+                    else:
+                        if hasattr(request, 'organization') and request.organization:
+                            baseline = BaselineConfiguration.objects.get(id=baseline_id, organization=request.organization)
+                        else:
+                            return JsonResponse({'error': 'Baseline not found'}, status=404)
+                except BaselineConfiguration.DoesNotExist:
+                    return JsonResponse({'error': 'Baseline not found'}, status=404)
+                
+                # Update fields
+                if 'name' in data:
+                    baseline.name = data['name']
+                if 'description' in data:
+                    baseline.description = data['description']
+                if 'vendor' in data:
+                    baseline.vendor = data['vendor']
+                if 'device_type' in data:
+                    baseline.device_type = data['device_type']
+                if 'compliance_frameworks' in data:
+                    baseline.set_frameworks_list(data['compliance_frameworks'])
+                if 'rule_ids' in data:
+                    baseline.rule_ids = data['rule_ids']
+                if 'template_config' in data:
+                    baseline.template_config = data['template_config']
+                
+                baseline.save()
+                
+                # Log action
+                ip_address = get_client_ip(request)
+                log_audit_action(request.user, 'update', 'baseline', baseline.id,
+                               f'Updated baseline {baseline.name}', ip_address, request.organization)
+                
+                baseline_dict = model_to_dict(baseline)
+                baseline_dict['rule_count'] = baseline.get_rule_count()
+                baseline_dict['frameworks_list'] = baseline.get_frameworks_list()
+                return JsonResponse(baseline_dict, status=200)
+            
+            elif action == 'delete':
+                # Delete baseline
+                if not baseline_id:
+                    return JsonResponse({'error': 'baseline_id required'}, status=400)
+                
+                try:
+                    if hasattr(request, 'user_role') and request.user_role == 'super_admin':
+                        baseline = BaselineConfiguration.objects.get(id=baseline_id, organization__isnull=True)
+                    else:
+                        if hasattr(request, 'organization') and request.organization:
+                            baseline = BaselineConfiguration.objects.get(id=baseline_id, organization=request.organization)
+                        else:
+                            return JsonResponse({'error': 'Baseline not found'}, status=404)
+                except BaselineConfiguration.DoesNotExist:
+                    return JsonResponse({'error': 'Baseline not found'}, status=404)
+                
+                baseline_name = baseline.name
+                baseline.delete()
+                
+                # Log action
+                ip_address = get_client_ip(request)
+                log_audit_action(request.user, 'delete', 'baseline', baseline_id,
+                               f'Deleted baseline {baseline_name}', ip_address, request.organization)
+                
+                return JsonResponse({'status': 'deleted', 'message': 'Baseline deleted successfully'}, status=200)
+            
+            return JsonResponse({'error': 'Invalid action'}, status=400)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+
+
+@csrf_exempt
+@require_http_methods(["GET", "POST"])
+@require_authenticated
+def baseline_compare_api(request, baseline_id):
+    """Handle baseline comparison API requests"""
+    # Get audit_id from GET params or POST body
+    if request.method == 'GET':
+        audit_id = request.GET.get('audit_id')
+        format_type = request.GET.get('format', 'json')
+    else:  # POST
+        try:
+            data = json.loads(request.body)
+            audit_id = data.get('audit_id')
+            format_type = data.get('format', 'json')
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    
+    if not audit_id:
+        return JsonResponse({'error': 'audit_id required'}, status=400)
+    
+    try:
+        # Filter by organization
+        if hasattr(request, 'user_role') and request.user_role == 'super_admin':
+            return JsonResponse({'error': 'Super Admin cannot access individual audits'}, status=403)
+        
+        if hasattr(request, 'organization') and request.organization:
+            audit = Audit.objects.get(id=int(audit_id), organization=request.organization)
+            # Allow platform baselines or org baselines
+            baseline = BaselineConfiguration.objects.get(
+                Q(id=baseline_id) & (Q(organization__isnull=True) | Q(organization=request.organization))
+            )
+        else:
+            return JsonResponse({'error': 'No organization found'}, status=403)
+    except Audit.DoesNotExist:
+        return JsonResponse({'error': 'Audit not found'}, status=404)
+    except BaselineConfiguration.DoesNotExist:
+        return JsonResponse({'error': 'Baseline not found'}, status=404)
+    
+    if format_type == 'html':
+        # Generate HTML comparison report
+        report_html = generate_comparison_report(int(audit_id), baseline_id, format='html')
+        if isinstance(report_html, dict) and 'error' in report_html:
+            return JsonResponse(report_html, status=500)
+        response = HttpResponse(report_html, content_type='text/html')
+        response['Content-Disposition'] = f'attachment; filename="baseline_comparison_{baseline_id}_{audit_id}.html"'
+        return response
+    else:
+        # Return JSON comparison
+        comparison = compare_audit_to_baseline(int(audit_id), baseline_id)
+        return JsonResponse(comparison, status=200)
+
+
+@require_http_methods(["GET"])
+@require_authenticated
+def baseline_document_api(request, baseline_id):
+    """Generate baseline document"""
+    format_type = request.GET.get('format', 'html')
+    
+    try:
+        # Super admin can only access platform baselines
+        if hasattr(request, 'user_role') and request.user_role == 'super_admin':
+            baseline = BaselineConfiguration.objects.get(id=baseline_id, organization__isnull=True)
+        else:
+            # Regular users can access platform baselines OR their org baselines
+            if hasattr(request, 'organization') and request.organization:
+                baseline = BaselineConfiguration.objects.get(
+                    Q(id=baseline_id) & (Q(organization__isnull=True) | Q(organization=request.organization))
+                )
+            else:
+                return JsonResponse({'error': 'Baseline not found'}, status=404)
+    except BaselineConfiguration.DoesNotExist:
+        return JsonResponse({'error': 'Baseline not found'}, status=404)
+    
+    document = generate_baseline_document(baseline_id, format=format_type)
+    
+    if not document:
+        return JsonResponse({'error': 'Failed to generate document'}, status=500)
+    
+    if format_type == 'html':
+        response = HttpResponse(document, content_type='text/html')
+        response['Content-Disposition'] = f'attachment; filename="baseline_{baseline.name}_{baseline_id}.html"'
+        return response
+    elif format_type == 'json':
+        return JsonResponse(json.loads(document), status=200)
+    else:
+        response = HttpResponse(document, content_type='text/plain')
+        response['Content-Disposition'] = f'attachment; filename="baseline_{baseline.name}_{baseline_id}.txt"'
+        return response
+
+
+@require_http_methods(["GET"])
+@require_authenticated
+def baseline_template_api(request, baseline_id):
+    """Get baseline template configuration"""
+    try:
+        # Super admin can only access platform baselines
+        if hasattr(request, 'user_role') and request.user_role == 'super_admin':
+            baseline = BaselineConfiguration.objects.get(id=baseline_id, organization__isnull=True)
+        else:
+            # Regular users can access platform baselines OR their org baselines
+            if hasattr(request, 'organization') and request.organization:
+                baseline = BaselineConfiguration.objects.get(
+                    Q(id=baseline_id) & (Q(organization__isnull=True) | Q(organization=request.organization))
+                )
+            else:
+                return JsonResponse({'error': 'Baseline not found'}, status=404)
+    except BaselineConfiguration.DoesNotExist:
+        return JsonResponse({'error': 'Baseline not found'}, status=404)
+    
+    template = generate_baseline_template(baseline_id)
+    
+    if not template:
+        # Return stored template if available
+        if baseline.template_config:
+            template = baseline.template_config
+        else:
+            return JsonResponse({'error': 'No template available'}, status=404)
+    
+    return JsonResponse({'template': template, 'baseline_id': baseline_id, 'baseline_name': baseline.name}, status=200)
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+@require_authenticated
+def baseline_copy_api(request, baseline_id):
+    """Copy a baseline (platform or org) to create a new organization baseline"""
+    from django.forms.models import model_to_dict
+    
+    # Super admin cannot copy baselines (they manage platform baselines)
+    if hasattr(request, 'user_role') and request.user_role == 'super_admin':
+        return JsonResponse({'error': 'Super Admin cannot copy baselines'}, status=403)
+    
+    if not hasattr(request, 'organization') or not request.organization:
+        return JsonResponse({'error': 'No organization found'}, status=403)
+    
+    try:
+        data = json.loads(request.body)
+        new_name = data.get('name', '')  # Optional custom name
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    
+    try:
+        # Get source baseline (can be platform or org baseline)
+        source_baseline = BaselineConfiguration.objects.get(
+            Q(id=baseline_id) & (Q(organization__isnull=True) | Q(organization=request.organization))
+        )
+    except BaselineConfiguration.DoesNotExist:
+        return JsonResponse({'error': 'Source baseline not found'}, status=404)
+    
+    # Generate new name if not provided
+    if not new_name:
+        if source_baseline.is_platform_baseline():
+            new_name = f"{source_baseline.name} (Copy)"
+        else:
+            new_name = f"{source_baseline.name} (Copy)"
+    
+    # Check if name already exists for this organization
+    if BaselineConfiguration.objects.filter(name=new_name, organization=request.organization).exists():
+        return JsonResponse({'error': 'A baseline with this name already exists in your organization'}, status=400)
+    
+    # Create new baseline as a copy
+    new_baseline = BaselineConfiguration.objects.create(
+        name=new_name,
+        description=source_baseline.description or '',
+        vendor=source_baseline.vendor,
+        device_type=source_baseline.device_type,
+        compliance_frameworks=source_baseline.compliance_frameworks or '',
+        rule_ids=source_baseline.rule_ids.copy() if source_baseline.rule_ids else [],
+        template_config=source_baseline.template_config or '',
+        organization=request.organization
+    )
+    
+    # Log action
+    ip_address = get_client_ip(request)
+    log_audit_action(request.user, 'create', 'baseline', new_baseline.id,
+                   f'Copied baseline {source_baseline.name} to {new_name}', ip_address, request.organization)
+    
+    baseline_dict = model_to_dict(new_baseline)
+    baseline_dict['rule_count'] = new_baseline.get_rule_count()
+    baseline_dict['frameworks_list'] = new_baseline.get_frameworks_list()
+    baseline_dict['is_platform'] = new_baseline.is_platform_baseline()
+    baseline_dict['organization_name'] = new_baseline.organization.name
+    
+    return JsonResponse(baseline_dict, status=201)

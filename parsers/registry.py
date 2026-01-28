@@ -37,6 +37,24 @@ def _register_default_parsers():
         register_parser('juniper', JuniperParser)
     except ImportError:
         pass
+    
+    try:
+        from parsers.fortinet.parser import FortinetParser
+        register_parser('fortinet', FortinetParser)
+    except ImportError:
+        pass
+    
+    try:
+        from parsers.huawei.parser import HuaweiParser
+        register_parser('huawei', HuaweiParser)
+    except ImportError:
+        pass
+    
+    try:
+        from parsers.sophos.parser import SophosParser
+        register_parser('sophos', SophosParser)
+    except ImportError:
+        pass
 
 _register_default_parsers()
 

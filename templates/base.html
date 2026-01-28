@@ -128,6 +128,10 @@
                     <i class="fas fa-server w-5"></i>
                     <span>Assets</span>
                 </a>
+                <a href="{% url 'baselines_page' %}" class="flex items-center space-x-3 px-4 py-2 rounded hover:bg-gray-800 transition-colors">
+                    <i class="fas fa-shield-alt w-5"></i>
+                    <span>Baselines</span>
+                </a>
                 <a href="{% url 'help_page' %}" class="flex items-center space-x-3 px-4 py-2 rounded hover:bg-gray-800 transition-colors">
                     <i class="fas fa-question-circle w-5"></i>
                     <span>Help</span>
@@ -151,10 +155,11 @@
             <button id="userInfoButton" class="w-full p-4 hover:bg-gray-800 transition-colors text-left" aria-label="User menu">
                 <div class="text-sm text-gray-400">Logged in as</div>
                 <div class="font-medium">{{ user.username }}</div>
-                {% if user.userprofile.organization %}
-                <div class="text-xs text-gray-500 mt-1">{{ user.userprofile.organization.name }}</div>
-                {% elif user.userprofile.is_super_admin %}
+                {% if user.userprofile.is_super_admin %}
                 <div class="text-xs text-blue-400 mt-1">Super Admin</div>
+                {% elif user.userprofile.organization %}
+                <div class="text-xs text-gray-500 mt-1">{{ user.userprofile.organization.name }}</div>
+                <div class="text-xs text-gray-400 mt-0.5">{{ user.userprofile.get_role_display }}</div>
                 {% endif %}
                 <i class="fas fa-chevron-up absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xs transition-transform" id="userDropdownIcon"></i>
             </button>

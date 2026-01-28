@@ -164,7 +164,7 @@ LOGGING = {
         },
         'django.request': {
             'handlers': ['file', 'console'],
-            'level': 'WARNING',  # Only show warnings and errors for requests
+            'level': 'INFO',  # Show INFO level logs to track user actions
             'propagate': False,
         },
         'django.server': {

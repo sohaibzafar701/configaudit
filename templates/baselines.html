@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block title %}Baseline Configurations - NCRT{% endblock %}
+
+{% block breadcrumb_current %}Baseline Configurations{% endblock %}
+
+{% block content %}
+<section class="bg-white rounded-lg shadow p-6 mb-6">
+    <div class="mb-6">
+        <h2 class="text-2xl font-bold mb-2">Baseline Configuration Management</h2>
+        <p class="text-gray-600">Define and manage security baseline configurations based on international standards and security best practices.</p>
+    </div>
+    
+    <div class="mb-6">
+        <div class="flex justify-between items-center mb-4">
+            <div>
+                <h3 class="text-xl font-semibold">Baseline Configurations</h3>
+                <p class="text-sm text-gray-600 mt-1">
+                    Showing <span id="baselineCount" class="font-semibold">0</span> baseline(s)
+                </p>
+            </div>
+            <button onclick="showCreateBaselineModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                <i class="fas fa-plus mr-2"></i>Create Baseline
+            </button>
+        </div>
+        
+        <!-- Filters -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+            <div>
+                <label for="filterVendor" class="block text-sm font-medium text-gray-700 mb-1">Vendor</label>
+                <select id="filterVendor" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="">All Vendors</option>
+                    <option value="cisco">Cisco</option>
+                    <option value="juniper">Juniper</option>
+                    <option value="fortinet">Fortinet</option>
+                    <option value="huawei">Huawei</option>
+                    <option value="sophos">Sophos</option>
+                </select>
+            </div>
+            <div>
+                <label for="filterDeviceType" class="block text-sm font-medium text-gray-700 mb-1">Device Type</label>
+                <select id="filterDeviceType" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="">All Types</option>
+                    <option value="router">Router</option>
+                    <option value="switch">Switch</option>
+                    <option value="firewall">Firewall</option>
+                </select>
+            </div>
+            <div>
+                <label for="filterFramework" class="block text-sm font-medium text-gray-700 mb-1">Compliance Framework</label>
+                <select id="filterFramework" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="">All Frameworks</option>
+                    <option value="ISO27001">ISO 27001</option>
+                    <option value="NIST">NIST</option>
+                    <option value="PCI-DSS">PCI-DSS</option>
+                    <option value="CIS">CIS</option>
+                </select>
+            </div>
+            <div>
+                <label for="searchBaseline" class="block text-sm font-medium text-gray-700 mb-1">Search</label>
+                <input type="text" id="searchBaseline" placeholder="Search baselines..." class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+        </div>
+    </div>
+    
+    <div id="baselinesList" class="space-y-4">
+        <p class="text-gray-500">Loading baselines...</p>
+    </div>
+</section>
+
+<!-- Create/Edit Baseline Modal -->
+<div id="baselineModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+    <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold" id="modalTitle">Create Baseline</h3>
+                <button onclick="closeBaselineModal()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <form id="baselineForm">
+                <input type="hidden" id="baselineId">
+                
+                <div class="mb-4">
+                    <label for="baselineName" class="block text-sm font-medium text-gray-700 mb-1">Name *</label>
+                    <input type="text" id="baselineName" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                
+                <div class="mb-4">
+                    <label for="baselineDescription" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <textarea id="baselineDescription" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="baselineVendor" class="block text-sm font-medium text-gray-700 mb-1">Vendor</label>
+                        <select id="baselineVendor" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Select Vendor</option>
+                            <option value="cisco">Cisco</option>
+                            <option value="juniper">Juniper</option>
+                            <option value="fortinet">Fortinet</option>
+                            <option value="huawei">Huawei</option>
+                            <option value="sophos">Sophos</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="baselineDeviceType" class="block text-sm font-medium text-gray-700 mb-1">Device Type</label>
+                        <select id="baselineDeviceType" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Select Type</option>
+                            <option value="router">Router</option>
+                            <option value="switch">Switch</option>
+                            <option value="firewall">Firewall</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label for="baselineFrameworks" class="block text-sm font-medium text-gray-700 mb-1">Compliance Frameworks (comma-separated)</label>
+                    <input type="text" id="baselineFrameworks" placeholder="ISO27001,NIST,PCI-DSS" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                
+                <div class="mb-4">
+                    <label for="baselineRules" class="block text-sm font-medium text-gray-700 mb-1">Select Rules</label>
+                    <div class="border border-gray-300 rounded-lg p-4 max-h-60 overflow-y-auto">
+                        <div id="rulesCheckboxes" class="space-y-2">
+                            <p class="text-gray-500">Loading rules...</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label for="baselineTemplate" class="block text-sm font-medium text-gray-700 mb-1">Template Configuration (Optional)</label>
+                    <textarea id="baselineTemplate" rows="6" placeholder="Example configuration template..." class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"></textarea>
+                </div>
+                
+                <div class="flex justify-end gap-2">
+                    <button type="button" onclick="closeBaselineModal()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="/static/js/baselines.js"></script>
+{% endblock %}

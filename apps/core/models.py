@@ -2,7 +2,7 @@
 Django models for NCRT
 """
 from django.db import models
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from django.contrib.auth.models import User
 from django.utils import timezone
@@ -10,6 +10,9 @@ from datetime import timedelta
 import json
 import uuid
 import random
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class Organization(models.Model):
@@ -54,23 +57,54 @@ class Organization(models.Model):
     
     def copy_platform_rules(self):
         """Copy all platform rules to this organization"""
-        platform_rules = Rule.objects.filter(organization__isnull=True)
-        for rule in platform_rules:
-            Rule.objects.create(
-                name=rule.name,
-                description=rule.description,
-                rule_type=rule.rule_type,
-                category=rule.category,
-                severity=rule.severity,
-                yaml_content=rule.yaml_content,
-                tags=rule.tags,
-                enabled=rule.enabled,
-                remediation_template=rule.remediation_template,
-                compliance_frameworks=rule.compliance_frameworks,
-                framework_mappings=rule.framework_mappings,
-                risk_weight=rule.risk_weight,
-                organization=self
+        try:
+            platform_rules = Rule.objects.filter(organization__isnull=True)
+            copied_count = 0
+            error_count = 0
+            
+            for rule in platform_rules:
+                try:
+                    Rule.objects.create(
+                        name=rule.name,
+                        description=rule.description,
+                        rule_type=rule.rule_type,
+                        category=rule.category,
+                        severity=rule.severity,
+                        yaml_content=rule.yaml_content,
+                        tags=rule.tags,
+                        enabled=rule.enabled,
+                        remediation_template=rule.remediation_template,
+                        compliance_frameworks=rule.compliance_frameworks,
+                        framework_mappings=rule.framework_mappings,
+                        risk_weight=rule.risk_weight,
+                        organization=self
+                    )
+                    copied_count += 1
+                except Exception as e:
+                    error_count += 1
+                    logger.error(
+                        f"Error copying rule '{rule.name}' to organization '{self.name}' (ID: {self.id}): {str(e)}",
+                        exc_info=True
+                    )
+            
+            if copied_count > 0:
+                logger.info(
+                    f"Successfully copied {copied_count} platform rules to organization '{self.name}' (ID: {self.id})"
+                )
+            if error_count > 0:
+                logger.warning(
+                    f"Failed to copy {error_count} rules to organization '{self.name}' (ID: {self.id})"
+                )
+            if copied_count == 0 and error_count == 0:
+                logger.info(
+                    f"No platform rules found to copy to organization '{self.name}' (ID: {self.id})"
+                )
+        except Exception as e:
+            logger.error(
+                f"Critical error copying platform rules to organization '{self.name}' (ID: {self.id}): {str(e)}",
+                exc_info=True
             )
+            raise
 
 
 class UserProfile(models.Model):
@@ -203,6 +237,56 @@ class Rule(models.Model):
             self.compliance_frameworks = ','.join(frameworks_list)
         else:
             self.compliance_frameworks = frameworks_list or ''
+
+
+class BaselineConfiguration(models.Model):
+    """Baseline configuration model for defining security baselines"""
+    
+    name = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)
+    vendor = models.CharField(max_length=100, blank=True, null=True)  # cisco, juniper, fortinet, huawei, sophos, etc.
+    device_type = models.CharField(max_length=100, blank=True, null=True)  # router, switch, firewall
+    compliance_frameworks = models.CharField(max_length=500, blank=True, null=True)  # comma-separated: PCI-DSS,ISO27001,NIST
+    rule_ids = models.JSONField(default=list, blank=True)  # List of rule IDs that define this baseline
+    template_config = models.TextField(blank=True, null=True)  # Example/template configuration
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, blank=True, null=True, related_name='baselines')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['name']
+        verbose_name = 'Baseline Configuration'
+        verbose_name_plural = 'Baseline Configurations'
+    
+    def __str__(self):
+        return self.name
+    
+    def is_platform_baseline(self):
+        """Check if this is a platform baseline"""
+        return self.organization is None
+    
+    def get_frameworks_list(self):
+        """Get compliance frameworks as a list"""
+        if not self.compliance_frameworks:
+            return []
+        return [f.strip() for f in self.compliance_frameworks.split(',') if f.strip()]
+    
+    def set_frameworks_list(self, frameworks_list):
+        """Set compliance frameworks from a list"""
+        if isinstance(frameworks_list, list):
+            self.compliance_frameworks = ','.join(frameworks_list)
+        else:
+            self.compliance_frameworks = frameworks_list or ''
+    
+    def get_rules(self):
+        """Get Rule objects for this baseline"""
+        if not self.rule_ids:
+            return Rule.objects.none()
+        return Rule.objects.filter(id__in=self.rule_ids, enabled=True)
+    
+    def get_rule_count(self):
+        """Get number of rules in this baseline"""
+        return len(self.rule_ids) if self.rule_ids else 0
 
 
 class Audit(models.Model):
@@ -451,4 +535,116 @@ class AuditLog(models.Model):
 def copy_platform_rules_to_organization(sender, instance, created, **kwargs):
     """Copy all platform rules to new organization"""
     if created:
-        instance.copy_platform_rules()
+        try:
+            logger.info(f"Signal triggered: Copying platform rules to new organization '{instance.name}' (ID: {instance.id})")
+            instance.copy_platform_rules()
+        except Exception as e:
+            logger.error(
+                f"Error in signal handler when copying rules to organization '{instance.name}' (ID: {instance.id}): {str(e)}",
+                exc_info=True
+            )
+            # Don't re-raise - we don't want to prevent organization creation if rule copying fails
+
+
+def update_platform_baselines_on_rule_change(rule):
+    """
+    Update platform baselines when a platform rule changes.
+    Only updates baselines that might include this rule based on vendor tags or compliance frameworks.
+    """
+    # Only process platform rules
+    if rule.organization is not None:
+        return
+    
+    # Skip if rule is disabled (will be removed from baselines)
+    if not rule.enabled:
+        return
+    
+    try:
+        from django.db.models import Q
+        
+        # Get vendor from rule tags
+        vendor = None
+        if rule.tags:
+            tags_lower = rule.tags.lower()
+            for v in ['cisco', 'juniper', 'fortinet', 'huawei', 'sophos']:
+                if v in tags_lower:
+                    vendor = v
+                    break
+        
+        # Get compliance frameworks from rule
+        frameworks = []
+        if rule.compliance_frameworks:
+            frameworks = [f.strip() for f in rule.compliance_frameworks.split(',') if f.strip()]
+        
+        # Find platform baselines that might include this rule
+        # Match by vendor or compliance framework
+        baseline_query = BaselineConfiguration.objects.filter(organization__isnull=True)
+        
+        matching_baselines = []
+        if vendor:
+            matching_baselines.extend(baseline_query.filter(vendor=vendor))
+        if frameworks:
+            for framework in frameworks:
+                matching_baselines.extend(baseline_query.filter(compliance_frameworks__icontains=framework))
+        
+        # Remove duplicates
+        matching_baselines = list(set(matching_baselines))
+        
+        if not matching_baselines:
+            return
+        
+        # Recalculate rule_ids for each matching baseline
+        for baseline in matching_baselines:
+            try:
+                rule_ids = []
+                
+                # Get rules by vendor if baseline has vendor
+                if baseline.vendor:
+                    vendor_rules = Rule.objects.filter(
+                        enabled=True,
+                        organization__isnull=True,
+                        tags__icontains=baseline.vendor.lower()
+                    )
+                    rule_ids.extend(vendor_rules.values_list('id', flat=True))
+                
+                # Get rules by compliance frameworks
+                if baseline.compliance_frameworks:
+                    baseline_frameworks = baseline.get_frameworks_list()
+                    for framework in baseline_frameworks:
+                        framework_rules = Rule.objects.filter(
+                            enabled=True,
+                            organization__isnull=True,
+                            compliance_frameworks__icontains=framework
+                        )
+                        rule_ids.extend(framework_rules.values_list('id', flat=True))
+                
+                # Remove duplicates and convert to list
+                rule_ids = list(set(rule_ids))
+                
+                # Update baseline if rule_ids changed
+                if set(baseline.rule_ids or []) != set(rule_ids):
+                    baseline.rule_ids = rule_ids
+                    baseline.save(update_fields=['rule_ids'])
+                    logger.info(f"Updated platform baseline '{baseline.name}' with {len(rule_ids)} rules")
+                    
+            except Exception as e:
+                logger.error(f"Error updating baseline '{baseline.name}': {str(e)}", exc_info=True)
+                
+    except Exception as e:
+        logger.error(f"Error in update_platform_baselines_on_rule_change: {str(e)}", exc_info=True)
+
+
+@receiver(post_save, sender=Rule)
+def rule_saved_handler(sender, instance, created, **kwargs):
+    """Update platform baselines when a platform rule is saved"""
+    # Only update if this is a platform rule
+    if instance.organization is None:
+        update_platform_baselines_on_rule_change(instance)
+
+
+@receiver(post_delete, sender=Rule)
+def rule_deleted_handler(sender, instance, **kwargs):
+    """Update platform baselines when a platform rule is deleted"""
+    # Only update if this was a platform rule
+    if instance.organization is None:
+        update_platform_baselines_on_rule_change(instance)
